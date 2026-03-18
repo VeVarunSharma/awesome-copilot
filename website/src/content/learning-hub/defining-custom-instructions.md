@@ -3,7 +3,7 @@ title: 'Defining Custom Instructions'
 description: 'Learn how to create persistent, context-aware instructions that guide GitHub Copilot automatically across your codebase.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2025-12-02
+lastUpdated: 2026-03-18
 estimatedReadingTime: '8 minutes'
 tags:
   - instructions
@@ -100,13 +100,20 @@ export function UserProfile({ userId, onUpdate }: UserProfileProps) {
 
 ## Scoping Instructions Effectively
 
-The `applyTo` field determines which files receive the instruction's guidance.
+The `applyTo` field determines which files receive the instruction's guidance. It accepts either a **comma-separated string** or a **YAML array** — both formats are equivalent.
 
 ### Common Scoping Patterns
 
-**All TypeScript files**:
+**All TypeScript files (string format)**:
 ```yaml
 applyTo: '**/*.ts, **/*.tsx'
+```
+
+**All TypeScript files (array format)**:
+```yaml
+applyTo:
+  - '**/*.ts'
+  - '**/*.tsx'
 ```
 
 **Specific directory**:

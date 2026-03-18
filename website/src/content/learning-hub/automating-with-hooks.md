@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-18
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -90,13 +90,47 @@ Hooks can trigger on several lifecycle events:
 | `sessionStart` | Agent session begins or resumes | Initialize environments, log session starts, validate project state |
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
 | `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
-| `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
+| `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve, deny, or ask for user confirmation** before tool executions; block dangerous commands; enforce security policies |
 | `postToolUse` | After a tool completes execution | Log results, track usage, format code after edits, send failure alerts |
 | `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
+| `subagentStart` | A subagent is spawned by the main agent | Inject context into a subagent's prompt, log subagent launches, enforce access policies per subagent |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
+| `preCompact` | Before context compaction starts | Save work-in-progress state, log compaction events, run lightweight checkpoints |
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
 
-> **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
+> **Key insight**: The `preToolUse` hook is the most powerful — it can **approve, deny, or ask for user confirmation** for individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring explicit approval before sensitive file operations.
+
+### User Confirmation in preToolUse
+
+Hooks can return an `ask` decision to pause execution and prompt the user for approval before a tool runs. This is useful for operations that require human judgment — for example, destructive commands, network requests, or writes to sensitive directories.
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": "./scripts/sensitive-op-check.sh",
+        "cwd": ".",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
+```
+
+Your script signals its decision by writing a JSON object to stdout:
+
+```json
+{ "decision": "ask", "reason": "This command will delete files. Please confirm." }
+```
+
+| Decision | Meaning |
+|----------|---------|
+| `"allow"` (or exit 0 with no output) | Tool execution proceeds |
+| `"deny"` (or exit non-zero) | Tool execution is blocked |
+| `"ask"` | User is prompted to approve or deny before proceeding |
 
 ### Event Configuration
 
@@ -281,6 +315,62 @@ Send a Slack or Teams notification when an agent session completes:
 }
 ```
 
+### Checkpoint Before Context Compaction
+
+Run a lightweight save or log before the CLI compacts context (useful for long sessions):
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "preCompact": [
+      {
+        "type": "command",
+        "bash": "./scripts/save-checkpoint.sh",
+        "cwd": ".",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
+```
+
+### Inject Context into a Subagent
+
+Use `subagentStart` to append additional instructions when the main agent spawns a helper subagent:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "subagentStart": [
+      {
+        "type": "command",
+        "bash": "echo '{\"additionalContext\": \"Always follow security-first coding practices.\"}'",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+## Disabling All Hooks
+
+To temporarily disable all hooks from a configuration file (useful for debugging or one-off sessions), add the `disableAllHooks` flag at the top level of your hooks.json:
+
+```json
+{
+  "version": 1,
+  "disableAllHooks": true,
+  "hooks": {
+    "postToolUse": [...]
+  }
+}
+```
+
+When `disableAllHooks` is `true`, no hooks in that file will fire, even if they are defined. Remove the flag (or set it to `false`) to re-enable hooks.
+
 ## Writing Hook Scripts
 
 For complex logic, use bundled scripts instead of inline bash commands:
@@ -313,6 +403,21 @@ echo "Pre-commit checks passed ✅"
 - Make scripts executable: `chmod +x scripts/pre-commit-check.sh`
 - Test scripts manually before adding them to hooks.json
 - Use reasonable timeouts—formatting a large codebase may need 30+ seconds
+
+## Cross-Platform Compatibility
+
+Hook configuration files work across GitHub Copilot CLI, VS Code, and Claude Code without modification. The CLI accepts **both camelCase and PascalCase** event names, so you can use whichever convention your toolchain prefers:
+
+| camelCase | PascalCase |
+|-----------|------------|
+| `preToolUse` | `PreToolUse` |
+| `postToolUse` | `PostToolUse` |
+| `sessionStart` | `SessionStart` |
+| `agentStop` | `AgentStop` |
+| `subagentStart` | `SubagentStart` |
+| `preCompact` | `PreCompact` |
+
+The CLI also supports Claude Code's nested `matcher/hooks` structure and an optional `type` field alongside the flat structure shown in the examples above. This means a single `hooks.json` can be shared across all three tools.
 
 ## Best Practices
 
