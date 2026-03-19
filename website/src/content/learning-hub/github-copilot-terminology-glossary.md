@@ -246,3 +246,31 @@ tools: ['codebase', 'terminalCommand', 'github']
 ---
 
 **Have a term you'd like to see added?** Contributions are welcome! See our [Contributing Guidelines](https://github.com/github/awesome-copilot/blob/main/CONTRIBUTING.md) for how to suggest additions to this glossary.
+
+---
+
+### Copilot Space
+
+A named, shareable knowledge base that bundles repositories, files, issues, and custom instructions to ground Copilot responses in your team's actual code and documentation. Spaces are loaded explicitly in a conversation, making them ideal for cross-repo or team-level context that complements per-repo instruction files.
+
+**Example**: A "Security Standards" Space that attaches your internal security policies, compliance checklists, and relevant code examples — so any team member can ask security questions and get answers grounded in your actual standards.
+
+**When to use**: When you want to share a curated, reusable context package across teammates and projects — for onboarding, domain Q&A, or encoding repeatable workflows.
+
+**Learn more**: [Using Copilot Spaces](../using-copilot-spaces/)
+
+**Related terms**: [Instruction](#instruction), [Agent](#agent)
+
+---
+
+### Copilot SDK
+
+A set of language-specific libraries (TypeScript/Node.js, Python, Go, .NET) that let you embed the GitHub Copilot agentic engine in your own applications. The SDK manages session lifecycle, tool invocation, streaming, and communication with the CLI server — so you can build AI-powered apps without implementing your own orchestration layer.
+
+**Example**: A CLI tool that uses the Copilot SDK to analyze pull request diffs and post code review comments, leveraging the same AI models that power GitHub Copilot.
+
+**When to use**: When you want to build a custom application that leverages Copilot's reasoning capabilities — internal tools, domain-specific assistants, or automation scripts that go beyond what agents and skills support.
+
+**Learn more**: [Building with the GitHub Copilot SDK](../building-with-copilot-sdk/)
+
+**Related terms**: [Agent](#agent), [MCP](#mcp-model-context-protocol)
