@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-20
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -190,6 +190,7 @@ MCP server SDKs are available in [Python](https://github.com/modelcontextprotoco
 
 ## Best Practices
 
+- **Validate against a registry**: As of v1.0.8, you can enable the experimental `MCP_ALLOWLIST` feature flag to validate MCP servers against a configured registry of approved servers. This helps enterprise teams ensure only vetted servers are used.
 - **Principle of least privilege**: Only give MCP servers the minimum access they need. Use read-only database connections for analysis agents.
 - **Keep secrets out of config files**: Use `${input:variableName}` for API keys and connection strings, or load from environment variables.
 - **Document your servers**: Add comments or a README explaining which MCP servers your project uses and why.

@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-20
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -234,6 +234,17 @@ Also, add a test for the Retry-After header value.
 ```
 
 The agent will read your feedback, make changes, and push new commits to the same PR.
+
+### Using the /pr Command (Copilot CLI)
+
+If you use the [GitHub Copilot CLI](https://github.com/github/copilot-cli), the `/pr` command provides an interactive way to manage the entire PR lifecycle from your terminal:
+
+- **Create PRs** from the current branch with a generated title and description
+- **Fix CI failures** — `/pr` can read failing CI logs and open new commits to fix them
+- **Address review feedback** — paste review comments and let the agent resolve them automatically
+- **Resolve merge conflicts** — `/pr` can merge the base branch and resolve conflicts for you
+
+To use it, open Copilot in your terminal and type `/pr`. This is complementary to the cloud-based coding agent — use the coding agent for autonomous issue-to-PR workflows, and `/pr` for interactive PR iteration from your local machine.
 
 ## Agent Skills and the Coding Agent
 
