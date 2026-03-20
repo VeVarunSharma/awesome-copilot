@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-20
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -93,7 +93,9 @@ Hooks can trigger on several lifecycle events:
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
 | `postToolUse` | After a tool completes execution | Log results, track usage, format code after edits, send failure alerts |
 | `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
+| `subagentStart` | A subagent is spawned by the task tool | Inject additional context into subagent prompts, log subagent creation, enforce subagent policies |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
+| `preCompact` | Before context compaction starts | Archive context for audit logs, notify team of large sessions, save in-progress summaries |
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
@@ -281,6 +283,50 @@ Send a Slack or Teams notification when an agent session completes:
 }
 ```
 
+### Context Compaction Guard (preCompact)
+
+Run a script before context compaction to archive the current session state or notify teammates:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "preCompact": [
+      {
+        "type": "command",
+        "bash": "./scripts/archive-session.sh",
+        "cwd": ".",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
+```
+
+The `preCompact` hook is useful in long sessions where you want to preserve a snapshot of the in-progress work before the model compresses history.
+
+### Inject Context into Subagents (subagentStart)
+
+Inject additional instructions whenever the task tool spawns a new subagent:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "subagentStart": [
+      {
+        "type": "command",
+        "bash": "echo \"Always follow our security standards at .github/SECURITY.md\"",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+The `subagentStart` hook fires when a subagent is spawned and can inject additional context into the subagent's initial prompt — useful for enforcing team standards across all agents in a session.
+
 ## Writing Hook Scripts
 
 For complex logic, use bundled scripts instead of inline bash commands:
@@ -327,7 +373,12 @@ echo "Pre-commit checks passed ✅"
 
 **Q: Where do I put hooks configuration files?**
 
-A: Place them in the `.github/hooks/` directory in your repository (e.g., `.github/hooks/my-hook.json`). You can have multiple hook files — all are loaded automatically. This makes hooks available to all team members.
+A: You have two options:
+
+1. **Repository hooks**: Place JSON files in the `.github/hooks/` directory (e.g., `.github/hooks/my-hook.json`). All files in this directory are loaded automatically and are shared with all team members.
+2. **Personal / machine-level hooks**: As of v1.0.8, you can also define hooks directly in `settings.json`, `settings.local.json`, or `config.json`. This lets you set up personal hooks without modifying the repository.
+
+Hook configuration files work across VS Code, Claude Code, and the CLI without modification — PascalCase event names are accepted alongside camelCase.
 
 **Q: Can hooks access the user's prompt text?**
 
