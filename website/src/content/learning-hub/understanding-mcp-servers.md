@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-21
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -195,6 +195,28 @@ MCP server SDKs are available in [Python](https://github.com/modelcontextprotoco
 - **Document your servers**: Add comments or a README explaining which MCP servers your project uses and why.
 - **Version control carefully**: Commit `.vscode/mcp.json` for shared server configurations, but use `.gitignore` for any files containing credentials.
 - **Test server connectivity**: Verify MCP servers start correctly before relying on them in agent workflows.
+- **Use registry validation**: When running in environments where server provenance matters, enable the experimental `MCP_ALLOWLIST` feature flag to validate configured MCP servers against approved registries before allowing them to run.
+
+## MCP Server Registry Validation (Experimental)
+
+GitHub Copilot CLI v1.0.8 introduced an experimental feature for validating MCP servers against configured registries. When the `MCP_ALLOWLIST` feature flag is enabled, the CLI checks each configured MCP server against a list of approved sources before starting it.
+
+This is particularly useful in team or enterprise environments where you want to ensure only vetted MCP servers are used:
+
+```json
+{
+  "servers": {
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"]
+    }
+  }
+}
+```
+
+With `MCP_ALLOWLIST` enabled, the CLI validates that `@modelcontextprotocol/server-postgres` matches an entry in your configured registry before running it. Servers not in the allowlist are blocked with a clear error message.
+
+> **Note**: This feature is experimental and the configuration API may change. Refer to the [Copilot CLI changelog](https://github.com/github/copilot-cli/releases) for the latest details as the feature stabilises.
 
 ## Common Questions
 
