@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-21
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -95,6 +95,7 @@ Hooks can trigger on several lifecycle events:
 | `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
+| `preCompact` | Before the agent compacts its context window | Save state, archive the full context, or log before compression |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
 
@@ -327,7 +328,13 @@ echo "Pre-commit checks passed ✅"
 
 **Q: Where do I put hooks configuration files?**
 
-A: Place them in the `.github/hooks/` directory in your repository (e.g., `.github/hooks/my-hook.json`). You can have multiple hook files — all are loaded automatically. This makes hooks available to all team members.
+A: Hooks can be defined in several places depending on the scope you need:
+
+- **Repository hooks**: Place JSON files in the `.github/hooks/` directory (e.g., `.github/hooks/my-hook.json`). Multiple files are all loaded automatically and shared with all team members.
+- **User-level hooks**: Define hooks in your personal `settings.json` or `settings.local.json` to apply them across all your projects.
+- **Global config hooks**: You can also define hooks in `config.json` for machine-wide application.
+
+The `version` field in hooks config files is optional and can be omitted.
 
 **Q: Can hooks access the user's prompt text?**
 
