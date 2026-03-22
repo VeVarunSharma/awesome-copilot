@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-22
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -327,7 +327,13 @@ echo "Pre-commit checks passed ✅"
 
 **Q: Where do I put hooks configuration files?**
 
-A: Place them in the `.github/hooks/` directory in your repository (e.g., `.github/hooks/my-hook.json`). You can have multiple hook files — all are loaded automatically. This makes hooks available to all team members.
+A: Hooks can be defined in several places depending on your use case:
+
+- **Repository hooks** (shared with the team): Place JSON files in `.github/hooks/` in your repository (e.g., `.github/hooks/my-hook.json`). All files in this directory are loaded automatically.
+- **User-level hooks** (apply to all your sessions): Add a `hooks` key to your Copilot CLI `settings.json` or `settings.local.json` user config file.
+- **Session config**: You can also define hooks in `config.json` for session-specific overrides.
+
+Repository hooks are the recommended approach for team-wide automation — they're version-controlled and shared automatically.
 
 **Q: Can hooks access the user's prompt text?**
 
