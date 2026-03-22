@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2025-11-28
+lastUpdated: 2026-03-22
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -335,14 +335,20 @@ Settings: File → Settings → Tools → GitHub Copilot
 
 ### GitHub Copilot CLI
 
-Configuration file: `~/.copilot-cli/config.json`
+Configuration file: `~/.copilot/settings.json` (or `settings.local.json` for local-only overrides)
 
 ```json
 {
-  "editor": "vim",
-  "suggestions": true
+  "includeCoAuthoredBy": true,
+  "effortLevel": "medium",
+  "autoUpdatesChannel": "stable",
+  "statusLine": true
 }
 ```
+
+> **Note (v1.0.10+)**: CLI config settings use **camelCase** names (`includeCoAuthoredBy`, `effortLevel`, `autoUpdatesChannel`, `statusLine`). The older snake_case names still work for backwards compatibility, but camelCase is now preferred.
+
+You can also set `include_gitignored: true` to include gitignored files in `@` file search completions — useful when you need to reference build artifacts or locally excluded files during a session.
 
 ## Common Questions
 
