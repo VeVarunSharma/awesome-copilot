@@ -3,8 +3,8 @@ title: 'GitHub Copilot Terminology Glossary'
 description: 'A quick reference guide defining common GitHub Copilot and platform-specific terms.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2025-12-15
-estimatedReadingTime: '8 minutes'
+lastUpdated: 2026-03-23
+estimatedReadingTime: '9 minutes'
 tags:
   - glossary
   - terminology
@@ -183,11 +183,11 @@ A standardized protocol for connecting AI assistants like GitHub Copilot to exte
 
 ### Hook
 
-A shell command or script that runs automatically in response to lifecycle events during a Copilot agent session. Hooks are stored as JSON files in `.github/hooks/` and can trigger on events like session start/end, prompt submission, before/after tool use, and when errors occur. They provide deterministic automation—linting, formatting, governance scanning—that doesn't depend on the AI remembering to do it.
+A shell command or script that runs automatically in response to lifecycle events during a Copilot agent session. Hooks are stored as JSON files in `.github/hooks/` (repository-level, shared with the team) or defined in `settings.json` / `settings.local.json` (user-level, personal). They can trigger on events like session start/end, prompt submission, before/after tool use, and when errors occur. They provide deterministic automation—linting, formatting, governance scanning—that doesn't depend on the AI remembering to do it.
 
 **Example**: A `postToolUse` hook that runs Prettier after the agent edits files, or a `preToolUse` hook that blocks dangerous shell commands.
 
-**When to use**: For deterministic automation that must happen reliably, like formatting code, running linters, or auditing prompts for compliance.
+**When to use**: For deterministic automation that must happen reliably, like formatting code, running linters, or auditing prompts for compliance. Use `.github/hooks/` for team-shared hooks and `settings.json` for personal hooks.
 
 **Learn more**: [Automating with Hooks](../automating-with-hooks/)
 
@@ -242,6 +242,18 @@ tools: ['codebase', 'terminalCommand', 'github']
 ```
 
 **Related terms**: [MCP](#mcp-model-context-protocol), [Built-in Tool](#built-in-tool), [Agent](#agent)
+
+---
+
+### /undo
+
+A Copilot CLI slash command that reverses the last turn in a session, restoring any file changes the agent made during that turn. This is useful when an agent's response produced unwanted edits and you want a clean slate without manually reverting each file.
+
+**Example**: If an agent reformatted your entire codebase when you only wanted one function changed, `/undo` reverts all those edits and removes the turn from session history.
+
+**When to use**: During interactive Copilot CLI sessions when you want to roll back the most recent agent action and try a different approach.
+
+**Related terms**: [Coding Agent](#coding-agent), [Agent](#agent)
 
 ---
 

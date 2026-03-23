@@ -3,8 +3,8 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
-estimatedReadingTime: '8 minutes'
+lastUpdated: 2026-03-23
+estimatedReadingTime: '9 minutes'
 tags:
   - hooks
   - automation
@@ -28,7 +28,7 @@ Hooks are shell commands or scripts that run automatically in response to lifecy
 - Hooks run as shell commands on the user's machine
 - They execute synchronously—the agent waits for them to complete
 - They can block actions (e.g., prevent commits that fail linting)
-- They're defined in JSON files stored at `.github/hooks/*.json` in your repository
+- They can be defined at the repository level (`.github/hooks/*.json`) or at the user level (`settings.json`)
 - They receive detailed context via JSON input, enabling context-aware automation
 - They can include bundled scripts for complex logic
 
@@ -45,7 +45,52 @@ Hooks are shell commands or scripts that run automatically in response to lifecy
 
 Hooks are ideal for **deterministic automation** that must happen reliably—things you don't want to depend on the AI remembering to do.
 
-## Anatomy of a Hook
+## Where to Define Hooks
+
+Hooks can be configured at two levels, giving you flexibility between team-shared and personal automation:
+
+| Location | Scope | When to Use |
+|----------|-------|-------------|
+| `.github/hooks/*.json` | Repository (all team members) | Shared standards: linting, formatting, governance |
+| `settings.json` / `settings.local.json` | User (personal, not committed) | Personal preferences: notifications, custom logging |
+| `config.json` | User (global config) | Machine-wide hooks applied to all sessions |
+
+### Repository-Level Hooks (`.github/hooks/`)
+
+Place JSON files in `.github/hooks/` to share hooks with everyone who works on the repository. All files in this directory are loaded automatically — no additional registration required.
+
+```
+.github/
+└── hooks/
+    ├── format-on-edit.json
+    └── governance-audit.json
+```
+
+This is the recommended approach for team standards like code formatting, security scanning, and compliance checks.
+
+### User-Level Hooks (`settings.json`)
+
+You can also define hooks in your personal settings files to apply automation across all your Copilot sessions without committing anything to a repository. This is useful for personal workflows, notifications, or custom tooling that the rest of your team doesn't need.
+
+Add a `hooks` key directly in your `settings.json` or `settings.local.json`:
+
+```json
+{
+  "hooks": {
+    "sessionEnd": [
+      {
+        "type": "command",
+        "bash": "notify-send 'Copilot session ended'",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+> **Tip**: Use `settings.local.json` for machine-specific hooks (e.g., paths that differ between computers) and keep it in `.gitignore` to avoid accidentally committing personal settings.
+
+
 
 Each hook in this repository is a folder containing:
 
@@ -327,7 +372,12 @@ echo "Pre-commit checks passed ✅"
 
 **Q: Where do I put hooks configuration files?**
 
-A: Place them in the `.github/hooks/` directory in your repository (e.g., `.github/hooks/my-hook.json`). You can have multiple hook files — all are loaded automatically. This makes hooks available to all team members.
+A: You have two options depending on the scope you want:
+
+- **Repository-level** (shared with the team): Place them in the `.github/hooks/` directory (e.g., `.github/hooks/my-hook.json`). You can have multiple files — all are loaded automatically.
+- **User-level** (personal, not committed): Define a `hooks` key in your `settings.json`, `settings.local.json`, or `config.json`. These hooks apply to all your Copilot sessions regardless of the repository.
+
+See the [Where to Define Hooks](#where-to-define-hooks) section for details.
 
 **Q: Can hooks access the user's prompt text?**
 
