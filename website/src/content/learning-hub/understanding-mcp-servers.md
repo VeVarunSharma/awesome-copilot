@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-24
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -61,7 +61,17 @@ GitHub Copilot provides several **built-in tools** that are always available:
 
 ## Configuring MCP Servers
 
-MCP servers are configured per-workspace in `.vscode/mcp.json`:
+MCP servers are configured per-workspace. Copilot CLI and VS Code both support multiple configuration file locations:
+
+| File | Scope |
+|------|-------|
+| `.vscode/mcp.json` | VS Code workspace (committed to repo) |
+| `.mcp.json` | Project root (Copilot CLI and VS Code) |
+| `devcontainer.json` | Dev container environments |
+
+> **Folder trust**: Workspace MCP servers from `.mcp.json`, `.vscode/mcp.json`, and `devcontainer.json` are only loaded after the folder is trusted. This protects you from malicious server configurations in untrusted repositories.
+
+Example `.vscode/mcp.json`:
 
 ```json
 {
@@ -187,6 +197,20 @@ If your team has internal tools or proprietary APIs, you can build custom MCP se
 | **Prompts** | Pre-built conversation templates | Common troubleshooting flows |
 
 MCP server SDKs are available in [Python](https://github.com/modelcontextprotocol/python-sdk), [TypeScript](https://github.com/modelcontextprotocol/typescript-sdk), and other languages. Browse the [Agents Directory](../../agents/) for examples of agents built around MCP server expertise.
+
+## Organization Policy and MCP Servers
+
+GitHub organization administrators can control which third-party MCP servers users can connect to. If your organization has an MCP server allowlist policy:
+
+- **Blocked servers** will trigger a warning when Copilot CLI starts: _"MCP server 'X' is blocked by your organization's policy."_
+- **Allowlisted servers** work normally with no extra steps
+- **Policy enforcement** applies to all users in the organization, regardless of client (CLI or VS Code)
+
+If you see a policy warning, contact your GitHub organization administrator to request that a specific server be added to the allowlist.
+
+### OAuth Authentication
+
+Some MCP servers (such as the Atlassian Rovo MCP Server) require OAuth authentication using Dynamic Client Registration. Copilot CLI supports this flow, including servers that host their authorization metadata at non-standard URLs. If prompted to authenticate, follow the OAuth flow in your browser and Copilot CLI will automatically store the resulting tokens.
 
 ## Best Practices
 
