@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-24
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -97,6 +97,14 @@ Hooks can trigger on several lifecycle events:
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
+
+### sessionStart and additionalContext
+
+When you include an `additionalContext` field in a `sessionStart` hook response, that content is automatically injected into the conversation at the start of the session. This lets your hook script provide dynamic context — for example, the current git branch, environment name, or project status — without requiring the user to copy-paste it manually.
+
+### Hook Merging Across Extensions
+
+If you use multiple VS Code extensions that each contribute their own hooks (in addition to your repository's `hooks.json`), **all hooks are merged** rather than one set overwriting the other. This means extension hooks and your project-level hooks work together seamlessly — you don't need to worry about extension hooks silently replacing your team's configuration.
 
 ### Event Configuration
 

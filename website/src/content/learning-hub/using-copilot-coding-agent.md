@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-24
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -267,7 +267,7 @@ Skills are stored in a `skills/` subdirectory, with each skill in its own folder
 
 **Personal skills** (shared across all your projects):
 ```
-~/.copilot/
+~/.agents/
 └── skills/
     └── code-review-checklist/
         └── SKILL.md
@@ -333,6 +333,32 @@ This repository provides a curated collection of agents, skills, and hooks desig
 4. The hooks will run automatically during coding agent sessions
 
 > **Example workflow**: Combine a `test-specialist` agent with a `database-migrations` skill and a linting hook. Assign an issue to the coding agent using the test-specialist agent — it will automatically pick up the migrations skill when relevant, and the hook ensures all code is formatted before completion.
+
+## Monorepo Support
+
+Custom instructions, MCP servers, skills, and agents are discovered at **every directory level** from the current working directory up to the git root. This enables full monorepo support without any additional configuration.
+
+For example, in a monorepo with this structure:
+
+```
+my-monorepo/
+├── .github/
+│   ├── agents/           # Root-level agents available to all packages
+│   └── skills/           # Root-level skills available to all packages
+├── packages/
+│   ├── frontend/
+│   │   └── .github/
+│   │       └── agents/   # Frontend-specific agents
+│   └── backend/
+│       └── .github/
+│           └── agents/   # Backend-specific agents
+```
+
+When the coding agent works in `packages/frontend/`, it loads agents and skills from both `packages/frontend/.github/agents/` and the root `.github/agents/`. This means you can:
+
+- Share common agents (e.g., a security reviewer) at the root level
+- Add package-specific agents in each package's `.github/` directory
+- Mix and match — root-level agents and package-level agents both apply automatically
 
 ## Hooks and the Coding Agent
 

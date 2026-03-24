@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2025-11-28
+lastUpdated: 2026-03-24
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -335,14 +335,19 @@ Settings: File → Settings → Tools → GitHub Copilot
 
 ### GitHub Copilot CLI
 
-Configuration file: `~/.copilot-cli/config.json`
+The Copilot CLI stores its configuration in `~/.copilot-cli/config.json`. Settings use **camelCase** naming:
 
 ```json
 {
   "editor": "vim",
-  "suggestions": true
+  "includeCoAuthoredBy": true,
+  "effortLevel": "medium",
+  "autoUpdatesChannel": "stable",
+  "statusLine": { "enabled": true }
 }
 ```
+
+> **Note**: Config settings were renamed to camelCase in v1.0.10 (March 2026). Previous snake_case names (e.g., `include_co_authored_by`) still work as aliases for backward compatibility.
 
 ## Common Questions
 
