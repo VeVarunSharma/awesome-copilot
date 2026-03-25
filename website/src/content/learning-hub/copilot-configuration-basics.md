@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2025-11-28
+lastUpdated: 2026-03-25
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -282,6 +282,29 @@ Add error handling to the selected code:
 - Provide meaningful error messages
 - Follow our error handling patterns from @error-utils.ts
 ```
+
+### Monorepo Support
+
+As of Copilot CLI v1.0.11, custom instructions, MCP servers, skills, and agents are discovered at **every directory level** from the working directory up to the git root. This means monorepos are fully supported — you can place configurations at different nesting levels and Copilot will discover all of them automatically.
+
+For example, in a monorepo:
+
+```
+my-monorepo/
+├── .github/
+│   └── instructions/                # Repo-wide instructions
+│       └── global-standards.instructions.md
+├── packages/
+│   └── api/
+│       └── .github/
+│           └── instructions/        # Package-specific instructions
+│               └── api-patterns.instructions.md
+│       └── .github/
+│           └── agents/              # Package-specific agents
+│               └── api-expert.agent.md
+```
+
+When you work from within `packages/api/`, Copilot discovers both the package-level configurations and the repo-wide instructions automatically.
 
 ### 4. Version Control Best Practices
 

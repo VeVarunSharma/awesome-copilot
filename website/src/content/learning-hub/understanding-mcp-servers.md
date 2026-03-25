@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-25
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -195,6 +195,16 @@ MCP server SDKs are available in [Python](https://github.com/modelcontextprotoco
 - **Document your servers**: Add comments or a README explaining which MCP servers your project uses and why.
 - **Version control carefully**: Commit `.vscode/mcp.json` for shared server configurations, but use `.gitignore` for any files containing credentials.
 - **Test server connectivity**: Verify MCP servers start correctly before relying on them in agent workflows.
+
+## Organization Policy Enforcement
+
+As of Copilot CLI v1.0.11, organization policy for third-party MCP servers is enforced for all users. If your organization has an MCP server allowlist configured, connecting to servers not on the list will show a warning and the connection will be blocked. This helps organizations maintain control over what external services their Copilot workflows can interact with.
+
+If you see a warning like "MCP server blocked by policy", contact your organization administrator to have the server added to the allowlist.
+
+## Folder Trust and MCP Servers
+
+Workspace MCP servers (from `.mcp.json`, `.vscode/mcp.json`, and `devcontainer.json`) are loaded **only after folder trust is confirmed**. This security measure ensures that MCP servers defined in untrusted repositories cannot run automatically. When you open a workspace for the first time, Copilot will prompt for trust before activating any MCP server configurations.
 
 ## Common Questions
 

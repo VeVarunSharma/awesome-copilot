@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-25
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -28,7 +28,7 @@ Hooks are shell commands or scripts that run automatically in response to lifecy
 - Hooks run as shell commands on the user's machine
 - They execute synchronously—the agent waits for them to complete
 - They can block actions (e.g., prevent commits that fail linting)
-- They're defined in JSON files stored at `.github/hooks/*.json` in your repository
+- They're defined in JSON files stored at `.github/hooks/*.json` in your repository, or in `settings.json`, `settings.local.json`, or `config.json` for user-level configuration
 - They receive detailed context via JSON input, enabling context-aware automation
 - They can include bundled scripts for complex logic
 
@@ -87,7 +87,7 @@ Hooks can trigger on several lifecycle events:
 
 | Event | When It Fires | Common Use Cases |
 |-------|---------------|------------------|
-| `sessionStart` | Agent session begins or resumes | Initialize environments, log session starts, validate project state |
+| `sessionStart` | Agent session begins or resumes | Initialize environments, log session starts, validate project state; the `additionalContext` field in the response is injected into the conversation |
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
 | `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
@@ -95,6 +95,8 @@ Hooks can trigger on several lifecycle events:
 | `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
+
+> **New in v1.0.11**: The `sessionStart` hook's `additionalContext` field is now injected directly into the conversation. This allows session-start hooks to provide dynamic context (e.g., environment details, project state) that the agent can reference throughout the session.
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
 
@@ -327,7 +329,9 @@ echo "Pre-commit checks passed ✅"
 
 **Q: Where do I put hooks configuration files?**
 
-A: Place them in the `.github/hooks/` directory in your repository (e.g., `.github/hooks/my-hook.json`). You can have multiple hook files — all are loaded automatically. This makes hooks available to all team members.
+A: Place them in the `.github/hooks/` directory in your repository (e.g., `.github/hooks/my-hook.json`). You can have multiple hook files — all are loaded automatically. You can also define hooks in your user-level `settings.json`, `settings.local.json`, or `config.json` for hooks that should apply across all your projects regardless of repository. This makes hooks available to all team members when stored in the repository.
+
+> **Note**: When using multiple extensions, hooks from all extensions are merged together rather than overwriting each other (Copilot CLI v1.0.11+).
 
 **Q: Can hooks access the user's prompt text?**
 
