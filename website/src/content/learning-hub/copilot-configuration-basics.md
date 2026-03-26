@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2025-11-28
+lastUpdated: 2026-03-26
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -169,6 +169,8 @@ A well-organized Copilot configuration directory looks like this:
     ├── typescript-conventions.instructions.md
     └── api-design.instructions.md
 ```
+
+> **Monorepo support (v1.0.11+)**: Custom agents, skills, instructions, and MCP servers are discovered at every directory level from your current working directory up to the git root. This means you can place `.github/agents/`, `.github/skills/`, and `.github/instructions/` in subdirectories of a monorepo (e.g., `packages/api/.github/`) and Copilot will automatically load them when you are working in or below that directory.
 
 ### Custom Agents
 
@@ -343,6 +345,12 @@ Configuration file: `~/.copilot-cli/config.json`
   "suggestions": true
 }
 ```
+
+**Session commands**: As of v1.0.11, the CLI distinguishes between two session commands:
+- `/new` — starts a fresh conversation while keeping the current session backgrounded (you can resume it later)
+- `/clear` — abandons the current session entirely and starts a new one
+
+Both commands accept an optional prompt to begin the new session with an initial message (e.g., `/new Fix the failing tests`).
 
 ## Common Questions
 

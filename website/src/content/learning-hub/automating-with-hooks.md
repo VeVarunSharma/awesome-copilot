@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-26
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -87,7 +87,7 @@ Hooks can trigger on several lifecycle events:
 
 | Event | When It Fires | Common Use Cases |
 |-------|---------------|------------------|
-| `sessionStart` | Agent session begins or resumes | Initialize environments, log session starts, validate project state |
+| `sessionStart` | Agent session begins or resumes | Initialize environments, log session starts, inject context, validate project state |
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
 | `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
@@ -97,6 +97,10 @@ Hooks can trigger on several lifecycle events:
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
+
+> **New in v1.0.11**: The `sessionStart` hook now supports an `additionalContext` field. Any text returned via `additionalContext` in the hook's output is automatically injected into the conversation at session start, allowing hooks to prime the agent with environment state, project metadata, or dynamic context before the first user message.
+
+> **Extension hooks**: When multiple VS Code extensions each define hooks (via their own `hooks.json`), those hooks now **merge** rather than overwriting each other. This means you can safely use multiple extensions that contribute hooks without losing any hook registrations.
 
 ### Event Configuration
 
