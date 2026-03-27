@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-27
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -92,11 +92,15 @@ Hooks can trigger on several lifecycle events:
 | `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
 | `postToolUse` | After a tool completes execution | Log results, track usage, format code after edits, send failure alerts |
+| `preCompact` | Before context compaction starts | Save current state, trigger summary generation, notify team |
 | `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
+| `subagentStart` | A subagent is spawned | Inject additional context into the subagent's prompt, set up subagent environment |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
+
+> **New in v1.0.7+**: The `subagentStart` hook supports an `additionalContext` field that injects extra context directly into the subagent's initial prompt — useful for passing project-specific metadata or instructions to spawned agents. The `sessionStart` hook also supports `additionalContext` injection (v1.0.11+).
 
 ### Event Configuration
 
@@ -327,7 +331,13 @@ echo "Pre-commit checks passed ✅"
 
 **Q: Where do I put hooks configuration files?**
 
-A: Place them in the `.github/hooks/` directory in your repository (e.g., `.github/hooks/my-hook.json`). You can have multiple hook files — all are loaded automatically. This makes hooks available to all team members.
+A: Hooks can be configured in several places:
+
+- **Repository hooks**: `.github/hooks/*.json` — shared with all team members, version-controlled
+- **Settings files**: `settings.json`, `settings.local.json`, or `config.json` — useful for personal hooks or machine-specific automation
+- **Extension hooks**: Extensions (VS Code, Claude Code) can contribute their own hooks, and hooks from multiple extensions are automatically merged together
+
+Repository hooks (`.github/hooks/`) are the recommended approach for team-wide automation. Note that hooks are discovered at every directory level from the working directory up to the git root, which means they work correctly in monorepos.
 
 **Q: Can hooks access the user's prompt text?**
 

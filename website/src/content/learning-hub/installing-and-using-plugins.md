@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-27
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -189,6 +189,15 @@ When you install a plugin, its components become available to Copilot CLI automa
 - **Agents** appear in your agent selection (use with `/agent` or the agents dropdown)
 - **Skills** are loaded automatically when relevant to your current task
 - **Hooks** run at the configured lifecycle events during agent sessions
+
+Plugin hooks receive special environment variables that you can use in hook scripts:
+
+| Variable | Description |
+|----------|-------------|
+| `CLAUDE_PROJECT_DIR` | The current project directory where the CLI is running |
+| `CLAUDE_PLUGIN_DATA` | The plugin's data directory for storing persistent plugin state |
+
+Hook configurations also support template variables `{{project_dir}}` and `{{plugin_data_dir}}` as alternatives to the environment variables above.
 - **MCP servers** extend the tools available to agents
 
 You don't need to do any additional configuration after installing — the plugin's components integrate seamlessly into your workflow.
