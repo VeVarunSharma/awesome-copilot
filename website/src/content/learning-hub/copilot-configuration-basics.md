@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2025-11-28
+lastUpdated: 2026-03-27
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -343,6 +343,10 @@ Configuration file: `~/.copilot-cli/config.json`
   "suggestions": true
 }
 ```
+
+The CLI also reads `.claude/settings.json` and `.claude/settings.local.json` in your repository as additional configuration sources. This allows you to define CLI-specific settings (including hooks) alongside your other repository configuration without affecting team members using other editors.
+
+> **Monorepo tip**: Custom instructions, MCP servers, skills, agents, and hooks are discovered at every directory level from your current working directory up to the git root. This means each sub-package in a monorepo can have its own configuration that applies only when you're working in that directory.
 
 ## Common Questions
 

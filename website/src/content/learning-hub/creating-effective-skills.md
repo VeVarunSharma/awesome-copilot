@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-27
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -360,6 +360,10 @@ A: Yes! Skills are folders, not single files. You can bundle reference documents
 **Q: How do I share skills with my team?**
 
 A: Store skill folders in your repository's `.github/skills/` directory. They're automatically available to all team members with Copilot access when working in that repository.
+
+Skills are discovered at every directory level from the working directory up to the git root, which means **monorepos are fully supported** — skills in a subdirectory's `.github/skills/` folder are available when working in that subdirectory.
+
+For personal skills (not tied to any repository), place skill folders in `~/.agents/skills/`. These are available across all projects on your machine and align with the VS Code GitHub Copilot for Azure extension's default skill discovery path.
 
 **Q: Can agents chain multiple skills?**
 
