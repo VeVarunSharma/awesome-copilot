@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-28
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -61,7 +61,17 @@ GitHub Copilot provides several **built-in tools** that are always available:
 
 ## Configuring MCP Servers
 
-MCP servers are configured per-workspace in `.vscode/mcp.json`:
+MCP servers can be configured in multiple locations. Copilot CLI loads servers from all of these (after folder trust is confirmed):
+
+| Config File | Scope |
+|-------------|-------|
+| `.mcp.json` | Repository root (git root) |
+| `.vscode/mcp.json` | VS Code workspace |
+| `devcontainer.json` | Dev container definitions |
+
+The recommended starting point is `.mcp.json` at the repository root — this works for all Copilot CLI and VS Code users and is the most portable format.
+
+**Example `.mcp.json`**:
 
 ```json
 {
@@ -167,6 +177,8 @@ current data distribution.
 ```
 
 Without the MCP server, the agent would have to guess at database structure and performance characteristics. With it, the agent works with real data.
+
+**MCP Sampling (LLM inference)**: MCP servers can now request LLM inference from the model — known as *sampling* — with the user's approval. This enables more advanced MCP servers to reason and generate responses themselves using the connected AI model. When a server requests sampling, Copilot displays a review prompt so you can approve or deny the request before it proceeds.
 
 ## Finding MCP Servers
 

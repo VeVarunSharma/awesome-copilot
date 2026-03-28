@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-28
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -93,10 +93,21 @@ Hooks can trigger on several lifecycle events:
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
 | `postToolUse` | After a tool completes execution | Log results, track usage, format code after edits, send failure alerts |
 | `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
+| `subagentStart` | A subagent is spawned by the main agent | Inject additional context into the subagent's prompt, log subagent activity |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
+
+### Hook Configuration Sources
+
+In addition to `.github/hooks/*.json`, hooks can be defined in:
+
+- **`.claude/settings.json`** — repository-level Copilot CLI settings (checked into version control)
+- **`.claude/settings.local.json`** — local overrides not committed to the repo
+- **`config.json`** — user-level CLI configuration
+
+Hook event names are accepted in both camelCase (`postToolUse`) and PascalCase (`PostToolUse`) formats, providing compatibility across VS Code, Claude Code, and the CLI without modification.
 
 ### Event Configuration
 
@@ -327,7 +338,7 @@ echo "Pre-commit checks passed ✅"
 
 **Q: Where do I put hooks configuration files?**
 
-A: Place them in the `.github/hooks/` directory in your repository (e.g., `.github/hooks/my-hook.json`). You can have multiple hook files — all are loaded automatically. This makes hooks available to all team members.
+A: Place them in the `.github/hooks/` directory in your repository (e.g., `.github/hooks/my-hook.json`). You can have multiple hook files — all are loaded automatically. Hooks can also be defined directly in `.claude/settings.json`, `.claude/settings.local.json`, or the user-level `config.json`. This makes hooks available to all team members.
 
 **Q: Can hooks access the user's prompt text?**
 

@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2025-11-28
+lastUpdated: 2026-03-28
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -169,6 +169,16 @@ A well-organized Copilot configuration directory looks like this:
     ├── typescript-conventions.instructions.md
     └── api-design.instructions.md
 ```
+
+Copilot CLI also reads additional configuration from:
+
+```
+.claude/
+├── settings.json        # Repository-level CLI settings (commit to version control)
+└── settings.local.json  # Local overrides (add to .gitignore)
+```
+
+These files support hooks, config settings, and other CLI-specific options that complement `.github/` customizations. See the [hooks documentation](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/use-hooks) for examples.
 
 ### Custom Agents
 

@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-28
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -234,6 +234,10 @@ Also, add a test for the Retry-After header value.
 ```
 
 The agent will read your feedback, make changes, and push new commits to the same PR.
+
+### Undoing Changes
+
+If you want to roll back the agent's most recent turn and revert its file changes, use `/undo` in the session. This removes the last turn from the conversation history and reverts any file edits made in that turn — useful when the agent takes an approach you want to redirect.
 
 ## Agent Skills and the Coding Agent
 
