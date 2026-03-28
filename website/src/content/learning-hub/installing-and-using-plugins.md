@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-28
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -192,6 +192,33 @@ When you install a plugin, its components become available to Copilot CLI automa
 - **MCP servers** extend the tools available to agents
 
 You don't need to do any additional configuration after installing — the plugin's components integrate seamlessly into your workflow.
+
+### Plugin Hook Environment Variables
+
+Hooks bundled in plugins receive two additional environment variables at runtime:
+
+| Variable | Value |
+|----------|-------|
+| `CLAUDE_PROJECT_DIR` | Absolute path to the user's project directory |
+| `CLAUDE_PLUGIN_DATA` | Path to the plugin's persistent data directory |
+
+Plugin `hooks.json` files can also use template variables in command strings:
+
+```json
+{
+  "hooks": {
+    "postToolUse": [
+      {
+        "type": "command",
+        "bash": "{{plugin_data_dir}}/scripts/check.sh {{project_dir}}",
+        "timeoutSec": 15
+      }
+    ]
+  }
+}
+```
+
+These template variables are replaced with the actual paths before the hook runs, making it easy to write portable hook scripts that reference plugin-bundled assets regardless of where the plugin is installed.
 
 ## Plugins from This Repository
 
