@@ -3,12 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
-estimatedReadingTime: '8 minutes'
-tags:
-  - hooks
-  - automation
-  - fundamentals
+lastUpdated: 2026-03-29
 relatedArticles:
   - ./building-custom-agents.md
   - ./what-are-agents-skills-instructions.md
@@ -280,6 +275,40 @@ Send a Slack or Teams notification when an agent session completes:
   }
 }
 ```
+
+## Plugin Hook Environment Variables
+
+When hooks are provided by an installed plugin (rather than from your repository's `.github/hooks/`), they receive additional environment variables that help them locate plugin-specific resources:
+
+| Variable | Description |
+|----------|-------------|
+| `CLAUDE_PROJECT_DIR` | The path to the current project's root directory |
+| `CLAUDE_PLUGIN_DATA` | The path to the plugin's persistent data directory (unique per plugin) |
+
+These are also available as **template variables** in the hook configuration itself, letting you reference paths without hardcoding them:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "postToolUse": [
+      {
+        "type": "command",
+        "bash": "{{plugin_data_dir}}/scripts/format.sh",
+        "cwd": "{{project_dir}}",
+        "timeoutSec": 30
+      }
+    ]
+  }
+}
+```
+
+| Template Variable | Equivalent Env Var |
+|-------------------|--------------------|
+| `{{project_dir}}` | `$CLAUDE_PROJECT_DIR` |
+| `{{plugin_data_dir}}` | `$CLAUDE_PLUGIN_DATA` |
+
+This makes plugin-provided hooks fully portable—they work correctly regardless of where the project is located on disk.
 
 ## Writing Hook Scripts
 

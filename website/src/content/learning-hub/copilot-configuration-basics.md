@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2025-11-28
+lastUpdated: 2026-03-29
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -44,6 +44,14 @@ Repository settings live in your codebase (typically in `.github/` although some
 - Custom agents for domain expertise
 
 **When to use**: For repository-wide standards, project-specific best practices, and reusable customizations that should be version-controlled and shared.
+
+> **Monorepo support**: GitHub Copilot CLI discovers configuration files (custom instructions, MCP servers, skills, and agents) at **every directory level** from your working directory up to the git root. This means each sub-package or module in a monorepo can have its own `.github/agents/`, `.github/skills/`, and `.github/instructions/` directories while still inheriting configuration from the repo root.
+
+#### Additional Configuration Sources
+
+Alongside `.github/`, the CLI also reads configuration from:
+
+- **`.claude/settings.json`** and **`.claude/settings.local.json`** — additional repository-level configuration files, useful when your team uses multiple AI coding tools that share the same settings format. `settings.local.json` is typically added to `.gitignore` for personal overrides.
 
 ### Organisation Settings (GitHub.com only)
 
