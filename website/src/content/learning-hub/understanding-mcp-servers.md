@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-03-29
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -196,6 +196,27 @@ MCP server SDKs are available in [Python](https://github.com/modelcontextprotoco
 - **Version control carefully**: Commit `.vscode/mcp.json` for shared server configurations, but use `.gitignore` for any files containing credentials.
 - **Test server connectivity**: Verify MCP servers start correctly before relying on them in agent workflows.
 
+## MCP Sampling (LLM Inference)
+
+A newer MCP capability allows MCP servers to request LLM inference—asking the AI model to generate text or reason—as part of completing their own operations. This is called **sampling**.
+
+When an MCP server requests sampling, GitHub Copilot CLI shows a **review prompt** asking the user to approve before the inference proceeds. This keeps you in control of any AI-generated data flowing through third-party MCP servers.
+
+**Why this matters**: Some advanced MCP servers use AI-assisted reasoning to interpret data, summarize results, or generate structured output. With sampling support, these servers can delegate that reasoning to Copilot's model rather than requiring their own LLM integration.
+
+> **Security note**: Approve sampling requests only from trusted MCP servers. A malicious MCP server could use sampling to exfiltrate context or manipulate model outputs.
+
+## Organization Policies for MCP Servers
+
+GitHub organizations can enforce policies that restrict which third-party MCP servers members can use. These policies apply to all users in the organization—not just administrators.
+
+When an MCP server is blocked by policy:
+- It is hidden from `/mcp show` output in the CLI
+- Attempting to invoke its tools returns a policy error
+- The restriction is transparent to the user with a clear message
+
+If you're managing Copilot for an organization, configure MCP allowlist policies in your organization settings on GitHub.com to ensure only approved MCP servers are used.
+
 ## Common Questions
 
 **Q: Do MCP servers run in the cloud?**
@@ -208,11 +229,15 @@ A: Yes. Once configured in `.vscode/mcp.json`, MCP tools are available in any Co
 
 **Q: Are MCP servers secure?**
 
-A: MCP servers run with the same permissions as your user account. Follow least-privilege principles: use read-only database connections, scope API tokens narrowly, and review server code before trusting it.
+A: MCP servers run with the same permissions as your user account. Follow least-privilege principles: use read-only database connections, scope API tokens narrowly, and review server code before trusting it. Also review sampling requests carefully—only approve LLM inference from servers you trust.
 
 **Q: How many MCP servers can I configure?**
 
 A: There's no hard limit, but each server is a running process. Configure only the servers you actively use. Most projects use 1–3 servers.
+
+**Q: What if my organization blocks an MCP server I need?**
+
+A: Contact your organization's Copilot administrator to request that the server be added to the allowlist. Alternatively, consider building an internal MCP server that wraps the external service through an approved channel.
 
 ## Next Steps
 
