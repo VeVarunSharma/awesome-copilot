@@ -3,7 +3,7 @@ title: 'Understanding Copilot Context'
 description: 'Learn how GitHub Copilot uses context from your code, workspace, and conversation to generate relevant suggestions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2025-11-28
+lastUpdated: 2026-03-30
 estimatedReadingTime: '8 minutes'
 tags:
   - context
@@ -11,6 +11,7 @@ tags:
   - how-it-works
 relatedArticles:
   - ./what-are-agents-skills-instructions.md
+  - ./using-copilot-spaces.md
 ---
 
 Context is the foundation of how GitHub Copilot generates relevant, accurate suggestions. Understanding what Copilot "sees" and how it uses that information helps you write better prompts, get higher-quality completions, and work more effectively with AI assistance. This article explains the types of context Copilot uses and how to optimize your development environment for better results.
@@ -140,6 +141,8 @@ Maximize GitHub Copilot's effectiveness by providing clear, relevant context:
 
 **Provide examples in prompts**: When asking Copilot to generate code, include examples of your existing patterns and conventions.
 
+**Use Copilot Spaces**: Spaces let you pre-load curated project knowledge—documentation, architecture files, and custom instructions—shared across your whole team. Referencing a Space gives Copilot accurate, project-specific context without requiring you to manually open the right files. See [Using Copilot Spaces](../using-copilot-spaces/) for details.
+
 ## Common Questions
 
 **Q: Does Copilot see my entire repository?**
@@ -157,6 +160,7 @@ A: Yes, you have several ways to control context:
 - Use `#` mentions to explicitly reference specific files, symbols or functions
 - Configure `.gitignore` to exclude files from workspace context
 - Use instructions and skills to provide persistent context for specific scenarios
+- Load a **Copilot Space** to bring curated, team-managed knowledge into your conversation
 
 **Q: Does closing a file remove it from context?**
 
@@ -167,6 +171,7 @@ A: Yes, closing a file can remove it from Copilot's active context. However, fil
 Now that you understand how context works in GitHub Copilot, explore these related topics:
 
 - **[What are Agents, Skills, and Instructions](../what-are-agents-skills-instructions/)** - Learn about customization types that provide persistent context
+- **[Using Copilot Spaces](../using-copilot-spaces/)** - Load curated, team-shared knowledge bases into your conversations
 - **[Copilot Configuration Basics](../copilot-configuration-basics/)** - Configure settings to optimize context usage
 - **[Creating Effective Skills](../creating-effective-skills/)** - Use context effectively in your skills
 - **Common Pitfalls and Solutions** _(coming soon)_ - Avoid context-related mistakes
