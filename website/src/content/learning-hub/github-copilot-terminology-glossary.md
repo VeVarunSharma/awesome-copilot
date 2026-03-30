@@ -3,7 +3,7 @@ title: 'GitHub Copilot Terminology Glossary'
 description: 'A quick reference guide defining common GitHub Copilot and platform-specific terms.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2025-12-15
+lastUpdated: 2026-03-30
 estimatedReadingTime: '8 minutes'
 tags:
   - glossary
@@ -210,6 +210,38 @@ The autonomous GitHub Copilot agent that works on issues in a cloud environment 
 **Learn more**: [Using the Copilot Coding Agent](../using-copilot-coding-agent/)
 
 **Related terms**: [Agent](#agent), [Hook](#hook)
+
+---
+
+### Copilot SDK
+
+A multi-language SDK (Node.js/TypeScript, Python, Go, .NET) that exposes the GitHub Copilot agent runtime as a programmable API. The SDK lets developers embed Copilot's agentic capabilities—planning, tool invocation, file editing, streaming responses, and MCP server connections—directly into their own applications without building orchestration from scratch.
+
+**When to use**: When you need to embed AI agent behavior in a custom application, create automated pipelines, or build developer tools powered by Copilot.
+
+**Learn more**: [copilot-sdk plugin](../../plugins/?q=copilot-sdk)
+
+**Related terms**: [Agent](#agent), [MCP](#mcp-model-context-protocol)
+
+---
+
+### Copilot Space
+
+A named, shared collection of context resources (GitHub files, issues, repositories, and free text) that grounds Copilot conversations in project-specific knowledge. Spaces are created and managed on GitHub.com and can be owned by individual users or organizations. When a Space is loaded into a conversation, Copilot uses its curated content—documentation, code context, and custom instructions—instead of relying on generic context.
+
+**Key characteristics**:
+- Shared with teams via user or org-level ownership
+- Auto-updates as referenced repositories change
+- Can contain workflow instructions that Copilot follows step by step
+- Accessible via the GitHub MCP server or `gh api`
+
+**When to use**: For providing consistent, curated project knowledge to a whole team; onboarding new developers; or defining reusable workflow templates.
+
+**Learn more**: [Using Copilot Spaces](../using-copilot-spaces/)
+
+**Related terms**: [MCP](#mcp-model-context-protocol), [Instruction](#instruction)
+
+---
 
 ---
 
