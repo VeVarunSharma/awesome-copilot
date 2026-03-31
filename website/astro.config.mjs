@@ -80,6 +80,7 @@ export default defineConfig({
             "learning-hub/automating-with-hooks",
             "learning-hub/agentic-workflows",
             "learning-hub/using-copilot-coding-agent",
+            "learning-hub/using-copilot-edits",
             "learning-hub/installing-and-using-plugins",
             "learning-hub/before-after-customization-examples",
           ],
