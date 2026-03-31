@@ -8,7 +8,9 @@ tableOfContents: false
 
 Essential concepts to tailor GitHub Copilot beyond its default experience. Start with
 [What are Agents, Skills, and Instructions](what-are-agents-skills-instructions/)
-and work through the full track to master every customization primitive.
+and work through the full track to master every customization primitive. See also
+[Using Copilot Edits for Multi-File Changes](using-copilot-edits/) to learn how to apply
+coordinated AI edits across multiple files at once.
 
 ## Reference
 

@@ -213,6 +213,24 @@ The autonomous GitHub Copilot agent that works on issues in a cloud environment 
 
 ---
 
+### Copilot Edits
+
+A multi-file editing mode in VS Code where you describe a change and Copilot applies coordinated diffs across a user-selected **working set** of files. Unlike Copilot Chat, which is conversation-oriented, Copilot Edits is edit-oriented—changes are applied directly to files and presented as diffs to review, accept, or discard.
+
+**Key characteristics**:
+- Works on a user-defined working set of files (you choose which files Copilot can edit)
+- Shows proposed changes as diffs before any file is modified
+- Supports iteration—refine and expand requests within the same session
+- Respects custom instructions and coding standards automatically
+
+**When to use**: For coordinated changes across multiple files, migrations, refactoring, or adding consistent patterns (like error handling or validation) to a set of related files.
+
+**Learn more**: [Using Copilot Edits for Multi-File Changes](../using-copilot-edits/)
+
+**Related terms**: [Coding Agent](#coding-agent), [Instruction](#instruction)
+
+---
+
 ### Plugin
 
 An installable package that extends GitHub Copilot CLI with a bundled set of agents, skills, hooks, MCP server configurations, and LSP integrations. Plugins provide a way to distribute and share custom capabilities across projects and teams, with versioning, discovery, and one-command installation via marketplaces.
