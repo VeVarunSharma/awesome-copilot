@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-02
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -88,6 +88,37 @@ MCP servers are configured per-workspace in `.vscode/mcp.json`:
 **args**: Arguments passed to the command. Most MCP servers are distributed as npm packages and can be run with `npx -y`.
 
 **env**: Environment variables passed to the server process. Use these for connection strings, API keys, and configuration—never hardcode secrets in the JSON file.
+
+### Managing Persistent MCP Server Configuration (Copilot CLI)
+
+In GitHub Copilot CLI, you can manage your MCP server configuration persistently using built-in `/mcp` sub-commands — no manual JSON editing required:
+
+```bash
+# List all configured MCP servers
+/mcp config list
+
+# Add a new server
+/mcp config add postgres --command npx --args "-y @modelcontextprotocol/server-postgres"
+
+# Update an existing server's configuration
+/mcp config update postgres --env DATABASE_URL=postgresql://...
+
+# Remove a server
+/mcp config remove postgres
+```
+
+These commands update your persistent configuration file so the server is available in every future session.
+
+### MCP OAuth Authentication
+
+Some MCP servers use OAuth to authenticate with external services. Copilot CLI provides built-in support for the OAuth flow:
+
+```bash
+# Re-authenticate or switch accounts for an OAuth MCP server
+/mcp auth <server-name>
+```
+
+In headless or CI environments where a browser cannot be opened, Copilot CLI automatically falls back to the **device code flow** (RFC 8628) — it prints a short code you enter at a URL on another device.
 
 ### Common MCP Server Configurations
 
@@ -185,6 +216,8 @@ If your team has internal tools or proprietary APIs, you can build custom MCP se
 | **Tools** | Functions the AI can invoke | `query_database`, `deploy_service` |
 | **Resources** | Data the AI can read | Database schemas, API docs |
 | **Prompts** | Pre-built conversation templates | Common troubleshooting flows |
+
+MCP servers can also **request LLM inference (sampling)** — asking Copilot to generate text as part of a server-side workflow. When an MCP server makes a sampling request, Copilot presents an approval prompt so you remain in control of what inference is triggered.
 
 MCP server SDKs are available in [Python](https://github.com/modelcontextprotocol/python-sdk), [TypeScript](https://github.com/modelcontextprotocol/typescript-sdk), and other languages. Browse the [Agents Directory](../../agents/) for examples of agents built around MCP server expertise.
 
