@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-02
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -141,6 +141,8 @@ Or from a local path:
 ```bash
 copilot plugin marketplace add /path/to/local-marketplace
 ```
+
+> **Configuration note**: If you configure extra marketplaces via the CLI settings file, use the `extraKnownMarketplaces` key. The older `marketplaces` key was removed in v1.0.16.
 
 ## Installing Plugins
 

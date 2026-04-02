@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-02
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -91,12 +91,13 @@ Hooks can trigger on several lifecycle events:
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
 | `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
-| `postToolUse` | After a tool completes execution | Log results, track usage, format code after edits, send failure alerts |
+| `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits |
+| `postToolUseFailure` | After a tool exits with an error | Send failure alerts, log errors, rollback state after failed operations |
 | `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
 
-> **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
+> **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations. Since v1.0.15, `postToolUse` only fires on **successful** tool calls; use `postToolUseFailure` to handle error cases.
 
 ### Event Configuration
 
@@ -171,6 +172,28 @@ Ensure all code is formatted after the agent edits files:
   }
 }
 ```
+
+### Alert on Tool Failure
+
+Send an alert (or log details) whenever a tool call fails:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "postToolUseFailure": [
+      {
+        "type": "command",
+        "bash": "echo \"Tool failed: $TOOL_NAME\" >> /tmp/copilot-errors.log",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+The `postToolUseFailure` hook receives the same JSON context as `postToolUse` (tool name, inputs, error details), allowing you to build targeted error-handling scripts, alerting pipelines, or rollback logic.
 
 ### Lint Check When Agent Completes
 
