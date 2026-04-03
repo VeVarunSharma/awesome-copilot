@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-03
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -368,6 +368,18 @@ A: Agents can discover and invoke multiple skills during a conversation based on
 **Q: Should skills include code examples?**
 
 A: Yes, for clarity. Show examples of desired output format, patterns to follow, or anti-patterns to avoid. For complex schemas or formats, consider bundling them as reference files rather than inline examples.
+
+**Q: Where does Copilot discover skills?**
+
+A: Copilot discovers skills from multiple locations, in order of precedence:
+
+1. **Repository skills** — `.github/skills/` in your repository (shared with the whole team)
+2. **Monorepo support** — every directory level from your working directory up to the git root is scanned, so subdirectory-specific skills are picked up automatically (v1.0.11+)
+3. **Personal skills** — `~/.agents/skills/` on your local machine (only visible to you, aligns with VS Code's Copilot extension default)
+4. **Built-in CLI skills** — the Copilot CLI ships with a set of built-in skills out of the box (v1.0.17+), so you get useful capabilities without any setup
+5. **Plugin skills** — skills bundled inside installed plugins (see [Installing and Using Plugins](../installing-and-using-plugins/))
+
+This layered discovery means you can have project-specific skills checked into the repo, personal cross-project skills in `~/.agents/skills/`, and community skills via plugins — all working together.
 
 ## Common Pitfalls to Avoid
 

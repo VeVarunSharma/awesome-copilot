@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-03
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -61,7 +61,7 @@ GitHub Copilot provides several **built-in tools** that are always available:
 
 ## Configuring MCP Servers
 
-MCP servers are configured per-workspace in `.vscode/mcp.json`:
+MCP servers are configured per-workspace in `.vscode/mcp.json` (VS Code) or `.mcp.json` (Copilot CLI). The Copilot CLI also loads workspace-level MCP servers defined in `.mcp.json` at the git root:
 
 ```json
 {
@@ -167,6 +167,46 @@ current data distribution.
 ```
 
 Without the MCP server, the agent would have to guess at database structure and performance characteristics. With it, the agent works with real data.
+
+## MCP Authentication
+
+Many MCP servers require OAuth or token-based authentication. Copilot CLI provides built-in support for several authentication patterns.
+
+### The `/mcp auth` Command
+
+Use `/mcp auth` (v1.0.15+) to authenticate with OAuth-enabled MCP servers directly from within a Copilot session:
+
+```
+/mcp auth my-server
+```
+
+This opens the OAuth flow in your browser. Once authenticated, Copilot stores the credentials and reuses them across sessions. If you use multiple accounts, `/mcp auth` also supports account switching.
+
+For **headless or CI environments** where a browser isn't available, the CLI uses the device code flow (RFC 8628) as a fallback — it prints a URL and code for you to complete authentication on another device (v1.0.15+).
+
+### Managing Persistent MCP Configuration
+
+The CLI provides server RPC commands for managing your persistent MCP server configuration programmatically (v1.0.15+):
+
+```
+/mcp config list                      # List all configured servers
+/mcp config add my-server             # Add a new server configuration
+/mcp config update my-server          # Update server settings
+/mcp config remove my-server          # Remove a server
+```
+
+These commands update your persistent configuration, so changes survive across sessions and `/mcp reload`.
+
+## MCP Sampling (LLM Inference by Servers)
+
+MCP servers can request LLM inference from the host (Copilot CLI) on your behalf — a capability called **sampling** (v1.0.13+). When an MCP server invokes sampling, Copilot displays a review prompt so you can approve or deny the request before the inference runs.
+
+This enables advanced MCP server patterns such as:
+- Servers that summarize data before returning it to the agent
+- Servers that use an LLM to parse or classify responses from external APIs
+- Autonomous pipelines where the server chains multiple LLM calls
+
+> **Security note**: Always review sampling requests carefully. A sampling-enabled MCP server is effectively requesting that Copilot run an LLM call on its behalf. Only approve requests from servers you trust.
 
 ## Finding MCP Servers
 

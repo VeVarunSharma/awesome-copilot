@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-03
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -91,12 +91,16 @@ Hooks can trigger on several lifecycle events:
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
 | `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
-| `postToolUse` | After a tool completes execution | Log results, track usage, format code after edits, send failure alerts |
+| `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits |
+| `postToolUseFailure` | After a tool call **fails** or errors | Alert on failures, log errors, trigger recovery actions |
+| `PermissionRequest` | When the agent requests permission to use a tool | Programmatically approve or deny tool permission requests |
 | `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
 
-> **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
+> **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations. The new `PermissionRequest` hook (v1.0.16) offers a complementary, higher-level way to grant or deny tool access programmatically.
+>
+> **Note**: As of v1.0.15, `postToolUse` only runs after **successful** tool calls. Use the new `postToolUseFailure` event to handle tool errors separately.
 
 ### Event Configuration
 
@@ -280,6 +284,28 @@ Send a Slack or Teams notification when an agent session completes:
   }
 }
 ```
+
+### Alert on Tool Failures
+
+Use `postToolUseFailure` to detect when a tool call errors and take action (e.g., log the failure or notify a monitoring system):
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "postToolUseFailure": [
+      {
+        "type": "command",
+        "bash": "echo \"[$(date -u)] Tool failure detected\" >> /tmp/copilot-tool-errors.log",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+> **Tip**: `postToolUse` (success) and `postToolUseFailure` (error) are complementary — use them together to cover all tool completion scenarios.
 
 ## Writing Hook Scripts
 

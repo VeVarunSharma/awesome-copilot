@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-03
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -142,6 +142,8 @@ Or from a local path:
 copilot plugin marketplace add /path/to/local-marketplace
 ```
 
+> **Note**: The `marketplaces` repository setting is deprecated as of v1.0.16. Use `extraKnownMarketplaces` instead if you configure marketplaces in your repository settings.
+
 ## Installing Plugins
 
 ### From Copilot CLI
@@ -192,6 +194,33 @@ When you install a plugin, its components become available to Copilot CLI automa
 - **MCP servers** extend the tools available to agents
 
 You don't need to do any additional configuration after installing — the plugin's components integrate seamlessly into your workflow.
+
+### Plugin Hook Environment Variables
+
+When plugin hooks run, they receive two environment variables (v1.0.12+) that help scripts locate plugin-specific resources:
+
+| Variable | Description |
+|----------|-------------|
+| `CLAUDE_PROJECT_DIR` | The current project directory (equivalent to your working directory) |
+| `CLAUDE_PLUGIN_DATA` | The plugin's persistent data directory for storing state across sessions |
+
+You can also reference these paths using template variables in your hook configuration, avoiding hard-coded paths:
+
+```json
+{
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "bash": "{{plugin_data_dir}}/setup.sh --project {{project_dir}}",
+        "timeoutSec": 15
+      }
+    ]
+  }
+}
+```
+
+This makes plugin hooks portable across different machines and project locations.
 
 ## Plugins from This Repository
 
