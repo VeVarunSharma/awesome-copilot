@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2025-11-28
+lastUpdated: 2026-04-03
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -335,14 +335,46 @@ Settings: File → Settings → Tools → GitHub Copilot
 
 ### GitHub Copilot CLI
 
-Configuration file: `~/.copilot-cli/config.json`
+Configuration file: `~/.copilot/settings.json`
 
 ```json
 {
-  "editor": "vim",
-  "suggestions": true
+  "model": "claude-sonnet-4-5",
+  "autoUpdate": true
 }
 ```
+
+The CLI also reads **repository-level settings** from `.claude/settings.json` and `.claude/settings.local.json` at the project root (v1.0.12+). These files are loaded alongside `.github/` configuration, giving you an additional place to store project-specific CLI preferences. Use `.claude/settings.local.json` for machine-specific overrides (add it to `.gitignore`).
+
+```json
+// .claude/settings.json — project-level CLI config (commit this)
+{
+  "model": "claude-opus-4-5",
+  "autoUpdate": false
+}
+```
+
+### Monorepo Support
+
+Since v1.0.11, Copilot discovers custom instructions, MCP servers, skills, and agents at **every directory level** from your current working directory up to the git root. This means you can organize a monorepo with both global and package-specific customizations:
+
+```
+my-monorepo/
+├── .github/
+│   ├── instructions/
+│   │   └── global-conventions.instructions.md   # applies everywhere
+│   └── skills/
+│       └── shared-skill/                        # available everywhere
+├── packages/
+│   └── api/
+│       └── .github/
+│           ├── instructions/
+│           │   └── api-conventions.instructions.md   # only in packages/api/
+│           └── agents/
+│               └── api-specialist.agent.md           # only in packages/api/
+```
+
+When working in `packages/api/`, Copilot loads configuration from both `packages/api/.github/` and the root `.github/`, merging them together.
 
 ## Common Questions
 
