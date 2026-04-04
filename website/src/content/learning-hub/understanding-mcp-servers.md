@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-04
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -128,6 +128,41 @@ MCP servers are configured per-workspace in `.vscode/mcp.json`:
 ```
 
 > **Security tip**: Use `${input:variableName}` for sensitive values. VS Code will prompt for these at runtime rather than storing them in the file.
+
+## Managing MCP Servers from the CLI
+
+The GitHub Copilot CLI (v1.0.15+) includes commands for managing persistent MCP server configuration without editing JSON files manually.
+
+### MCP Config Commands
+
+```bash
+# List configured MCP servers
+/mcp config list
+
+# Add a new server
+/mcp config add <name> --command <cmd> --args <args>
+
+# Update an existing server
+/mcp config update <name> --env KEY=value
+
+# Remove a server
+/mcp config remove <name>
+
+# Reload servers after changes
+/mcp reload
+```
+
+### OAuth Authentication for MCP Servers
+
+For MCP servers that require OAuth (e.g., Slack, GitHub with specific scopes), use the `/mcp auth` command:
+
+```bash
+/mcp auth <server-name>
+```
+
+This launches the OAuth flow for the specified server, stores the credentials, and supports account switching if you need to connect with different identities. The OAuth flow supports both browser-based and headless/CI environments (via device code flow, RFC 8628).
+
+> **HTTPS note**: OAuth flows now support HTTPS redirect URIs via a self-signed certificate fallback, improving compatibility with OAuth providers that require HTTPS.
 
 ## How Agents Use MCP Tools
 
