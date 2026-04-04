@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-04
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -91,12 +91,16 @@ Hooks can trigger on several lifecycle events:
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
 | `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
-| `postToolUse` | After a tool completes execution | Log results, track usage, format code after edits, send failure alerts |
+| `postToolUse` | After a tool completes successfully | Log results, track usage, format code after edits |
+| `postToolUseFailure` | After a tool fails with an error | Log failures, send alerts, track error patterns |
 | `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
+| `notification` | Asynchronously on shell completion, permission prompts, elicitation dialogs, and agent completion | Send real-time notifications to Slack/Teams, update dashboards |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
+
+> **New in v1.0.18**: When a `preToolUse` hook returns `permissionDecision: "allow"`, the tool approval prompt is automatically suppressed, letting hooks fully automate approval flows without additional user interaction.
 
 ### Event Configuration
 
@@ -216,6 +220,30 @@ Block dangerous commands before they execute:
 
 The `preToolUse` hook receives JSON input with details about the tool being called. Your script can inspect this input and exit with a non-zero code to **deny** the tool execution, or exit with zero to **approve** it.
 
+> **Tip**: To programmatically approve a tool request without showing the user an approval prompt, output `{"permissionDecision": "allow"}` from your script. This suppresses the interactive prompt entirely (requires v1.0.18+).
+
+### Programmatic Permission Control with PermissionRequest
+
+The `PermissionRequest` hook (added in v1.0.16) provides a dedicated channel for scripts to approve or deny tool permission requests — the dialogs that appear when Copilot needs elevated access:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "PermissionRequest": [
+      {
+        "type": "command",
+        "bash": "./scripts/auto-approve-safe-tools.sh",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+The hook receives JSON context describing the permission request. Your script can output `{"decision": "allow"}` or `{"decision": "deny"}` to control the outcome. This is especially useful in CI/CD or headless environments where interactive prompts aren't possible.
+
 ### Governance Audit
 
 Scan user prompts for potential security threats and log session activity:
@@ -257,6 +285,28 @@ Scan user prompts for potential security threats and log session activity:
 ```
 
 This pattern is useful for enterprise environments that need to audit AI interactions for compliance.
+
+### Real-Time Notifications with the notification Event
+
+The `notification` hook event (added in v1.0.18) fires **asynchronously** on significant moments: shell completion, permission prompts, elicitation dialogs, and agent completion. Because it's asynchronous, it never blocks the agent:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "notification": [
+      {
+        "type": "command",
+        "bash": "./scripts/notify.sh",
+        "cwd": ".",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
+```
+
+Use this for system tray notifications, pager alerts, or dashboard updates. Unlike `sessionEnd`, the `notification` event fires multiple times per session — once for each notable event.
 
 ### Notification on Session End
 
