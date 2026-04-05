@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-05
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -91,12 +91,19 @@ Hooks can trigger on several lifecycle events:
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
 | `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
-| `postToolUse` | After a tool completes execution | Log results, track usage, format code after edits, send failure alerts |
+| `postToolUse` | After a tool **successfully** completes | Log results, track usage, format code after edits |
+| `postToolUseFailure` | After a tool **fails** (non-zero exit or error) | Send failure alerts, log errors, trigger rollbacks |
 | `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
+| `notification` | Asynchronously on shell completion, permission prompts, elicitation dialogs, and agent completion | Non-blocking notifications, external alerting systems |
+| `PermissionRequest` | When the agent requests permission to execute a tool | Programmatically approve or deny permission requests via script |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
+
+> **New in v1.0.18**: Setting `permissionDecision` to `"allow"` in a `preToolUse` hook now **suppresses the interactive approval prompt**, enabling fully automated workflows that don't interrupt the agent for confirmations.
+
+> **New in v1.0.15**: `postToolUse` now fires only after **successful** tool calls. Use the new `postToolUseFailure` event to handle errors separately — this makes it much easier to distinguish success from failure in your automation scripts.
 
 ### Event Configuration
 
@@ -126,6 +133,8 @@ Each hook entry supports these fields:
 **timeoutSec**: Maximum execution time in seconds (default: 30). The hook is killed if it exceeds this limit.
 
 **env**: Additional environment variables merged with the existing environment.
+
+**additionalContext** (sessionStart only): A string injected into the agent's conversation context at the start of the session. Use this to provide runtime-determined context (e.g., project status, environment info) that instructions files can't anticipate.
 
 ### README.md
 
@@ -216,6 +225,75 @@ Block dangerous commands before they execute:
 
 The `preToolUse` hook receives JSON input with details about the tool being called. Your script can inspect this input and exit with a non-zero code to **deny** the tool execution, or exit with zero to **approve** it.
 
+### Handle Tool Failures with postToolUseFailure
+
+Since v1.0.15, `postToolUse` only fires for **successful** tool calls. Use `postToolUseFailure` to react when a tool errors:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "postToolUseFailure": [
+      {
+        "type": "command",
+        "bash": ".github/hooks/alert-on-failure.sh",
+        "cwd": ".",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
+```
+
+This separation lets you write simpler success-only post-processing in `postToolUse` and handle error recovery separately in `postToolUseFailure`.
+
+### Programmatic Permission Approval with PermissionRequest
+
+The `PermissionRequest` hook lets scripts **programmatically approve or deny** tool permission requests without interrupting the user:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "PermissionRequest": [
+      {
+        "type": "command",
+        "bash": ".github/hooks/auto-approve-safe-tools.sh",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+Your script receives context about the requested tool and can exit `0` to approve (with `permissionDecision: "allow"`) or non-zero to deny. This is powerful for CI environments where you want to auto-approve reads but block writes.
+
+### Asynchronous Notifications with notification
+
+The `notification` hook fires **asynchronously** (without blocking the agent) when shell commands complete, permission prompts appear, elicitation dialogs open, or the agent finishes:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "notification": [
+      {
+        "type": "command",
+        "bash": "curl -s -X POST \"$SLACK_WEBHOOK_URL\" -H 'Content-Type: application/json' -d \"{\\\"text\\\": \\\"Copilot event: $HOOK_EVENT_NAME\\\"}\"",
+        "cwd": ".",
+        "env": {
+          "SLACK_WEBHOOK_URL": "${input:slackWebhook}"
+        },
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
+```
+
+Unlike `sessionEnd`, the `notification` hook won't delay the agent — it's fire-and-forget, ideal for sending alerts to external systems.
+
 ### Governance Audit
 
 Scan user prompts for potential security threats and log session activity:
@@ -229,7 +307,8 @@ Scan user prompts for potential security threats and log session activity:
         "type": "command",
         "bash": ".github/hooks/governance-audit/audit-session-start.sh",
         "cwd": ".",
-        "timeoutSec": 5
+        "timeoutSec": 5,
+        "additionalContext": "You are operating in a governance-audited session. All prompts will be logged."
       }
     ],
     "userPromptSubmitted": [

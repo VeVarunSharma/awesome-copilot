@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2025-11-28
+lastUpdated: 2026-04-05
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -335,14 +335,54 @@ Settings: File → Settings → Tools → GitHub Copilot
 
 ### GitHub Copilot CLI
 
-Configuration file: `~/.copilot-cli/config.json`
+Configuration file: `~/.copilot/settings.json` (or `.claude/settings.json` / `.claude/settings.local.json` in your project root for repository-specific overrides)
 
 ```json
 {
-  "editor": "vim",
-  "suggestions": true
+  "model": "claude-sonnet-4",
+  "theme": "dark"
 }
 ```
+
+> **Note**: Starting in v1.0.12, the CLI also reads `.claude/settings.json` and `.claude/settings.local.json` from your project root as additional configuration sources, giving you finer-grained per-repository settings without modifying global config.
+
+### Monorepo Support
+
+As of v1.0.11, custom instructions, MCP servers, skills, and agents are discovered at **every directory level from the working directory up to the git root**. This means large monorepos can define both shared customizations at the root and specialized customizations in individual package subdirectories — the CLI merges them automatically.
+
+```
+my-monorepo/
+├── .github/
+│   ├── agents/          # Shared across all packages
+│   │   └── code-reviewer.agent.md
+│   └── instructions/    # Shared coding standards
+│       └── general.instructions.md
+├── packages/
+│   ├── api/
+│   │   └── .github/
+│   │       └── agents/  # API-specific agents
+│   │           └── api-architect.agent.md
+│   └── frontend/
+│       └── .github/
+│           └── instructions/  # Frontend-specific instructions
+│               └── react.instructions.md
+```
+
+When working in `packages/api/`, Copilot loads agents and instructions from both `packages/api/.github/` and the root `.github/`, giving the agent the full picture.
+
+### Plugin Marketplace Configuration
+
+The `marketplaces` setting was deprecated in v1.0.16. Use `extraKnownMarketplaces` instead to add additional plugin sources:
+
+```json
+{
+  "extraKnownMarketplaces": [
+    "my-org/internal-plugins"
+  ]
+}
+```
+
+The built-in `copilot-plugins` and `awesome-copilot` marketplaces are always available and don't need to be listed here.
 
 ## Common Questions
 

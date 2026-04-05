@@ -3,12 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
-estimatedReadingTime: '10 minutes'
-tags:
-  - agents
-  - customization
-  - fundamentals
+lastUpdated: 2026-04-05
 relatedArticles:
   - ./what-are-agents-skills-instructions.md
   - ./creating-effective-skills.md
@@ -257,7 +252,32 @@ The agent can then query your database, analyze query plans, and suggest optimiz
 
 Keep agents focused—one persona per file. If you find an agent trying to do too many things, split it into multiple agents or extract common tasks into skills that agents can invoke.
 
-## Common Questions
+## The Critic Agent (Experimental)
+
+Starting in v1.0.18, GitHub Copilot CLI includes a **built-in Critic agent** that automatically reviews plans and complex implementations using a complementary AI model. The Critic is available as an experimental feature for Claude models and works alongside your main agent rather than replacing it.
+
+**How it works**: When the Critic is enabled, after the primary model produces a plan or complex implementation, a secondary model reviews it independently—catching logical errors, missed edge cases, or implementation gaps before code is written or committed.
+
+**Enabling the Critic**:
+
+The Critic is available in experimental mode. You can enable it in your settings:
+
+```json
+{
+  "experimental": {
+    "critic": true
+  }
+}
+```
+
+**When it helps most**:
+- Complex multi-step plans where an early mistake propagates through the implementation
+- Security-sensitive code changes where a second set of "eyes" reduces risk
+- Architectural decisions that will be difficult to change later
+
+> **Note**: The Critic adds an extra model call to each plan review, which increases latency and token usage. Enable it for high-stakes workflows rather than routine coding tasks.
+
+
 
 **Q: How do I select a custom agent?**
 

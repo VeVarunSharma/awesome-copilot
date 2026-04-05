@@ -3,12 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
-estimatedReadingTime: '8 minutes'
-tags:
-  - mcp
-  - tools
-  - fundamentals
+lastUpdated: 2026-04-05
 relatedArticles:
   - ./building-custom-agents.md
   - ./what-are-agents-skills-instructions.md
@@ -167,6 +162,41 @@ current data distribution.
 ```
 
 Without the MCP server, the agent would have to guess at database structure and performance characteristics. With it, the agent works with real data.
+
+> **New in v1.0.16**: MCP tool calls now display the **tool name and a parameter summary** in the CLI timeline, making it easy to see at a glance what external calls the agent is making during a session.
+
+### MCP Servers Requesting LLM Inference
+
+As of v1.0.13, MCP servers can request **LLM inference (sampling)** from the CLI—meaning an MCP server can ask the connected model to generate text as part of its own processing. The CLI presents a review prompt so you can approve or deny these requests before inference runs. This is useful for MCP servers that perform AI-assisted analysis of their own tool results.
+
+## Managing MCP Server Authentication
+
+Many MCP servers use OAuth for authentication. The CLI provides dedicated tooling to manage this:
+
+### `/mcp auth` Command
+
+Use `/mcp auth` to connect or reconnect an MCP server that requires OAuth login:
+
+```
+/mcp auth my-server-name
+```
+
+This opens a browser-based authentication flow (or device code flow in headless/CI environments) and saves the credentials. You can also switch between accounts directly from the re-authentication UI.
+
+> **Tip**: MCP OAuth flows now support HTTPS redirect URIs via a self-signed certificate fallback, improving compatibility with OAuth providers that require HTTPS (such as Slack).
+
+### Persistent MCP Server Configuration via RPCs
+
+Starting in v1.0.15, you can manage MCP server configurations programmatically via server RPCs:
+
+| RPC | Description |
+|-----|-------------|
+| `mcp.config.list` | List all configured MCP servers |
+| `mcp.config.add` | Add a new MCP server configuration |
+| `mcp.config.update` | Update an existing MCP server |
+| `mcp.config.remove` | Remove an MCP server |
+
+These RPCs allow automation scripts and CI pipelines to dynamically configure MCP servers without editing `.vscode/mcp.json` by hand.
 
 ## Finding MCP Servers
 
