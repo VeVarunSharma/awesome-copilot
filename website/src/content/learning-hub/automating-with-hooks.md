@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-06
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -91,12 +91,17 @@ Hooks can trigger on several lifecycle events:
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
 | `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
-| `postToolUse` | After a tool completes execution | Log results, track usage, format code after edits, send failure alerts |
+| `postToolUse` | After a tool **successfully** completes | Log results, track usage, format code after edits |
+| `postToolUseFailure` | After a tool call **fails** | Log errors, send failure alerts, retry diagnostics |
+| `PermissionRequest` | When the agent requests user permission for a tool | Programmatically approve/deny permission requests without UI prompts |
+| `notification` | Asynchronously on shell completion, permission prompts, dialogs, and agent completion | Non-blocking alerts: Slack/Teams messages, desktop notifications |
 | `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
 
-> **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
+> **Key insight**: The `preToolUse` and `PermissionRequest` hooks can **approve or deny** individual tool executions and permission requests. `preToolUse` can also return `permissionDecision: allow` to **suppress the tool approval prompt** entirely for specific tools. The `notification` hook is unique — it fires **asynchronously** and never blocks the agent, making it safe for external alerting.
+>
+> **Note on `postToolUse` vs `postToolUseFailure`**: As of v1.0.15, `postToolUse` only fires when a tool **succeeds**. Use `postToolUseFailure` to handle tool errors separately — this lets you send failure alerts or run diagnostics without affecting the success path.
 
 ### Event Configuration
 
@@ -216,6 +221,25 @@ Block dangerous commands before they execute:
 
 The `preToolUse` hook receives JSON input with details about the tool being called. Your script can inspect this input and exit with a non-zero code to **deny** the tool execution, or exit with zero to **approve** it.
 
+To **suppress the tool approval prompt** for specific tools (so the user isn't asked to confirm each time), output `permissionDecision: allow` from your hook script:
+
+```bash
+#!/usr/bin/env bash
+# scripts/security-check.sh
+TOOL=$(echo "$COPILOT_HOOK_INPUT" | jq -r '.tool')
+
+# Automatically approve read-only tools, deny others
+if [[ "$TOOL" =~ ^(read_file|list_directory|grep)$ ]]; then
+  echo "permissionDecision: allow"
+  exit 0
+fi
+
+# Let the user decide for everything else
+exit 0
+```
+
+As of v1.0.18, when a `preToolUse` hook returns `permissionDecision: allow`, the user is **not prompted** for that tool execution.
+
 ### Governance Audit
 
 Scan user prompts for potential security threats and log session activity:
@@ -280,6 +304,77 @@ Send a Slack or Teams notification when an agent session completes:
   }
 }
 ```
+
+### Using the notification Hook for Non-Blocking Alerts
+
+The `notification` hook (added in v1.0.18) fires **asynchronously** on multiple events — shell completion, permission prompts, elicitation dialogs, and agent completion — without blocking the agent. This makes it ideal for sending external alerts without adding latency to the agent loop:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "notification": [
+      {
+        "type": "command",
+        "bash": "./scripts/notify.sh",
+        "cwd": ".",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
+```
+
+Because `notification` is asynchronous, it's the best choice for Slack, Teams, or desktop notifications. Use `sessionEnd` when you need to run cleanup that must complete before the session closes.
+
+### Handling Tool Failures with postToolUseFailure
+
+Use `postToolUseFailure` to react specifically to tool errors without affecting the success path:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "postToolUse": [
+      {
+        "type": "command",
+        "bash": "./scripts/log-success.sh",
+        "timeoutSec": 5
+      }
+    ],
+    "postToolUseFailure": [
+      {
+        "type": "command",
+        "bash": "./scripts/alert-on-failure.sh",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
+```
+
+As of v1.0.15, `postToolUse` only fires when a tool **succeeds**. The `postToolUseFailure` hook fires when a tool call fails, giving you a dedicated place to log diagnostics or send failure alerts.
+
+### Programmatic Permission Approval with PermissionRequest
+
+The `PermissionRequest` hook (added in v1.0.16) lets you approve or deny tool permission requests programmatically — useful in CI/CD environments or when you want to auto-approve specific tools:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "PermissionRequest": [
+      {
+        "type": "command",
+        "bash": "./scripts/approve-permissions.sh",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+Your script receives the permission request context via JSON input and can output `permissionDecision: allow` or `permissionDecision: deny` to control the outcome.
 
 ## Writing Hook Scripts
 

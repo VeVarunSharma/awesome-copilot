@@ -76,6 +76,7 @@ export default defineConfig({
             "learning-hub/defining-custom-instructions",
             "learning-hub/creating-effective-skills",
             "learning-hub/building-custom-agents",
+            "learning-hub/critic-agent",
             "learning-hub/understanding-mcp-servers",
             "learning-hub/automating-with-hooks",
             "learning-hub/agentic-workflows",
