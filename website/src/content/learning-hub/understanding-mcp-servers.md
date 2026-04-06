@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-06
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -187,6 +187,25 @@ If your team has internal tools or proprietary APIs, you can build custom MCP se
 | **Prompts** | Pre-built conversation templates | Common troubleshooting flows |
 
 MCP server SDKs are available in [Python](https://github.com/modelcontextprotocol/python-sdk), [TypeScript](https://github.com/modelcontextprotocol/typescript-sdk), and other languages. Browse the [Agents Directory](../../agents/) for examples of agents built around MCP server expertise.
+
+## Managing MCP Server Configuration
+
+Starting with v1.0.15, GitHub Copilot CLI includes server RPCs for managing persistent MCP server configuration programmatically. These are useful for scripts, CI pipelines, or extensions that need to add or modify MCP servers without editing config files directly.
+
+| Command | Description |
+|---------|-------------|
+| `mcp.config.list` | List all configured MCP servers |
+| `mcp.config.add` | Add a new MCP server to persistent configuration |
+| `mcp.config.update` | Update an existing MCP server's configuration |
+| `mcp.config.remove` | Remove an MCP server from configuration |
+
+### MCP OAuth Authentication
+
+Many MCP servers require OAuth to authenticate with third-party services (e.g., Slack, GitHub). The CLI provides:
+
+- **`/mcp auth`**: Opens the re-authentication UI for OAuth-enabled MCP servers, with support for account switching. Useful when credentials expire or you need to connect a different account.
+- **Device code flow** (RFC 8628): As of v1.0.15, the CLI falls back to device code flow for MCP OAuth in headless and CI environments where a browser can't be opened.
+- **HTTPS redirect URIs**: As of v1.0.17, MCP OAuth flows support HTTPS redirect URIs via a self-signed certificate fallback, improving compatibility with providers that require HTTPS (e.g., Slack).
 
 ## Best Practices
 
