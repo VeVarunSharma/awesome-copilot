@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-07
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -211,6 +211,14 @@ You are an accessibility expert who reviews UI components for WCAG compliance.
 - Ensure images have meaningful alt text (or empty alt for decorative)
 - Test that all functionality is keyboard-accessible
 ```
+
+## Built-in Agents: The Critic Agent
+
+> **New in v1.0.18 (experimental)**: The **Critic agent** is a built-in agent that automatically reviews plans and complex implementations using a **complementary model** to catch errors early. When Copilot generates a plan or a complex response, the Critic agent evaluates it from a different perspective—surfacing logical errors, missed edge cases, or problematic assumptions before any code is written.
+
+The Critic agent is currently available in experimental mode for Claude models. To enable it, turn on experimental features in your settings.
+
+This built-in agent is a good example of the pattern where a second agent acts as a quality gate on the primary agent's output—a pattern you can replicate with your own custom review agents.
 
 ## Connecting Agents to MCP Servers
 

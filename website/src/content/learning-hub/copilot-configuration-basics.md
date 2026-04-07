@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2025-11-28
+lastUpdated: 2026-04-07
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -343,6 +343,10 @@ Configuration file: `~/.copilot-cli/config.json`
   "suggestions": true
 }
 ```
+
+> **New in v1.0.15**: CLI configuration settings now prefer **camelCase** key names (e.g., `askUser`, `autoUpdate`, `logLevel`, `skillDirectories`, `disabledSkills`). The previous snake_case names (e.g., `ask_user`) are still accepted for backwards compatibility, but new configurations should use camelCase.
+
+> **Deprecated in v1.0.16**: The `marketplaces` repository setting has been removed. Use `extraKnownMarketplaces` instead to configure additional plugin marketplaces.
 
 ## Common Questions
 

@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-07
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -58,6 +58,46 @@ GitHub Copilot provides several **built-in tools** that are always available:
 | Docker server | Manage containers, inspect logs, deploy services |
 | Sentry server | Fetch error reports, analyze crash data |
 | Figma server | Read design tokens, component specs |
+
+## Managing MCP Servers with `/mcp` Commands
+
+The Copilot CLI provides a set of `/mcp` commands for managing servers during a session:
+
+| Command | What It Does |
+|---------|--------------|
+| `/mcp list` | Show configured servers and their status |
+| `/mcp enable <server>` | Enable a specific server (persists across sessions) |
+| `/mcp disable <server>` | Disable a specific server (persists across sessions) |
+| `/mcp reload` | Reload server configuration without restarting |
+| `/mcp auth <server>` | Authenticate (or re-authenticate) with an OAuth-enabled server |
+
+> **New in v1.0.19**: `/mcp enable` and `/mcp disable` now **persist across sessions**. Once you toggle a server's state, it stays that way until you change it again.
+
+### MCP OAuth Authentication
+
+Many enterprise MCP servers (Slack, Google Drive, etc.) require OAuth authentication. The CLI supports several flows:
+
+- **Browser-based OAuth**: For interactive environments, the CLI opens your browser and handles the redirect automatically. HTTPS redirect URIs are supported via a self-signed certificate fallback (v1.0.17), which improves compatibility with providers like Slack that require HTTPS.
+- **Device code flow (RFC 8628)**: For **headless and CI environments** where a browser isn't available (v1.0.15), the CLI falls back to the device code flow — displaying a short code you enter on another device.
+- **Account switching**: The `/mcp auth` command (v1.0.15) lets you re-authenticate or switch accounts for any OAuth-enabled server without restarting.
+
+```
+# Re-authenticate a Slack MCP server
+/mcp auth slack
+```
+
+### Persistent MCP Configuration via RPCs
+
+For programmatic or automation-based setups, the CLI exposes `mcp.config.*` server RPCs (v1.0.15) that let you manage persistent MCP server configuration without editing JSON files:
+
+| RPC | Purpose |
+|-----|---------|
+| `mcp.config.list` | List all configured MCP servers |
+| `mcp.config.add` | Add a new MCP server configuration |
+| `mcp.config.update` | Update an existing MCP server configuration |
+| `mcp.config.remove` | Remove an MCP server configuration |
+
+These are useful for tooling and setup scripts that need to automate MCP server configuration.
 
 ## Configuring MCP Servers
 
@@ -146,6 +186,8 @@ With this configuration, the agent can:
 - Analyze query execution plans
 - Suggest index optimizations based on actual data
 - Compare schema changes against the live database
+
+> **New in v1.0.16**: MCP tool calls now **display the tool name and a parameter summary** in the conversation timeline, giving you better visibility into what the agent is doing behind the scenes.
 
 ### Example Conversation
 
