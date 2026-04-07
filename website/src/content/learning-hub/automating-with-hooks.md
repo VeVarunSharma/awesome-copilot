@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-07
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -91,12 +91,18 @@ Hooks can trigger on several lifecycle events:
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
 | `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
-| `postToolUse` | After a tool completes execution | Log results, track usage, format code after edits, send failure alerts |
+| `postToolUse` | After a tool completes **successfully** | Log results, track usage, format code after edits |
+| `postToolUseFailure` | After a tool execution **fails** | Send failure alerts, log errors, trigger rollback logic |
 | `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
+| `notification` | Fired asynchronously on shell completion, permission prompts, elicitation dialogs, or agent completion | Send external notifications, update dashboards, trigger integrations |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
+
+> **Note on `postToolUse` vs `postToolUseFailure`**: As of v1.0.15, `postToolUse` runs only after a tool **succeeds**, and `postToolUseFailure` runs when a tool **fails**. If you need to handle both outcomes, register handlers for both events.
+
+> **Note on `notification` hooks**: Unlike other hooks, `notification` fires asynchronously — the agent does not wait for it to complete. Use it for non-blocking side effects like sending alerts or updating external dashboards.
 
 ### Event Configuration
 
@@ -194,6 +200,28 @@ Run ESLint after the agent finishes responding and block if there are errors:
 
 If the lint command exits with a non-zero status, the action is blocked.
 
+### Alert on Tool Failures
+
+Use `postToolUseFailure` to react when a tool execution fails — for example, to log the error or notify your team:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "postToolUseFailure": [
+      {
+        "type": "command",
+        "bash": "./scripts/notify-failure.sh",
+        "cwd": ".",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
+```
+
+This complements `postToolUse` (which fires on success): register both if you need different behavior depending on the tool outcome.
+
 ### Security Gating with preToolUse
 
 Block dangerous commands before they execute:
@@ -215,6 +243,30 @@ Block dangerous commands before they execute:
 ```
 
 The `preToolUse` hook receives JSON input with details about the tool being called. Your script can inspect this input and exit with a non-zero code to **deny** the tool execution, or exit with zero to **approve** it.
+
+As of v1.0.18, if your `preToolUse` hook outputs `{"permissionDecision": "allow"}` as JSON, the tool approval prompt will be **suppressed entirely**, allowing fully automated approval workflows without manual confirmation dialogs.
+
+### Programmatic Permission Control with PermissionRequest
+
+The `PermissionRequest` hook (added in v1.0.16) is a dedicated hook for approving or denying tool permission requests programmatically. Unlike `preToolUse` (which can only approve/deny by exit code), the `PermissionRequest` hook provides a structured JSON interface for expressing fine-grained decisions:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "PermissionRequest": [
+      {
+        "type": "command",
+        "bash": "./scripts/permission-policy.sh",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+Your script receives a JSON payload with the requested permission and can respond with a structured decision, making it easier to implement rule-based access control than with exit codes alone.
 
 ### Governance Audit
 
