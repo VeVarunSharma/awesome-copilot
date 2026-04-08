@@ -3,10 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
-estimatedReadingTime: '12 minutes'
-tags:
-  - coding-agent
+lastUpdated: 2026-04-08
   - automation
   - agentic
 relatedArticles:
@@ -347,6 +344,17 @@ Hooks are especially valuable with the coding agent because they provide determi
 See [Automating with Hooks](../automating-with-hooks/) for configuration details.
 
 ## Best Practices
+
+### Critic Agent (Experimental)
+
+As of v1.0.18, Copilot CLI includes an experimental **Critic agent** that automatically reviews plans and complex implementations using a complementary model. The Critic reviews the primary agent's work and catches errors before they're committed — acting as an automated second pair of eyes.
+
+> **Availability**: The Critic agent is currently in experimental mode and is available for Claude models only. Enable it via your Copilot CLI experimental settings.
+
+The Critic is especially useful for:
+- Complex multi-file implementations where logic errors are easy to miss
+- Plan review before the agent begins writing code
+- Catching off-by-one errors, missed edge cases, and logic gaps in implementations
 
 ### Setting Up for Success
 

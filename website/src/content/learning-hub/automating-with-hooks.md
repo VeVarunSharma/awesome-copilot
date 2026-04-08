@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-08
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -95,8 +95,66 @@ Hooks can trigger on several lifecycle events:
 | `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
+| `notification` | Asynchronous: fires on shell completion, permission prompts, elicitation dialogs, and agent completion | Non-blocking side-effects like sending Slack alerts or logging completions |
+| `PermissionRequest` | When the agent requests permission for a tool action | Programmatically approve or deny tool permission requests |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
+
+### `notification` Event
+
+The `notification` event fires **asynchronously** — the agent does not wait for it to complete. This makes it ideal for side-effects that should not block the agent's workflow, such as sending a Slack message or writing to an audit log when a long-running shell command finishes.
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "notification": [
+      {
+        "type": "command",
+        "bash": "./scripts/notify-completion.sh",
+        "cwd": ".",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
+```
+
+The notification payload includes the event type and context about what triggered it (shell completion, permission prompt, elicitation dialog, or agent completion).
+
+### `PermissionRequest` Event
+
+The `PermissionRequest` hook fires when Copilot needs the user's approval before executing a tool action. Your script can inspect the requested action and return a programmatic decision — eliminating the interactive approval dialog for trusted operations.
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "PermissionRequest": [
+      {
+        "type": "command",
+        "bash": "./scripts/auto-approve.sh",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+The script receives a JSON payload describing the permission request. To approve programmatically, output a JSON decision:
+
+```json
+{ "permissionDecision": "allow" }
+```
+
+To deny:
+
+```json
+{ "permissionDecision": "deny", "reason": "Operation not permitted by policy" }
+```
+
+> **Note**: You can also use `preToolUse` with `permissionDecision: "allow"` to suppress the approval prompt for specific tools. As of v1.0.18, this correctly suppresses the interactive prompt.
 
 ### Event Configuration
 
@@ -126,6 +184,10 @@ Each hook entry supports these fields:
 **timeoutSec**: Maximum execution time in seconds (default: 30). The hook is killed if it exceeds this limit.
 
 **env**: Additional environment variables merged with the existing environment.
+
+### Hook Payload Format
+
+Hook scripts receive event context as JSON on stdin. As of v1.0.21, hooks configured with **PascalCase event names** (e.g., `PermissionRequest`, `PreToolUse`) receive VS Code-compatible **snake_case payloads** — including fields like `hook_event_name`, `session_id`, and ISO 8601 timestamps. This makes it easier to share hook scripts between Copilot CLI and VS Code environments.
 
 ### README.md
 
