@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2025-11-28
+lastUpdated: 2026-04-08
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -343,6 +343,17 @@ Configuration file: `~/.copilot-cli/config.json`
   "suggestions": true
 }
 ```
+
+### OpenTelemetry Monitoring (Copilot CLI)
+
+As of v1.0.20, GitHub Copilot CLI supports **OpenTelemetry (OTEL) monitoring**, which lets you export traces and spans from your Copilot CLI sessions to any OTEL-compatible backend (e.g., Jaeger, Grafana Tempo, Datadog, or Honeycomb).
+
+This is useful for:
+- Observing agent behaviour and tool call patterns in production environments
+- Integrating Copilot CLI sessions into your existing observability stack
+- Auditing agent activity for compliance and governance
+
+Run `copilot help monitoring` for details on configuration environment variables and supported exporters. Spans include subagent activity and, for streaming responses, a `github.copilot.time_to_first_chunk` attribute.
 
 ## Common Questions
 

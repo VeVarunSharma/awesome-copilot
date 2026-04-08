@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-08
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -167,6 +167,33 @@ current data distribution.
 ```
 
 Without the MCP server, the agent would have to guess at database structure and performance characteristics. With it, the agent works with real data.
+
+## Managing MCP Servers in Copilot CLI
+
+As of v1.0.21, GitHub Copilot CLI includes a dedicated `copilot mcp` command for managing MCP servers:
+
+```bash
+# List configured MCP servers
+copilot mcp list
+
+# Enable a server
+copilot mcp enable postgres
+
+# Disable a server
+copilot mcp disable postgres
+
+# Reload all servers (after config changes)
+copilot mcp reload
+```
+
+You can also enable and disable servers from within an interactive session using slash commands:
+
+```
+/mcp enable postgres
+/mcp disable postgres
+```
+
+> **Persistence**: As of v1.0.19, `/mcp enable` and `/mcp disable` state persists across sessions — you no longer need to re-enable servers after restarting Copilot CLI.
 
 ## Finding MCP Servers
 
