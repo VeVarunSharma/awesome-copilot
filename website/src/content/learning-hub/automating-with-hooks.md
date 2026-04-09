@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-09
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -94,9 +94,13 @@ Hooks can trigger on several lifecycle events:
 | `postToolUse` | After a tool completes execution | Log results, track usage, format code after edits, send failure alerts |
 | `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
+| `notification` | Async event on shell completion, permission prompts, elicitation dialogs, or agent completion | Non-blocking notifications, background logging, external alerts |
+| `PermissionRequest` | A tool permission prompt is raised | Programmatically approve or deny permission requests without user interaction |
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
 
-> **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
+> **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations. Starting with v1.0.18, returning `permissionDecision: "allow"` from a `preToolUse` hook also suppresses the interactive tool-approval prompt.
+
+> **Payload format**: All hooks receive a standardized JSON payload with `hook_event_name`, `session_id`, and ISO 8601 timestamps — consistent across both the CLI and VS Code.
 
 ### Event Configuration
 
@@ -214,7 +218,29 @@ Block dangerous commands before they execute:
 }
 ```
 
-The `preToolUse` hook receives JSON input with details about the tool being called. Your script can inspect this input and exit with a non-zero code to **deny** the tool execution, or exit with zero to **approve** it.
+The `preToolUse` hook receives JSON input with details about the tool being called. Your script can inspect this input and exit with a non-zero code to **deny** the tool execution, or exit with zero to **approve** it. Return `permissionDecision: "allow"` to also suppress the interactive approval prompt.
+
+### Programmatic Permission Control with PermissionRequest
+
+The `PermissionRequest` hook fires when Copilot raises a permission prompt, letting a script approve or deny it without requiring user input. This is useful in automated or CI-like environments:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "PermissionRequest": [
+      {
+        "type": "command",
+        "bash": "./scripts/auto-approve.sh",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+The script receives a JSON payload with details about the requested permission. Exit with zero to approve, non-zero to deny.
 
 ### Governance Audit
 
