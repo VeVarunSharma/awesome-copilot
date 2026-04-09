@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-09
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -225,6 +225,21 @@ tools: ['codebase', 'terminal', 'postgres-mcp']
 ```
 
 The agent can then query your database, analyze query plans, and suggest optimizations—all within the conversation. For setup details, see [Understanding MCP Servers](../understanding-mcp-servers/).
+
+## Experimental: The Critic Agent
+
+GitHub Copilot CLI v1.0.18 introduced an experimental **Critic agent** that automatically reviews plans and complex implementations using a complementary model. When enabled, it runs silently alongside the main agent, catches logical errors early, and surfaces issues before they become wasted work.
+
+> **Availability**: Currently available in experimental mode when using Claude models. Enable it via `copilot config` or the `/experimental` settings in the CLI.
+
+The Critic agent is not a custom agent you define — it's a built-in reviewer that Copilot spins up automatically on complex tasks. Think of it as a second pair of eyes that asks "does this plan actually make sense?" before implementation begins.
+
+**When the Critic agent helps most**:
+- Large refactors where a flawed plan could affect many files
+- Architecture decisions that are hard to reverse
+- Security-sensitive code where subtle errors matter
+
+The Critic works transparently in the background — you don't invoke it directly. When it detects a problem it surfaces the concern in the timeline before the agent proceeds.
 
 ## Best Practices
 

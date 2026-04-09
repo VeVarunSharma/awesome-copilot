@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-09
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -128,6 +128,39 @@ MCP servers are configured per-workspace in `.vscode/mcp.json`:
 ```
 
 > **Security tip**: Use `${input:variableName}` for sensitive values. VS Code will prompt for these at runtime rather than storing them in the file.
+
+## Managing MCP Servers with the CLI
+
+GitHub Copilot CLI v1.0.21 introduced the `copilot mcp` command — a dedicated interface for managing MCP servers directly from the terminal, without editing JSON configuration files manually.
+
+### The `copilot mcp` Command
+
+```bash
+# List all configured MCP servers and their status
+copilot mcp list
+
+# Add a new MCP server
+copilot mcp add postgres npx -y @modelcontextprotocol/server-postgres
+
+# Remove an MCP server
+copilot mcp remove postgres
+
+# Show detailed info about a server
+copilot mcp show postgres
+```
+
+### Slash Commands for In-Session Control
+
+During an active Copilot chat session you can enable, disable, and reload MCP servers using slash commands — without restarting the session. Changes made with `/mcp enable` and `/mcp disable` **persist across sessions** (introduced in v1.0.19):
+
+```
+/mcp list           # See all MCP servers and which are active
+/mcp enable postgres    # Enable a server for the current and future sessions
+/mcp disable postgres   # Disable a server for the current and future sessions
+/mcp reload         # Reload all server configurations (e.g., after editing mcp.json)
+```
+
+MCP tool calls are shown by name and parameter summary in the timeline, giving you visibility into what external actions the agent is taking.
 
 ## How Agents Use MCP Tools
 
