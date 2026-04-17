@@ -3,7 +3,7 @@ title: '05 · Automate Repetitive Tasks'
 description: 'Mirror the source chapter on skills that load automatically for repeated GitHub Copilot CLI workflows.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-03-20
+lastUpdated: 2026-04-17
 ---
 
 ![Chapter 05: Skills System](/images/learning-hub/copilot-cli-for-beginners/05/chapter-header.png)
@@ -550,6 +550,12 @@ copilot
 
 > /plugin install <plugin-name>
 # Install a plugin from the marketplace
+```
+
+To keep your local plugin catalog current, refresh it with:
+
+```bash
+copilot plugin marketplace update
 ```
 
 Plugins can bundle multiple capabilities together - a single plugin might include related skills, agents, and MCP server configurations that work together.
