@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-18
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -405,6 +405,8 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
+Select **`auto`** as your model to let Copilot automatically pick the best available model for each session. The `auto` option appears in the model picker and removes the burden of choosing a model yourself — Copilot will select an appropriate model based on availability and task characteristics.
+
 ### CLI Session Commands
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
@@ -415,6 +417,24 @@ GitHub Copilot CLI has two commands for managing session state, with distinct be
 | `/clear [prompt]` | Abandons the current session entirely and starts a new one. Backgrounded sessions are not affected. MCP servers configured in your project are preserved in the new session. |
 
 Both commands accept an optional prompt argument to seed the new session with an opening message, for example `/new Add error handling to the login flow`.
+
+The `/ask` command asks a one-off question without adding it to the ongoing conversation history. This is useful for quick lookups or reference questions that you don't want to pollute the current session's context:
+
+```
+/ask What is the difference between var and let in JavaScript?
+```
+
+Because `/ask` doesn't affect history, the model's answer is isolated — the next turn continues from where you left off before the question.
+
+The `/statusline` command (also accessible as `/footer`) customizes which items appear in the status bar at the bottom of the terminal UI:
+
+```
+/statusline                    # show current status bar configuration
+/statusline directory branch   # show directory and branch only
+/statusline off                # hide the status bar entirely
+```
+
+Available status bar items include `directory`, `branch`, `effort`, `context` (context window usage), and `quota` (usage limit). Removing items you don't need gives the terminal more vertical space.
 
 The `/session rename` command renames the current session. When called **without a name argument**, it automatically generates a session name based on the conversation history:
 

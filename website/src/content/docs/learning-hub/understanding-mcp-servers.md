@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-01
+lastUpdated: 2026-04-18
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -97,7 +97,19 @@ Example `.mcp.json` or `.vscode/mcp.json`:
 
 **args**: Arguments passed to the command. Most MCP servers are distributed as npm packages and can be run with `npx -y`.
 
+**type**: The transport type for connecting to the server (`http`, `sse`, `stdio`). For remote HTTP-based servers, you can omit the `type` field entirely — it defaults to `http`.
+
 **env**: Environment variables passed to the server process. Use these for connection strings, API keys, and configuration—never hardcode secrets in the JSON file.
+
+### Environment Variables Available to MCP Servers
+
+MCP servers (and any shell commands they execute) automatically receive the following environment variables from Copilot CLI:
+
+| Variable | Value |
+|----------|-------|
+| `COPILOT_AGENT_SESSION_ID` | The unique ID of the current Copilot CLI session |
+
+`COPILOT_AGENT_SESSION_ID` is useful when an MCP server needs to correlate its own logs or state with a specific Copilot session, or when building tools that need to identify which session they're operating within.
 
 ### Managing Persistent MCP Configuration via Server RPCs
 

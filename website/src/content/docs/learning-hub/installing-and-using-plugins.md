@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-18
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -175,6 +175,8 @@ Or from an interactive session:
 /plugin install database-data-management@awesome-copilot
 ```
 
+> **Note**: Installing plugins directly from GitHub repository URLs, git URLs, or local paths is deprecated. Use marketplace installation (`name@marketplace`) whenever possible, or load local plugins for development via the `--plugin-dir` flag (see below).
+
 ### From VS Code
 
 Browse to the plugin via `@agentPlugins` in the Extensions search view or via **Chat: Plugins** in the Command Palette, then click **Install**.
@@ -192,7 +194,12 @@ copilot plugin update my-plugin
 
 # Remove a plugin
 copilot plugin uninstall my-plugin
+
+# Refresh all registered marketplace catalogs
+copilot plugin marketplace update
 ```
+
+Run `copilot plugin marketplace update` after a marketplace publishes new plugins or updates existing ones so your local catalog stays current.
 
 ### Loading Plugins from a Local Directory
 
@@ -215,7 +222,7 @@ When you install a plugin, its components become available to Copilot CLI automa
 
 - **Agents** appear in your agent selection (use with `/agent` or the agents dropdown)
 - **Skills** are loaded automatically when relevant to your current task
-- **Hooks** run at the configured lifecycle events during agent sessions
+- **Hooks** run at the configured lifecycle events during agent sessions. Plugin hooks automatically receive `PLUGIN_ROOT` (and the aliases `COPILOT_PLUGIN_ROOT` and `CLAUDE_PLUGIN_ROOT`) as environment variables pointing to the plugin's installation directory — useful for referencing bundled scripts without hardcoding absolute paths.
 - **MCP servers** extend the tools available to agents
 
 You don't need to do any additional configuration after installing — the plugin's components integrate seamlessly into your workflow.

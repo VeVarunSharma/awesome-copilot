@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-18
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -252,6 +252,7 @@ Use this skill when:
 - **Name descriptively**: Use clear, action-oriented names: `generate-tests`, not `helper`
 - **Keep assets lean**: Bundled files should be under 5 MB each
 - **Test thoroughly**: Verify skills work with different inputs and codebases
+- **Large skills stay discoverable**: Even if a skill's full content exceeds the context token limit, Copilot CLI still surfaces it in the skill list and lets users invoke it by name. The agent receives the skill name and description for discovery purposes, even when the full SKILL.md cannot be inlined. Focus on a clear, descriptive `description` field so agents can choose the right skill even without reading the full instructions.
 
 ### Writing Style Guidelines
 

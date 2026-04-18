@@ -3,7 +3,7 @@ title: 'Understanding Copilot Context'
 description: 'Learn how GitHub Copilot uses context from your code, workspace, and conversation to generate relevant suggestions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2025-11-28
+lastUpdated: 2026-04-18
 estimatedReadingTime: '8 minutes'
 tags:
   - context
@@ -137,6 +137,12 @@ Maximize GitHub Copilot's effectiveness by providing clear, relevant context:
 **Structure your workspace logically**: Organize files in meaningful directories that reflect your application architecture. Clear structure helps Copilot understand relationships between components.
 
 **Use #-mentions in chat**: When asking questions, explicitly reference files with `#filename` to ensure Copilot analyzes the exact code you're discussing.
+
+**Attach document files to prompts**: In GitHub Copilot CLI, you can attach supported document files (PDF, DOCX, TXT, and others) directly to your prompt so the agent can read and reason about their contents. This is useful for referencing specs, design documents, or RFCs alongside your code:
+
+```bash
+copilot "Summarize the requirements in this spec and identify any missing API endpoints" --attach ./docs/api-spec.pdf
+```
 
 **Provide examples in prompts**: When asking Copilot to generate code, include examples of your existing patterns and conventions.
 
