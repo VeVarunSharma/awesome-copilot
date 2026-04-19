@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-19
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -391,6 +391,7 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `statusLine` | Show status line in the terminal UI |
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
+| `sessionIdleTimeout` | Idle timeout in seconds before a session closes (disabled by default; added in v1.0.32) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -468,6 +469,24 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 ```
 
 > **Note**: `/allow-all on` permissions persist after `/clear` starts a new session, so you don't need to re-enable it each time.
+
+The `/statusline` command (also available as `/footer`) customizes which items appear in the terminal status bar. You can show or hide individual items:
+
+```
+/statusline               # toggle the status bar on/off
+/statusline show branch   # show the current git branch in the status bar
+/statusline hide quota    # hide the weekly usage quota indicator
+```
+
+Available items include `directory`, `branch`, `effort`, `context`, and `quota`. This is helpful for decluttering the UI when you only need a subset of status indicators.
+
+The `/ask` command lets you ask a quick question without adding the exchange to your conversation history. This keeps your main conversation focused while still getting answers to one-off questions:
+
+```
+/ask what does the --connect flag do?
+```
+
+The answer is shown but not persisted in the conversation, so it doesn't affect the agent's memory of your session.
 
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 

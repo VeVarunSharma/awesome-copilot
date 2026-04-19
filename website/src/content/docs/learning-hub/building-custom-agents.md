@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-19
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -240,10 +240,13 @@ The agent can then query your database, analyze query plans, and suggest optimiz
 
 | Scenario | Recommended Model |
 |----------|-------------------|
+| Let Copilot pick the best model automatically | `auto` (new in v1.0.32) |
 | Complex reasoning, security review | Claude Sonnet 4 or higher |
 | Code generation, refactoring | GPT-4.1 |
 | Quick analysis, simple tasks | Claude Haiku or GPT-4.1-mini |
 | Large codebase understanding | Models with larger context windows |
+
+> **Tip**: Set `model: auto` in your agent's frontmatter to let GitHub Copilot automatically select the most capable model available for each session. This is useful when you want agents to always benefit from the latest model improvements without updating agent files.
 
 ### Organizing Agents in Your Repository
 
