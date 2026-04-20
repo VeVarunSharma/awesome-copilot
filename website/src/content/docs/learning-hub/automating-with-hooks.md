@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-20
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -128,12 +128,15 @@ Hook event names can be written in **camelCase** (e.g., `preToolUse`) or **Pasca
 
 ### Plugin Hooks Environment Variables
 
-When hooks are defined inside a **plugin**, the hook scripts receive two additional environment variables automatically:
+When hooks are defined inside a **plugin**, the hook scripts receive additional environment variables automatically:
 
 | Variable | Description |
 |----------|-------------|
 | `CLAUDE_PROJECT_DIR` | The path to the current project (working) directory |
 | `CLAUDE_PLUGIN_DATA` | The path to a persistent data directory scoped to the plugin |
+| `PLUGIN_ROOT` | The path to the plugin's installation directory |
+| `COPILOT_PLUGIN_ROOT` | Same as `PLUGIN_ROOT` (Copilot-prefixed alias) |
+| `CLAUDE_PLUGIN_ROOT` | Same as `PLUGIN_ROOT` (Claude-prefixed alias) |
 
 You can also use these as **template variables** directly in the `bash` or `powershell` fields of your `hooks.json` configuration:
 
@@ -419,7 +422,7 @@ The `subagentStart` hook fires when the main agent spawns a subagent (e.g., via 
 
 This is especially useful in multi-agent workflows where subagents may not automatically inherit context from the parent session.
 
-### Plugin Hook Environment Variables
+### Plugin Hooks Environment Variables
 
 When hooks are defined inside a **plugin**, Copilot CLI automatically injects two extra environment variables so scripts can locate project-specific and plugin-specific directories:
 
@@ -427,6 +430,9 @@ When hooks are defined inside a **plugin**, Copilot CLI automatically injects tw
 |----------|-------------|
 | `CLAUDE_PROJECT_DIR` | Absolute path to the working project directory |
 | `CLAUDE_PLUGIN_DATA` | Absolute path to the plugin's persistent data directory |
+| `PLUGIN_ROOT` | Absolute path to the plugin's installation directory |
+| `COPILOT_PLUGIN_ROOT` | Same as `PLUGIN_ROOT` (Copilot-prefixed alias) |
+| `CLAUDE_PLUGIN_ROOT` | Same as `PLUGIN_ROOT` (Claude-prefixed alias) |
 
 You can also reference these paths as template variables in your hook configuration:
 

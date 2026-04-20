@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-03-25
+lastUpdated: 2026-04-20
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -132,6 +132,16 @@ Or provide more specific direction:
 Use the existing FileUpload component and S3 service.
 ```
 
+### Attaching Documents to Prompts
+
+When assigning work to the coding agent from the CLI, you can attach document files (PDFs, Word documents, spreadsheets, etc.) directly to your prompt. This lets the agent read and reason about external specifications, design docs, or requirements without needing to commit them to the repository:
+
+```bash
+copilot "Implement the API endpoints described in this spec" --attach ./api-spec.pdf
+```
+
+Attached documents are read once for the prompt and are not stored in the repository.
+
 ### Using Custom Agents
 
 Custom agents let you give the coding agent a specialized persona, toolset, and instructions for specific types of work. Instead of relying on generic behavior, you can point the coding agent at an agent profile tailored for your task.
@@ -234,6 +244,18 @@ Also, add a test for the Retry-After header value.
 ```
 
 The agent will read your feedback, make changes, and push new commits to the same PR.
+
+### Remote Control
+
+You can also **remote control** an active CLI agent session from GitHub.com or another terminal. This lets you steer an in-progress agent—sending follow-up instructions, reviewing tool calls, and approving or rejecting changes—without being in the same terminal where the session started.
+
+Start a session with remote control enabled:
+
+```bash
+copilot --remote
+```
+
+Or enable it mid-session with the `/remote` command. Once active, the session appears in the **Remote** tab on GitHub.com, where you can send messages and monitor progress. Remote control replaced the earlier "steering" terminology in v1.0.26.
 
 ## Agent Skills and the Coding Agent
 

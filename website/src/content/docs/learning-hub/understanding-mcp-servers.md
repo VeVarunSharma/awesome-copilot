@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-01
+lastUpdated: 2026-04-20
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -98,6 +98,17 @@ Example `.mcp.json` or `.vscode/mcp.json`:
 **args**: Arguments passed to the command. Most MCP servers are distributed as npm packages and can be run with `npx -y`.
 
 **env**: Environment variables passed to the server process. Use these for connection strings, API keys, and configuration—never hardcode secrets in the JSON file.
+
+### Installing MCP Servers from the Registry
+
+GitHub Copilot CLI includes a built-in MCP registry that lists popular, well-known servers. You can browse and install servers from the registry with a guided, interactive flow directly inside the CLI — no manual JSON editing required:
+
+```bash
+# Open the guided MCP server installer
+/mcp install
+```
+
+The installer prompts you to select a server from the registry, fills in the required configuration fields (connection strings, API keys, etc.), and writes the entry to your `.mcp.json` file automatically. This is the easiest way to add a new MCP server to your environment.
 
 ### Managing Persistent MCP Configuration via Server RPCs
 

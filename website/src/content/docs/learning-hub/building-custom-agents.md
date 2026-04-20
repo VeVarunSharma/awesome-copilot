@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-20
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -71,7 +71,13 @@ tools: ['codebase', 'terminal', 'github']
 
 **description** (required): A clear summary of what the agent does. This is shown in the agent picker and helps users find the right agent.
 
-**model** (recommended): The AI model that powers the agent. Choose based on the complexity of the task—use more capable models for nuanced reasoning.
+**model** (recommended): The AI model that powers the agent. Choose based on the complexity of the task—use more capable models for nuanced reasoning. You can also set this to `auto` to let Copilot automatically pick the best available model for each session, which is useful when you want agents to adapt to your current quota and model availability without manual selection.
+
+**skills** (optional): An array of skill names to eagerly load into the agent's context at startup. Normally skills are discovered on-demand; listing them here ensures their instructions are always available to the agent from the first turn—useful when you know the agent will always need certain skills:
+
+```yaml
+skills: ['database-migrations', 'api-testing']
+```
 
 **tools** (recommended): An array of built-in tools and MCP servers the agent can access. Common tools include:
 
@@ -244,6 +250,7 @@ The agent can then query your database, analyze query plans, and suggest optimiz
 | Code generation, refactoring | GPT-4.1 |
 | Quick analysis, simple tasks | Claude Haiku or GPT-4.1-mini |
 | Large codebase understanding | Models with larger context windows |
+| Adaptive (quota/availability aware) | `auto` — Copilot picks the best model |
 
 ### Organizing Agents in Your Repository
 
