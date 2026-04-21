@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-21
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -63,7 +63,9 @@ hooks/
 
 ### hooks.json
 
-The configuration defines which events trigger which commands:
+The configuration defines which events trigger which actions. Copilot CLI supports two hook types: **command hooks** that run a local shell script, and **HTTP hooks** that POST a JSON payload to a URL.
+
+**Command hook** (run a local script):
 
 ```json
 {
@@ -80,6 +82,25 @@ The configuration defines which events trigger which commands:
   }
 }
 ```
+
+**HTTP hook** (send a JSON payload to a remote URL):
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "sessionEnd": [
+      {
+        "type": "http",
+        "url": "https://your-server.example.com/webhook/session-end",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
+```
+
+HTTP hooks POST the same JSON context that command hooks receive via stdin (event name, tool details, prompt content, etc.) directly to the configured URL. This makes them ideal for forwarding lifecycle events to external dashboards, audit services, or notification systems without requiring a local script.
 
 ## Hook Events
 
@@ -156,7 +177,9 @@ This makes it straightforward to write plugin hooks that are portable across mac
 
 ### Event Configuration
 
-Each hook entry supports these fields:
+Each hook entry supports these fields. The available fields depend on the **type**:
+
+**Command hooks** (`"type": "command"`):
 
 ```json
 {
@@ -171,7 +194,23 @@ Each hook entry supports these fields:
 }
 ```
 
-**type**: Always `"command"` for shell-based hooks.
+**HTTP hooks** (`"type": "http"`):
+
+```json
+{
+  "type": "http",
+  "url": "https://your-server.example.com/hook",
+  "timeoutSec": 10
+}
+```
+
+**Shared fields**:
+
+**type**: Either `"command"` (run a local shell script) or `"http"` (POST a JSON payload to a URL).
+
+**timeoutSec**: Maximum execution time in seconds (default: 30). The hook is killed if it exceeds this limit.
+
+**Command-only fields**:
 
 **bash**: The command or script to execute on Unix systems. Can be inline or reference a script file.
 
@@ -179,9 +218,11 @@ Each hook entry supports these fields:
 
 **cwd**: Working directory for the command (relative to repository root).
 
-**timeoutSec**: Maximum execution time in seconds (default: 30). The hook is killed if it exceeds this limit.
-
 **env**: Additional environment variables merged with the existing environment.
+
+**HTTP-only fields**:
+
+**url**: The URL to POST the event context to as a JSON payload. Copilot CLI sends the same structured event data that command hooks receive via stdin.
 
 ### README.md
 
@@ -376,7 +417,9 @@ This pattern is useful for enterprise environments that need to audit AI interac
 
 ### Notification on Session End
 
-Send a Slack or Teams notification when an agent session completes:
+Send a Slack or Teams notification when an agent session completes. You can use either a command hook with `curl` or the simpler HTTP hook type:
+
+**Using a command hook**:
 
 ```json
 {
@@ -396,6 +439,25 @@ Send a Slack or Teams notification when an agent session completes:
   }
 }
 ```
+
+**Using an HTTP hook** (available in Copilot CLI v1.0.35+):
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "sessionEnd": [
+      {
+        "type": "http",
+        "url": "https://your-server.example.com/copilot/session-end",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+HTTP hooks post the full session event context (session ID, timestamp, exit reason) as a JSON payload to the URL — no local script required. This makes them ideal for forwarding events to audit services, observability platforms, or any webhook-compatible system.
 
 ### Injecting Context into Subagents
 

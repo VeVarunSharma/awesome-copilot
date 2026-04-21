@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-21
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -193,6 +193,16 @@ copilot plugin update my-plugin
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+### Refreshing Marketplace Catalogs
+
+Marketplace plugin lists are cached locally. If you don't see a newly published plugin, refresh the catalog:
+
+```bash
+copilot plugin marketplace update
+```
+
+This fetches the latest plugin index from all registered marketplaces so newly published plugins become discoverable immediately.
 
 ### Loading Plugins from a Local Directory
 

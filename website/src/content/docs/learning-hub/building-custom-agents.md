@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-04-21
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -71,7 +71,7 @@ tools: ['codebase', 'terminal', 'github']
 
 **description** (required): A clear summary of what the agent does. This is shown in the agent picker and helps users find the right agent.
 
-**model** (recommended): The AI model that powers the agent. Choose based on the complexity of the task—use more capable models for nuanced reasoning.
+**model** (recommended): The AI model that powers the agent. Choose based on the complexity of the task—use more capable models for nuanced reasoning. You can also set this to `auto` to let Copilot automatically choose the best available model for each session.
 
 **tools** (recommended): An array of built-in tools and MCP servers the agent can access. Common tools include:
 
