@@ -3,7 +3,7 @@ title: 'Understanding Copilot Context'
 description: 'Learn how GitHub Copilot uses context from your code, workspace, and conversation to generate relevant suggestions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2025-11-28
+lastUpdated: 2026-04-22
 estimatedReadingTime: '8 minutes'
 tags:
   - context
@@ -28,6 +28,12 @@ When GitHub Copilot generates a suggestion or responds to a chat message, it ana
 **Chat Conversation History**: In GitHub Copilot Chat, previous messages in your conversation provide context for follow-up questions. This allows for natural, iterative problem-solving where each response builds on earlier exchanges.
 
 **Workspace Structure**: The organization of your project—directory structure, configuration files, and patterns—helps Copilot understand the type of project you're working on and follow appropriate conventions.
+
+**Attached Documents**: In GitHub Copilot CLI, you can attach supported document files (PDFs, Word documents, plain text files, and other supported formats) directly to a prompt. The agent reads and reasons about the document's content as part of the same turn, making it useful for referencing specs, design documents, or API contracts without copying the text manually:
+
+```
+@/path/to/api-spec.pdf Implement the authentication endpoint described in this spec
+```
 
 ## Types of Context
 

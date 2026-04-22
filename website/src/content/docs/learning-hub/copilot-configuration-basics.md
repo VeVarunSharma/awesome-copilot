@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-22
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -391,6 +391,7 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `statusLine` | Show status line in the terminal UI |
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
+| `continueOnAutoMode` | Automatically switch to `auto` model when a rate limit is reached instead of pausing |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -405,6 +406,16 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
+Select **`auto`** as your model to let Copilot automatically choose the best available model for each session based on your workload and available quota. When rate limits are hit, `auto` mode pauses and retries automatically. You can also configure Copilot to switch to `auto` mode automatically when a rate limit is reached, using the `continueOnAutoMode` config setting:
+
+```json
+{
+  "continueOnAutoMode": true
+}
+```
+
+With this enabled, instead of pausing when you hit a rate limit, Copilot seamlessly switches to the auto-selected model and continues working.
+
 ### CLI Session Commands
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
@@ -416,6 +427,15 @@ GitHub Copilot CLI has two commands for managing session state, with distinct be
 
 Both commands accept an optional prompt argument to seed the new session with an opening message, for example `/new Add error handling to the login flow`.
 
+**Named sessions**: Start a session with a human-readable name using `--name`, and resume it by name later with `--resume=<name>`:
+
+```bash
+copilot --name "auth-refactor"       # start a named session
+copilot --resume="auth-refactor"     # resume that session by name
+```
+
+Named sessions appear in the session picker alongside auto-generated names, making it easy to switch between long-running workstreams.
+
 The `/session rename` command renames the current session. When called **without a name argument**, it automatically generates a session name based on the conversation history:
 
 ```
@@ -424,6 +444,14 @@ The `/session rename` command renames the current session. When called **without
 ```
 
 Auto-generated names help you find sessions quickly when switching between multiple backgrounded sessions.
+
+The `/ask` command lets you ask a quick one-off question **without adding it to your conversation history**. Use it when you need a quick lookup (e.g., "what's the syntax for X?") without polluting the main thread:
+
+```
+/ask What is the default timeout for fetch in Node.js?
+```
+
+The response is shown inline but does not become part of the session context, so your next prompt continues from where you left off.
 
 The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history, reverting both the conversation and any file changes made after that point. You can also trigger it by pressing **double-Esc**:
 
@@ -448,6 +476,23 @@ The `/cd` command changes the working directory for the current session. Each se
 ```
 
 This is useful when you have multiple backgrounded sessions each focused on a different project directory.
+
+The `/statusline` command (aliased as `/footer`) lets you customise which items appear in the CLI status bar at the bottom of the terminal. Toggle individual elements on or off to reduce visual clutter:
+
+```
+/statusline            # view the current status bar configuration
+/statusline context    # toggle the context window indicator
+/statusline branch     # toggle the git branch display
+/statusline effort     # toggle the reasoning effort indicator
+```
+
+The `/env` command prints a summary of your current loaded environment — which instruction files, MCP servers, skills, agents, and plugins are active in the session:
+
+```
+/env
+```
+
+This is useful for verifying that your customisations have loaded correctly before starting work, especially after installing a plugin or adding a new agent.
 
 The `/share html` command exports the current session — including conversation history and any research reports — as a **self-contained interactive HTML file**:
 

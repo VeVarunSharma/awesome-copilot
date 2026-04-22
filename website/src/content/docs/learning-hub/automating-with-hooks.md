@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-22
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -154,9 +154,13 @@ You can also use these as **template variables** directly in the `bash` or `powe
 
 This makes it straightforward to write plugin hooks that are portable across machines and projects without hardcoding paths.
 
-### Event Configuration
+### Hook Types
 
-Each hook entry supports these fields:
+Hooks support two execution types: **command** (runs a local shell script) and **http** (posts a JSON payload to a URL). Both types can be mixed in the same `hooks.json`.
+
+#### Command hooks
+
+Command hooks run a local shell command or script and are the most common type:
 
 ```json
 {
@@ -171,7 +175,7 @@ Each hook entry supports these fields:
 }
 ```
 
-**type**: Always `"command"` for shell-based hooks.
+**type**: `"command"` for shell-based hooks.
 
 **bash**: The command or script to execute on Unix systems. Can be inline or reference a script file.
 
@@ -182,6 +186,37 @@ Each hook entry supports these fields:
 **timeoutSec**: Maximum execution time in seconds (default: 30). The hook is killed if it exceeds this limit.
 
 **env**: Additional environment variables merged with the existing environment.
+
+#### HTTP hooks
+
+HTTP hooks POST a JSON payload to a configured URL instead of running a local command. This is ideal for integrating with external services — webhook receivers, audit APIs, notification endpoints — without writing shell scripts or running local processes:
+
+```json
+{
+  "type": "http",
+  "url": "https://hooks.example.com/copilot-events",
+  "method": "POST",
+  "headers": {
+    "Authorization": "Bearer ${env:HOOK_TOKEN}",
+    "Content-Type": "application/json"
+  },
+  "timeoutSec": 10
+}
+```
+
+**type**: `"http"` for HTTP-based hooks.
+
+**url**: The endpoint to POST the JSON payload to. Supports environment variable interpolation with `${env:VAR_NAME}`.
+
+**method**: HTTP method to use (default: `"POST"`).
+
+**headers**: Optional HTTP headers to include in the request.
+
+**timeoutSec**: Maximum time to wait for a response (default: 30 seconds).
+
+The hook body is a JSON object containing the same context information as command hooks — tool name, arguments, session ID, and the current event type — delivered as the request body. The response status code determines success: 2xx codes indicate approval (for `preToolUse`), while non-2xx codes block the action.
+
+> **Example use case**: Send audit events to a compliance logging service, trigger Slack notifications without running a curl command, or call an internal policy API to approve tool executions.
 
 ### README.md
 
