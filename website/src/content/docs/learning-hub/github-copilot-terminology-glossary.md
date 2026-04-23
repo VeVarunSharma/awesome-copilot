@@ -3,7 +3,7 @@ title: 'GitHub Copilot Terminology Glossary'
 description: 'A quick reference guide defining common GitHub Copilot and platform-specific terms.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-23
 estimatedReadingTime: '8 minutes'
 tags:
   - glossary
@@ -262,6 +262,18 @@ tools: ['codebase', 'terminalCommand', 'github']
 ```
 
 **Related terms**: [MCP](#mcp-model-context-protocol), [Built-in Tool](#built-in-tool), [Agent](#agent)
+
+---
+
+### Auto Model
+
+A special model selection option (`auto`) that instructs GitHub Copilot CLI to automatically choose the best available model for each session rather than locking to a specific model. When the selected model hits a rate limit, `auto` seamlessly switches to an available alternative without interrupting the session.
+
+**When to use**: When you want uninterrupted sessions without having to manually manage model availability, or when working in CI/CD pipelines where rate limits may occur unpredictably.
+
+**Configuration**: Set `auto` as your model at startup (`--model auto`) or enable `continueOnAutoMode: true` in your config to fall back to auto mode automatically when a rate limit is hit.
+
+**Related terms**: [Model Picker](../copilot-configuration-basics/#model-picker)
 
 ---
 

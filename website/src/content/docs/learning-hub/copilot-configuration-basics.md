@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-23
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -405,6 +405,24 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
+#### Auto Model Selection
+
+Select `auto` as your model to let Copilot automatically pick the best available model for each session based on your current usage and the task at hand. This is especially useful when you're hitting rate limits on a specific model:
+
+```bash
+gh copilot --model auto "Refactor the authentication module"
+```
+
+You can also set `continueOnAutoMode: true` in your config to automatically switch to auto model when a rate limit is reached, instead of pausing and waiting:
+
+```json
+{
+  "continueOnAutoMode": true
+}
+```
+
+With this setting, if your chosen model hits a rate limit mid-session, Copilot silently switches to the best available alternative and continues without interruption.
+
 ### CLI Session Commands
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
@@ -424,6 +442,46 @@ The `/session rename` command renames the current session. When called **without
 ```
 
 Auto-generated names help you find sessions quickly when switching between multiple backgrounded sessions.
+
+You can also name a session at startup using the `--name` flag, and later resume it by that name:
+
+```bash
+gh copilot --name "auth-refactor" "Let's refactor the auth module"
+gh copilot --resume="auth-refactor"
+```
+
+The `/session` command also provides subcommands for cleanup:
+
+```
+/session delete            # delete the current session
+/session delete <id>       # delete a specific session by ID (short prefix OK)
+/session delete-all        # delete all sessions
+```
+
+These are useful when your session list grows long and you want to clear out old work.
+
+The `/statusline` command (also accessible as `/footer`) lets you customize which items appear in the CLI status bar at the bottom of the screen:
+
+```
+/statusline              # show current statusline configuration
+/statusline directory    # toggle the current directory indicator
+/statusline branch       # toggle the git branch indicator
+/statusline effort       # toggle the reasoning effort indicator
+/statusline context      # toggle the context window indicator
+/statusline quota        # toggle the usage quota indicator
+```
+
+The `/env` command shows a summary of everything loaded in the current session—instructions, MCP servers, skills, agents, and plugins—making it easy to verify your environment is configured correctly:
+
+```
+/env
+```
+
+This is also available as the `--list-env` CLI flag when running in prompt mode, useful for debugging CI pipelines:
+
+```bash
+gh copilot --list-env -i "Fix the flaky tests"
+```
 
 The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history, reverting both the conversation and any file changes made after that point. You can also trigger it by pressing **double-Esc**:
 
@@ -476,6 +534,26 @@ gh copilot --effort high "Refactor the authentication module"
 ```
 
 Accepted values are `low`, `medium`, and `high`. You can also set a default via the `effortLevel` config setting.
+
+### Attaching Document Files to Prompts
+
+You can attach supported document files (PDFs, Word docs, text files) directly to prompts for the agent to read and reason about. This is useful when you want to share specs, design documents, or reference material without pasting the content into chat:
+
+```
+Add the API contract from @design-spec.pdf and implement the /users endpoint
+```
+
+The agent reads the attached file and incorporates its content into its response, allowing you to ground requests in external documents without manually copying content.
+
+### Session Idle Timeout
+
+By default, sessions run indefinitely when backgrounded. You can configure a session idle timeout to automatically end sessions that have been inactive for a given period:
+
+```bash
+gh copilot --session-idle-timeout 30m "Work on the new feature"
+```
+
+This is useful in CI and automation scenarios where you want to ensure orphaned sessions don't accumulate.
 
 ## Common Questions
 

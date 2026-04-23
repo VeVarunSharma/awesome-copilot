@@ -3,7 +3,7 @@ title: 'Defining Custom Instructions'
 description: 'Learn how to create persistent, context-aware instructions that guide GitHub Copilot automatically across your codebase.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-03-22
+lastUpdated: 2026-04-23
 estimatedReadingTime: '8 minutes'
 tags:
   - instructions
@@ -272,6 +272,8 @@ A: Start with 3-5 core instructions covering your most important standards (nami
 **Q: Do instructions slow down Copilot?**
 
 A: No. Instructions are processed efficiently as part of Copilot's context window. Keep individual files focused (under 500 lines) for best results, and ensure that they are scoped appropriately.
+
+> **Performance tip**: Instructions with a specific `applyTo` pattern (e.g., `**/*.tsx`) are consolidated into a compact table reference in the system prompt rather than fully inlined on every session. This reduces context window usage significantly when you have many instruction files. Instructions that match `**` (all files) are always inlined in full, so use targeted patterns wherever possible.
 
 **Q: Can instructions contradict each other?**
 

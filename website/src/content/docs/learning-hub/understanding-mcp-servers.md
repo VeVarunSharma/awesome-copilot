@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-01
+lastUpdated: 2026-04-23
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -99,6 +99,18 @@ Example `.mcp.json` or `.vscode/mcp.json`:
 
 **env**: Environment variables passed to the server process. Use these for connection strings, API keys, and configuration—never hardcode secrets in the JSON file.
 
+**type** (for remote servers): The transport protocol used by the server. When connecting to a remote MCP server over HTTP or SSE, the `type` field is optional—it defaults to `http` when omitted. Explicit values are `http` and `sse`.
+
+### Installing MCP Servers from the Registry
+
+GitHub Copilot CLI can install MCP servers directly from the registry with guided configuration—no manual JSON editing required. Run `/mcp add` inside a session to browse and install servers interactively:
+
+```
+/mcp add
+```
+
+The CLI walks you through selecting a server, filling in required configuration values (like connection strings or API keys), and adds the server to your persistent configuration. This is the recommended way to add new MCP servers, especially for servers that require complex setup.
+
 ### Managing Persistent MCP Configuration via Server RPCs
 
 In addition to file-based configuration, GitHub Copilot CLI exposes **server RPCs** that let MCP servers and tooling scripts manage the persistent MCP server registry at runtime. This enables programmatic setup — for example, an installer script that registers a server without requiring you to hand-edit a JSON file.
@@ -164,6 +176,8 @@ Some MCP servers require authentication to connect to protected resources. GitHu
 - **Microsoft Entra ID (Azure AD)**: MCP servers that authenticate via Microsoft Entra ID are fully supported. Once you complete the initial login, the CLI caches the authentication and **will not show the consent screen on subsequent connections** — you authenticate once per session rather than every time the server reconnects.
 - **API keys via environment variables**: Pass secrets through the `env` field in the MCP server configuration (see examples above). Never hardcode credentials in `.mcp.json`.
 - **`${input:variableName}` prompts**: VS Code will prompt for these values at runtime, keeping secrets out of committed files.
+
+> **Session environment variable**: Shell commands and MCP server processes automatically receive a `COPILOT_AGENT_SESSION_ID` environment variable containing the current session ID. This is useful for MCP servers that want to log or track which Copilot session invoked them.
 
 > **Tip**: If your MCP server uses OAuth with Dynamic Client Registration but hosts its authorization metadata at a non-standard URL (as some enterprise servers like Atlassian Rovo do), Copilot CLI handles this automatically.
 
