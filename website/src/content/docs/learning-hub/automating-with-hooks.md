@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-24
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -171,17 +171,73 @@ Each hook entry supports these fields:
 }
 ```
 
-**type**: Always `"command"` for shell-based hooks.
+**type**: The hook type — either `"command"` for shell-based hooks or `"http"` for webhook-style hooks that POST a JSON payload to a URL.
 
-**bash**: The command or script to execute on Unix systems. Can be inline or reference a script file.
+**bash**: The command or script to execute on Unix systems (command type only). Can be inline or reference a script file.
 
-**powershell**: The command or script to execute on Windows systems. Either `bash` or `powershell` (or both) must be provided.
+**powershell**: The command or script to execute on Windows systems (command type only). Either `bash` or `powershell` (or both) must be provided.
 
-**cwd**: Working directory for the command (relative to repository root).
+**cwd**: Working directory for the command (command type only, relative to repository root).
 
 **timeoutSec**: Maximum execution time in seconds (default: 30). The hook is killed if it exceeds this limit.
 
-**env**: Additional environment variables merged with the existing environment.
+**env**: Additional environment variables merged with the existing environment (command type only).
+
+### HTTP Hook Configuration
+
+For `type: "http"` hooks, instead of running a local command, the hook POSTs a JSON payload to a configured URL. This is useful for sending notifications to external systems (Slack, Teams, PagerDuty, custom APIs) without requiring curl or local scripts:
+
+```json
+{
+  "type": "http",
+  "url": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL",
+  "headers": {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer ${SLACK_TOKEN}"
+  },
+  "timeoutSec": 10
+}
+```
+
+**url**: The HTTP endpoint to POST to. Environment variable references (e.g., `${MY_VAR}`) are expanded from the current environment.
+
+**headers**: Optional key-value pairs sent as HTTP headers. Useful for authentication tokens and content type declarations.
+
+**timeoutSec**: Maximum time to wait for the HTTP request to complete (default: 30).
+
+The JSON body sent to the URL contains the same hook event context that shell-based hooks receive via stdin — including the event type, tool details, and session metadata.
+
+### Using `matcher` to Filter Tool Events
+
+For `preToolUse` and `postToolUse` hooks, you can add a **`matcher`** field to restrict the hook to specific tools. The matcher is a regular expression that must fully match the tool name:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "matcher": "bash",
+        "type": "command",
+        "bash": "./scripts/check-bash-safety.sh",
+        "cwd": ".",
+        "timeoutSec": 10
+      },
+      {
+        "matcher": "edit|create",
+        "type": "command",
+        "bash": "./scripts/check-file-write.sh",
+        "cwd": ".",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
+```
+
+Without a `matcher`, the hook runs for **every** tool invocation. With a matcher, it only runs when the tool name fully matches the regex — for example, `"bash"` matches only the `bash` tool, and `"edit|create"` matches either `edit` or `create`.
+
+> **Note**: The `matcher` field requires CLI v1.0.36 or later. Earlier versions silently ignored the matcher and ran hooks for all tools.
 
 ### README.md
 
@@ -332,6 +388,8 @@ Block dangerous commands before they execute:
 
 The `preToolUse` hook receives JSON input with details about the tool being called. Your script can inspect this input and exit with a non-zero code to **deny** the tool execution, or exit with zero to **approve** it.
 
+To limit the hook to specific tools (e.g., only audit `bash` calls, not file edits), add a `matcher` field — see [Using `matcher` to Filter Tool Events](#using-matcher-to-filter-tool-events) above.
+
 ### Governance Audit
 
 Scan user prompts for potential security threats and log session activity:
@@ -373,6 +431,75 @@ Scan user prompts for potential security threats and log session activity:
 ```
 
 This pattern is useful for enterprise environments that need to audit AI interactions for compliance.
+
+### Sending Webhook Notifications with HTTP Hooks
+
+HTTP hooks let you POST structured JSON payloads to external services without writing curl commands. Use them to send real-time notifications to Slack, Teams, PagerDuty, or any custom webhook endpoint:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "agentStop": [
+      {
+        "type": "http",
+        "url": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL",
+        "timeoutSec": 10
+      }
+    ],
+    "postToolUseFailure": [
+      {
+        "type": "http",
+        "url": "https://your-alerting-system.example.com/hooks/copilot-failure",
+        "headers": {
+          "Authorization": "Bearer ${ALERT_TOKEN}"
+        },
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
+```
+
+The JSON body sent to the endpoint contains the event context automatically — no scripting required. For services that expect a specific payload shape, use a command hook with `curl` (or a lightweight wrapper script) instead.
+
+> **Availability**: HTTP hook support was added in CLI v1.0.35.
+
+### Targeting Specific Tools with `matcher` in preToolUse
+
+When you only want a hook to run for certain tools, use the `matcher` field. This avoids running expensive checks on every single tool call:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "matcher": "bash",
+        "type": "command",
+        "bash": "./scripts/audit-bash-command.sh",
+        "cwd": ".",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
+```
+
+The matcher is a regex that must **fully match** the tool name. A hook without a `matcher` runs for every tool call — useful for broad policies, but less efficient. Combine multiple matchers to target related tools:
+
+```json
+{
+  "preToolUse": [
+    {
+      "matcher": "bash|terminal",
+      "type": "command",
+      "bash": "./scripts/shell-safety-check.sh",
+      "timeoutSec": 10
+    }
+  ]
+}
+```
 
 ### Notification on Session End
 
