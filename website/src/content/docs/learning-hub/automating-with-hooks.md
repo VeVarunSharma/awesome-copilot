@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-25
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -156,7 +156,9 @@ This makes it straightforward to write plugin hooks that are portable across mac
 
 ### Event Configuration
 
-Each hook entry supports these fields:
+Hooks support two types: **command** hooks that run a local shell script, and **HTTP** hooks that POST a JSON payload to a URL.
+
+#### Command hooks
 
 ```json
 {
@@ -171,7 +173,7 @@ Each hook entry supports these fields:
 }
 ```
 
-**type**: Always `"command"` for shell-based hooks.
+**type**: `"command"` for shell-based hooks.
 
 **bash**: The command or script to execute on Unix systems. Can be inline or reference a script file.
 
@@ -182,6 +184,24 @@ Each hook entry supports these fields:
 **timeoutSec**: Maximum execution time in seconds (default: 30). The hook is killed if it exceeds this limit.
 
 **env**: Additional environment variables merged with the existing environment.
+
+#### HTTP hooks
+
+HTTP hooks POST the hook's JSON context payload directly to a URL—no shell command or `curl` required. This is ideal for integrations with external services like Slack, Teams, or custom webhooks.
+
+```json
+{
+  "type": "http",
+  "url": "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXX",
+  "timeoutSec": 5
+}
+```
+
+**type**: `"http"` for URL-based hooks.
+
+**url**: The endpoint that receives a POST request. Copilot CLI sends the hook's context (event name, tool details, etc.) as a JSON body.
+
+**timeoutSec**: Maximum time to wait for the HTTP response (default: 30).
 
 ### README.md
 
@@ -376,7 +396,24 @@ This pattern is useful for enterprise environments that need to audit AI interac
 
 ### Notification on Session End
 
-Send a Slack or Teams notification when an agent session completes:
+Send a Slack or Teams notification when an agent session completes. With HTTP hooks you can POST directly to a webhook URL without a `curl` command:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "sessionEnd": [
+      {
+        "type": "http",
+        "url": "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXX",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+Alternatively, use a command hook to customise the payload:
 
 ```json
 {

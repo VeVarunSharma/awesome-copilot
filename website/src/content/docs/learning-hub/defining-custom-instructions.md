@@ -3,7 +3,7 @@ title: 'Defining Custom Instructions'
 description: 'Learn how to create persistent, context-aware instructions that guide GitHub Copilot automatically across your codebase.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-03-22
+lastUpdated: 2026-04-25
 estimatedReadingTime: '8 minutes'
 tags:
   - instructions
@@ -284,6 +284,14 @@ A: Test by asking Copilot to generate code matching your patterns. If it follows
 **Q: Should I document everything in instructions?**
 
 A: No. Instructions are for persistent standards that apply repeatedly. Document one-off decisions in code comments. Use instructions for patterns you want Copilot to follow automatically.
+
+**Q: My instructions are stored in `.github/instructions/` which is gitignored — will they load?**
+
+A: Yes. Copilot CLI loads instruction files from `.github/instructions/` even when that directory is listed in `.gitignore`. This is intentional: you can commit instructions to a shared repo while still gitignoring the directory locally for other purposes.
+
+**Q: Do pattern-specific instructions get injected into every session?**
+
+A: No. Pattern-specific instruction files (those with an `applyTo` glob pattern) are only injected into the system prompt when the current file context matches their pattern. They are not loaded on every session, keeping your context window efficient.
 
 ## Best Practices
 
