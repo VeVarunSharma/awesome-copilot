@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-26
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -174,6 +174,8 @@ Or from an interactive session:
 ```
 /plugin install database-data-management@awesome-copilot
 ```
+
+> **Tip**: Plugins take effect immediately after installation — no restart required. Newly installed agents, skills, and hooks are available as soon as the install command completes.
 
 ### From VS Code
 

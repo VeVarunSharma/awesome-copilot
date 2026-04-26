@@ -3,8 +3,8 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
-estimatedReadingTime: '8 minutes'
+lastUpdated: 2026-04-26
+estimatedReadingTime: '9 minutes'
 tags:
   - hooks
   - automation
@@ -156,13 +156,18 @@ This makes it straightforward to write plugin hooks that are portable across mac
 
 ### Event Configuration
 
-Each hook entry supports these fields:
+Hooks support two types: shell command hooks (`"command"`) and HTTP webhook hooks (`"http"`).
+
+#### Shell Command Hooks
+
+Each shell hook entry supports these fields:
 
 ```json
 {
   "type": "command",
   "bash": "./scripts/my-check.sh",
   "powershell": "./scripts/my-check.ps1",
+  "matcher": "^(edit|write)$",
   "cwd": ".",
   "timeoutSec": 10,
   "env": {
@@ -171,17 +176,39 @@ Each hook entry supports these fields:
 }
 ```
 
-**type**: Always `"command"` for shell-based hooks.
+**type**: `"command"` for shell-based hooks.
 
 **bash**: The command or script to execute on Unix systems. Can be inline or reference a script file.
 
 **powershell**: The command or script to execute on Windows systems. Either `bash` or `powershell` (or both) must be provided.
+
+**matcher**: An optional regular expression that filters which tool names trigger this hook entry. Only applies to `preToolUse` and `postToolUse` events. If omitted, the hook runs for all tools. The regex must fully match the tool name (e.g., `"^edit$"` matches only the `edit` tool).
 
 **cwd**: Working directory for the command (relative to repository root).
 
 **timeoutSec**: Maximum execution time in seconds (default: 30). The hook is killed if it exceeds this limit.
 
 **env**: Additional environment variables merged with the existing environment.
+
+#### HTTP Webhook Hooks
+
+Instead of running a local command, HTTP hooks POST the hook's JSON context payload to a configured URL. This is useful for integrating with external services like Slack, PagerDuty, or custom webhook endpoints without running a local script:
+
+```json
+{
+  "type": "http",
+  "url": "https://hooks.example.com/copilot-events",
+  "timeoutSec": 10
+}
+```
+
+**type**: `"http"` for HTTP webhook hooks.
+
+**url**: The URL to POST the hook's JSON context payload to.
+
+**timeoutSec**: Maximum time to wait for the HTTP response (default: 30 seconds).
+
+The hook payload is the same JSON context that shell hooks receive via stdin — it includes the event type, session information, and event-specific data (e.g., the tool name and arguments for `preToolUse` events). HTTP hooks that receive a non-2xx response are treated as failures.
 
 ### README.md
 
@@ -418,6 +445,50 @@ The `subagentStart` hook fires when the main agent spawns a subagent (e.g., via 
 ```
 
 This is especially useful in multi-agent workflows where subagents may not automatically inherit context from the parent session.
+
+### HTTP Webhook Notifications
+
+Use an HTTP hook to notify an external service when a session ends — no local script required. This is ideal for integrations with tools like Slack, PagerDuty, or any service that accepts incoming webhooks:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "sessionEnd": [
+      {
+        "type": "http",
+        "url": "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXX",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+The hook automatically POSTs the session context as a JSON payload to the URL. For services that require a specific payload format, continue to use shell command hooks with `curl`.
+
+### Filtering preToolUse Hooks with matcher
+
+Use the `matcher` field to limit a `preToolUse` hook to specific tools, avoiding unnecessary overhead when only certain tools need guarding:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": "./scripts/check-bash-safety.sh",
+        "matcher": "^(bash|terminal)$",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+The `matcher` regex must fully match the tool name. This hook runs only when the agent tries to use `bash` or `terminal`, skipping file edits and other non-shell operations entirely.
 
 ### Plugin Hook Environment Variables
 
