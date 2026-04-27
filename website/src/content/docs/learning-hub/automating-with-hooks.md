@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-27
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -126,6 +126,8 @@ When multiple IDE extensions (or a mix of extensions and a `hooks.json` file) ea
 
 Hook event names can be written in **camelCase** (e.g., `preToolUse`) or **PascalCase** (e.g., `PreToolUse`). Both are accepted, making hook configuration files compatible across GitHub Copilot CLI, VS Code, and Claude Code without modification. Hooks also support Claude Code's nested `matcher`/`hooks` structure alongside the standard flat format.
 
+> **Important (v1.0.36+)**: The `matcher` field in `preToolUse` hooks now works correctly. Hooks that include a `matcher` pattern only fire for tool names that **fully match** the regex. If you have existing hooks with `matcher` set, verify they still behave as expected after upgrading — previously the field was silently ignored and the hook ran for all tools.
+
 ### Plugin Hooks Environment Variables
 
 When hooks are defined inside a **plugin**, the hook scripts receive two additional environment variables automatically:
@@ -156,7 +158,9 @@ This makes it straightforward to write plugin hooks that are portable across mac
 
 ### Event Configuration
 
-Each hook entry supports these fields:
+There are two hook types: **command hooks** that run local shell scripts, and **HTTP hooks** that POST JSON payloads to a URL.
+
+#### Command Hooks
 
 ```json
 {
@@ -171,7 +175,7 @@ Each hook entry supports these fields:
 }
 ```
 
-**type**: Always `"command"` for shell-based hooks.
+**type**: `"command"` for shell-based hooks.
 
 **bash**: The command or script to execute on Unix systems. Can be inline or reference a script file.
 
@@ -182,6 +186,37 @@ Each hook entry supports these fields:
 **timeoutSec**: Maximum execution time in seconds (default: 30). The hook is killed if it exceeds this limit.
 
 **env**: Additional environment variables merged with the existing environment.
+
+#### HTTP Hooks
+
+HTTP hooks POST a JSON payload to a configured URL instead of running a local command. This is useful for integrating with external services, webhooks, or internal APIs without needing a local script.
+
+```json
+{
+  "type": "http",
+  "url": "https://your-service.example.com/copilot-hook",
+  "method": "POST",
+  "headers": {
+    "Authorization": "Bearer ${input:apiToken}",
+    "Content-Type": "application/json"
+  },
+  "timeoutSec": 10
+}
+```
+
+**type**: `"http"` for HTTP-based hooks.
+
+**url**: The endpoint to POST the hook payload to.
+
+**method**: The HTTP method (default: `POST`).
+
+**headers**: Optional headers to include in the request (e.g., for authentication).
+
+**timeoutSec**: Maximum time to wait for the response before the hook is considered failed.
+
+The hook payload is the same JSON context object that command hooks receive as stdin. The HTTP response body can include an `additionalContext` field (for `sessionStart`) or a non-2xx status code to block the triggering action.
+
+> **Use case**: Send audit events to a compliance system, trigger CI pipelines, or notify Slack channels — all without local scripts.
 
 ### README.md
 
@@ -497,7 +532,7 @@ A: There are several supported locations, loaded in order of precedence:
 
 - **Repository-level** (shared with team): `.github/hooks/*.json` in your repository — all JSON files in this folder are loaded automatically
 - **Claude/Copilot project settings**: `.claude/settings.json` and `.claude/settings.local.json` — hooks defined here are applied to the current repository without committing them to `.github/`
-- **Global settings**: `settings.json` or `settings.local.json` (user-level CLI config)
+- **Global settings**: `~/.copilot/settings.json` or `settings.local.json` (user-level CLI config)
 - **Legacy config**: `config.json` (also supported)
 
 For team-wide hooks that everyone should use, `.github/hooks/` is the recommended location as it is version-controlled and shared automatically.

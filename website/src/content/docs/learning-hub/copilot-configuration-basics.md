@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-27
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -372,7 +372,7 @@ Settings: File → Settings → Tools → GitHub Copilot
 
 ### GitHub Copilot CLI
 
-Configuration file: `~/.copilot-cli/config.json`
+Configuration file: `~/.copilot/settings.json` (user settings) and `config.json` (internal state — do not edit directly)
 
 ```json
 {
@@ -394,12 +394,14 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
-In addition to the main config file, GitHub Copilot CLI reads two optional per-project files for repository-specific overrides:
+In addition to the main settings file, GitHub Copilot CLI reads two optional per-project files for repository-specific overrides:
 
 - `.claude/settings.json` — committed project settings
 - `.claude/settings.local.json` — local overrides (add to `.gitignore` for personal adjustments)
 
-These files follow the same format as `config.json` and are loaded after the global config, so they can tailor CLI behaviour—including hook definitions—per repository without touching `.github/`.
+These files follow the same format as `settings.json` and are loaded after the global config, so they can tailor CLI behaviour—including hook definitions—per repository without touching `.github/`.
+
+> **Note (v1.0.36+)**: Custom agents, skills, and commands from `~/.claude/` (the global user Claude directory) are **no longer loaded** by Copilot CLI. Only project-level `.claude/settings.json` files are honoured. Personal customisations should be placed in `~/.agents/` instead.
 
 ### Model Picker
 
