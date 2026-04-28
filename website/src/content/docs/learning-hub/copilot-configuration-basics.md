@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-28
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -372,6 +372,35 @@ Settings: File → Settings → Tools → GitHub Copilot
 
 ### GitHub Copilot CLI
 
+#### Shell Completion
+
+Generate static shell completion scripts for Copilot CLI commands, subcommands, flags, and known choice values. Add the appropriate line to your shell's startup file:
+
+```bash
+# Bash — add to ~/.bashrc
+eval "$(copilot completion bash)"
+
+# Zsh — add to ~/.zshrc
+eval "$(copilot completion zsh)"
+
+# Fish — add to your Fish config
+copilot completion fish | source
+```
+
+For faster shell startup, generate the script to a file instead of evaluating it inline:
+
+```bash
+copilot completion bash > ~/.local/share/bash-completion/copilot
+```
+
+#### Location-Based Permission Persistence
+
+As of v1.0.37, permission approvals **persist across sessions** for the same working directory. When you approve a tool permission (such as allowing a shell command to run), that approval is automatically remembered for future sessions in the same project directory — you no longer need to re-approve on every new session.
+
+This behavior is enabled by default. Use the `PermissionRequest` hook if you need fine-grained control over which permissions are auto-approved in automated or CI environments. See [Automating with Hooks](../automating-with-hooks/) for details.
+
+#### Configuration file
+
 Configuration file: `~/.copilot-cli/config.json`
 
 ```json
@@ -469,6 +498,18 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 
 > **Note**: `/allow-all on` permissions persist after `/clear` starts a new session, so you don't need to re-enable it each time.
 
+The `/remote` command controls whether the session runs in remote mode (using a GitHub.com cloud environment) versus locally:
+
+```
+/remote           # show current remote mode status
+/remote on        # enable remote mode
+/remote off       # disable remote mode
+```
+
+When resuming a remote session with `--resume` or `--continue`, the `--remote` flag is automatically inherited — you don't need to re-specify it.
+
+The `/keep-alive` command prevents the system from sleeping while Copilot CLI is active. This is useful for long-running agent sessions that would otherwise be interrupted by system sleep.
+
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
 ```bash
@@ -476,6 +517,21 @@ gh copilot --effort high "Refactor the authentication module"
 ```
 
 Accepted values are `low`, `medium`, and `high`. You can also set a default via the `effortLevel` config setting.
+
+### Command Aliases
+
+Several useful command aliases have been added to reduce typing:
+
+| Alias | Original Command | Description |
+|-------|-----------------|-------------|
+| `/continue` | `/resume` | Resume the most recent session |
+| `/reset` | `/clear` | Clear conversation and start fresh |
+| `/export` | `/share` | Export or share the current session |
+| `/release-notes` | — | View release notes for the current version |
+| `/bug` | — | File a bug report |
+| `/upgrade` | `/update` | Update Copilot CLI to the latest version |
+
+The slash command picker also suggests similar commands when you type an unrecognized or misspelled slash command, making it easier to find the right command.
 
 ## Common Questions
 

@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-28
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -101,6 +101,30 @@ Hooks can trigger on several lifecycle events:
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
+
+### preToolUse matcher behavior (v1.0.36+)
+
+The `preToolUse` hook supports a `matcher` field to restrict which tools the hook applies to. A fix in v1.0.36 corrected an issue where `matcher` was being silently ignored, meaning hooks with a `matcher` previously ran for **all** tools instead of only matching ones.
+
+> **Action required if upgrading**: If you have existing `preToolUse` hooks with a `matcher` field that relied on the hook running for all tools, update your configuration — after v1.0.36, the hook runs only for tool names that fully match the regex.
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "matcher": "bash",
+        "type": "command",
+        "bash": "./scripts/security-check.sh",
+        "timeoutSec": 15
+      }
+    ]
+  }
+}
+```
+
+In this example, `matcher: "bash"` causes the hook to run only when the agent calls the `bash` tool, not for file edits or other operations.
 
 ### sessionStart additionalContext
 
