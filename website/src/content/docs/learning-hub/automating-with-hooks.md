@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-29
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -158,6 +158,8 @@ This makes it straightforward to write plugin hooks that are portable across mac
 
 Each hook entry supports these fields:
 
+**Command hooks** (run a local shell command):
+
 ```json
 {
   "type": "command",
@@ -171,17 +173,36 @@ Each hook entry supports these fields:
 }
 ```
 
-**type**: Always `"command"` for shell-based hooks.
+**HTTP hooks** (POST JSON to a URL):
 
-**bash**: The command or script to execute on Unix systems. Can be inline or reference a script file.
+```json
+{
+  "type": "http",
+  "url": "https://your-webhook-endpoint.example.com/copilot-events",
+  "headers": {
+    "Authorization": "Bearer ${env:WEBHOOK_TOKEN}"
+  },
+  "timeoutSec": 10
+}
+```
 
-**powershell**: The command or script to execute on Windows systems. Either `bash` or `powershell` (or both) must be provided.
+**type**: The hook type — `"command"` for local shell commands, or `"http"` to POST the event payload as JSON to a URL (added in v1.0.35).
 
-**cwd**: Working directory for the command (relative to repository root).
+**bash**: The command or script to execute on Unix systems. Can be inline or reference a script file. (`"command"` hooks only)
+
+**powershell**: The command or script to execute on Windows systems. Either `bash` or `powershell` (or both) must be provided. (`"command"` hooks only)
+
+**url**: The endpoint to POST the event payload to. (`"http"` hooks only)
+
+**headers**: Optional HTTP headers to include in the request, e.g. for authentication. (`"http"` hooks only)
+
+**cwd**: Working directory for the command, relative to repository root. (`"command"` hooks only)
 
 **timeoutSec**: Maximum execution time in seconds (default: 30). The hook is killed if it exceeds this limit.
 
-**env**: Additional environment variables merged with the existing environment.
+**env**: Additional environment variables merged with the existing environment. (`"command"` hooks only)
+
+**matcher**: Optional regex pattern to filter which tool names trigger the hook. When set, only tool calls whose name fully matches the pattern will fire the hook. Useful for limiting `preToolUse` checks to specific tools (e.g., `"bash|terminal"`). See [Filtering preToolUse by Tool Name](#filtering-pretooluse-by-tool-name-matcher) below.
 
 ### README.md
 
@@ -446,6 +467,58 @@ You can also reference these paths as template variables in your hook configurat
 ```
 
 This is useful for plugins that bundle scripts or data files alongside their hooks, since `{{plugin_data_dir}}` always points to the correct installed location regardless of where the plugin is installed.
+
+### Sending Events to a Webhook (HTTP Hooks)
+
+HTTP hooks let you POST the event JSON payload to a remote URL instead of running a local command — ideal for integrating with Slack, PagerDuty, incident tracking systems, or your organization's governance APIs. Use them when the logic for handling an event lives in a service rather than a script.
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "agentStop": [
+      {
+        "type": "http",
+        "url": "https://hooks.example.com/copilot-events",
+        "headers": {
+          "Authorization": "Bearer ${env:WEBHOOK_TOKEN}",
+          "Content-Type": "application/json"
+        },
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
+```
+
+Copilot CLI POSTs the same JSON payload that a command-based hook would receive on stdin. A `2xx` HTTP response means success; any other status code is treated as failure.
+
+**Security note**: Reference secrets with `${env:VAR_NAME}` rather than hardcoding them in `hooks.json`. Store the actual values in environment variables or your CI secrets manager.
+
+### Filtering preToolUse by Tool Name (Matcher)
+
+To run a `preToolUse` hook only for specific tools, add a `matcher` field containing a regex pattern. The hook fires only when the tool name fully matches the pattern — letting you run targeted security checks without adding latency to every tool call:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "matcher": "bash|terminal",
+        "type": "command",
+        "bash": "./scripts/shell-security-check.sh",
+        "cwd": ".",
+        "timeoutSec": 15
+      }
+    ]
+  }
+}
+```
+
+In this example the hook only fires for `bash` and `terminal` tool calls, leaving file edits and code searches unblocked.
+
+> **Note**: The `matcher` field was fixed in v1.0.36 — in earlier versions it was silently ignored and hooks ran for all tool calls regardless of the pattern. If you were relying on `matcher`-based filtering before v1.0.36, verify your hook configuration after upgrading.
 
 ## Writing Hook Scripts
 
