@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-30
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -125,6 +125,8 @@ When multiple IDE extensions (or a mix of extensions and a `hooks.json` file) ea
 ### Cross-Platform Event Name Compatibility
 
 Hook event names can be written in **camelCase** (e.g., `preToolUse`) or **PascalCase** (e.g., `PreToolUse`). Both are accepted, making hook configuration files compatible across GitHub Copilot CLI, VS Code, and Claude Code without modification. Hooks also support Claude Code's nested `matcher`/`hooks` structure alongside the standard flat format.
+
+> **Breaking change in v1.0.36**: The `preToolUse.matcher` field was previously ignored — all `preToolUse` hooks fired regardless of the `matcher` value. This bug was fixed in v1.0.36. After upgrading, hooks that specify a `matcher` will **only** fire for tool names that fully match the regex. If you relied on the broken behavior (a matcher present but all tools firing), review your hook configuration and ensure your matchers are intentional.
 
 ### Plugin Hooks Environment Variables
 
@@ -497,7 +499,7 @@ A: There are several supported locations, loaded in order of precedence:
 
 - **Repository-level** (shared with team): `.github/hooks/*.json` in your repository — all JSON files in this folder are loaded automatically
 - **Claude/Copilot project settings**: `.claude/settings.json` and `.claude/settings.local.json` — hooks defined here are applied to the current repository without committing them to `.github/`
-- **Global settings**: `settings.json` or `settings.local.json` (user-level CLI config)
+- **Global settings**: `~/.copilot/settings.json` (user-level CLI config, as of v1.0.35)
 - **Legacy config**: `config.json` (also supported)
 
 For team-wide hooks that everyone should use, `.github/hooks/` is the recommended location as it is version-controlled and shared automatically.

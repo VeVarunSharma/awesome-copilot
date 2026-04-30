@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-04-30
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -372,12 +372,14 @@ Settings: File → Settings → Tools → GitHub Copilot
 
 ### GitHub Copilot CLI
 
-Configuration file: `~/.copilot-cli/config.json`
+User settings file: `~/.copilot/settings.json`
+
+> **Note**: As of v1.0.35, user settings are stored in `~/.copilot/settings.json`, separate from internal CLI state which remains in `~/.copilot/config.json`. If you have older tooling that references the previous `~/.copilot-cli/config.json` path, update it to `~/.copilot/settings.json`.
 
 ```json
 {
   "editor": "vim",
-  "suggestions": true
+  "effortLevel": "medium"
 }
 ```
 
@@ -424,6 +426,23 @@ The `/session rename` command renames the current session. When called **without
 ```
 
 Auto-generated names help you find sessions quickly when switching between multiple backgrounded sessions.
+
+You can also **name a session at startup** and **resume it by name** from the command line:
+
+```bash
+gh copilot --name "auth-refactor"           # start a new named session
+gh copilot --resume="auth-refactor"         # resume by name
+```
+
+The `/session delete` subcommand lets you remove sessions from within the picker:
+
+```
+/session delete               # delete the currently selected session
+/session delete <id>          # delete a specific session by ID
+/session delete-all           # delete all sessions
+```
+
+Press **x** in the interactive session picker to delete the highlighted session.
 
 The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history, reverting both the conversation and any file changes made after that point. You can also trigger it by pressing **double-Esc**:
 
@@ -476,6 +495,34 @@ gh copilot --effort high "Refactor the authentication module"
 ```
 
 Accepted values are `low`, `medium`, and `high`. You can also set a default via the `effortLevel` config setting.
+
+> **Note**: Claude Opus 4.6 now uses `medium` reasoning effort by default.
+
+### Shell Completion
+
+Generate static shell completion scripts for subcommands, flags, and known choice values using the `copilot completion` subcommand:
+
+```bash
+# Add to your shell profile for persistent completions
+gh copilot completion bash >> ~/.bashrc
+gh copilot completion zsh  >> ~/.zshrc
+gh copilot completion fish >> ~/.config/fish/completions/copilot.fish
+```
+
+### ACP Session Slash Commands
+
+When working in an ACP (Agent-to-Client Protocol) session, four additional slash commands are available for inspecting and managing the session:
+
+| Command | Description |
+|---------|-------------|
+| `/compact` | Compact the conversation to reduce context usage |
+| `/context` | Show current context window usage and breakdown |
+| `/usage` | Display a GitHub-style contribution graph of session usage |
+| `/env` | List environment variables available in the session |
+
+### Background Tasks
+
+Press **Ctrl+X → B** to move the currently running task or shell command to the background without interrupting it, so you can continue the conversation while the task finishes in the background.
 
 ## Common Questions
 
