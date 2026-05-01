@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-05-01
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -115,6 +115,12 @@ In GitHub Copilot CLI, the clearest end-user entry point is **`/fleet`**. Fleet 
 
 ```text
 /fleet Update the auth docs, refactor the auth service, and add related tests.
+```
+
+Another built-in command powered by the orchestrator/subagent model is **`/research`**. When you run `/research`, the CLI automatically uses an orchestrator to plan research questions and dispatches subagents to investigate them in parallel, then synthesizes findings into a final report. This multi-agent approach produces more thorough and reliable research results than a single-agent pass.
+
+```text
+/research What are the tradeoffs between JWT and session-based auth for our use case?
 ```
 
 For non-interactive execution:

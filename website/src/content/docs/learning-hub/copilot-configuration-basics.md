@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-05-01
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -562,6 +562,23 @@ copilot --plan          # start in plan mode (propose without executing)
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+### Configuration Directory and COPILOT_HOME
+
+By default, the CLI stores its configuration, sessions, and installed plugins in `~/.copilot/`. You can override this location using the `COPILOT_HOME` environment variable:
+
+```bash
+export COPILOT_HOME=/path/to/custom-dir
+copilot
+```
+
+> **Deprecation notice (v1.0.40+)**: The `--config-dir` command-line flag is deprecated in favor of `COPILOT_HOME`. If you are using `--config-dir` in scripts or aliases, migrate to the environment variable instead. Both are supported for now, but `--config-dir` will be removed in a future release.
+
+### Location-Based Permission Persistence
+
+When the agent asks for permission to run a tool (such as executing a shell command or reading a file), you can approve it for the **current directory**. Approvals are then automatically carried over in future sessions when you start the CLI from the same directory — you won't need to re-approve the same actions every time.
+
+> **Note (v1.0.37+)**: Location-based permission persistence is enabled by default. Approvals granted in a session are automatically reused in future sessions for the same working directory, reducing interruptions during repetitive workflows.
 
 ### Shell Completion
 

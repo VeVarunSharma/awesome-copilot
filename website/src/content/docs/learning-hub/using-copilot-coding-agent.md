@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-01
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -374,6 +374,40 @@ copilot --resume
 | No PR required | You can steer tasks that haven't yet opened a pull request |
 
 > **Note**: Remote control replaces the earlier "steering" feature. If you see references to steering in older documentation, remote control is the updated equivalent.
+
+## Session History and /chronicle
+
+The CLI automatically tracks which files were read or modified during a session and maintains a full history of prompts and responses. This context is useful for reviewing what happened in a long autonomous session and for understanding why the agent made particular decisions.
+
+**Viewing session history**:
+
+```
+/chronicle         # open the session timeline
+```
+
+The `/chronicle` command opens an interactive timeline showing each prompt, agent response, and tool invocation in the session. You can scroll through the full history, which is especially valuable when reviewing a coding agent run that completed while you were away.
+
+**File tracking**: The CLI records which files were touched during the session. This tracking persists across `/resume` so you always have a full picture of what changed — even after reconnecting to a session that ran unattended.
+
+> **Note**: Session history and `/chronicle` are available to all users as of CLI version 1.0.40.
+
+## Autopilot Mode
+
+Autopilot mode lets the CLI continue working without requiring a response from you after each agent turn. This is useful for long-running tasks where you want the agent to work uninterrupted.
+
+```bash
+copilot --autopilot
+```
+
+By default, autopilot mode allows up to **5 continuation messages** before pausing and waiting for your input. You can adjust this limit:
+
+```bash
+copilot --autopilot --max-autopilot-continues 10
+```
+
+Setting the limit higher allows longer uninterrupted runs; setting it to `1` effectively disables continuation. The limit is a safety guardrail to prevent runaway loops in case the agent gets stuck.
+
+> **Tip**: Combine autopilot mode with remote control so you can monitor progress and intervene if needed, rather than walking away entirely.
 
 ## Hooks and the Coding Agent
 
