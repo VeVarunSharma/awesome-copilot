@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-05-02
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -372,7 +372,17 @@ Settings: File → Settings → Tools → GitHub Copilot
 
 ### GitHub Copilot CLI
 
-Configuration file: `~/.copilot-cli/config.json`
+Configuration file: `~/.copilot/settings.json`
+
+> **Note (v1.0.35+)**: User settings are now stored in `~/.copilot/settings.json`, separate from internal CLI state in `~/.copilot/config.json`. If you were previously editing `config.json` for personal settings, move those to `settings.json`.
+
+> **Deprecation (v1.0.40+)**: The `--config-dir` startup flag is deprecated in favour of the `COPILOT_HOME` environment variable. Set `COPILOT_HOME` to change the root directory that Copilot CLI uses for its configuration, plugins, and session data:
+>
+> ```bash
+> export COPILOT_HOME=~/.my-copilot-config
+> ```
+>
+> `--config-dir` still works but will be removed in a future release.
 
 ```json
 {
@@ -507,6 +517,14 @@ The `/usage` command displays session metrics such as the number of tokens consu
 /usage
 ```
 
+The `/chronicle` command shows a timeline of all files read and edited during the session, giving you a clear audit trail of everything the agent accessed or changed:
+
+```
+/chronicle
+```
+
+> **Note (v1.0.40+)**: Session history, file tracking, and `/chronicle` are now available to **all users** — no experimental flag required. This makes `/chronicle` a reliable tool for auditing agent activity in any session.
+
 The `/compact` command summarizes the conversation history to free up context window space while preserving the thread of the conversation. Use it when your context is getting full but you do not want to start a fresh session:
 
 ```
@@ -543,6 +561,14 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
 
+When running in **autopilot mode** (where the agent executes a plan without pausing for confirmation), continuation messages are now limited to **5 by default**. You can adjust this with the `--max-autopilot-continues` flag:
+
+```bash
+copilot --autopilot --max-autopilot-continues 10 "Refactor the auth module"
+```
+
+Setting this to `0` disables the limit entirely (the previous behaviour). The limit prevents runaway autonomous sessions from consuming excessive resources without check-ins.
+
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
 ```bash
@@ -562,6 +588,18 @@ copilot --plan          # start in plan mode (propose without executing)
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+> **Prompt mode security (v1.0.40+)**: The `-p` / `--print` prompt mode (non-interactive output) now gates **repository hooks** and **workspace MCP servers** behind opt-in environment variables for secure-by-default behavior. To enable them in prompt mode, set the corresponding env vars before running:
+>
+> ```bash
+> # Enable repo hooks in prompt mode
+> GITHUB_COPILOT_PROMPT_MODE_REPO_HOOKS=1 copilot -p "Run the linter"
+>
+> # Enable workspace MCP servers in prompt mode
+> GITHUB_COPILOT_PROMPT_MODE_WORKSPACE_MCP=1 copilot -p "Query the database"
+> ```
+>
+> If you have CI scripts that rely on prompt mode with hooks or MCP servers, add the relevant env var to your pipeline configuration.
 
 ### Shell Completion
 
