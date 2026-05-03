@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-05-03
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -374,6 +374,12 @@ Settings: File → Settings → Tools → GitHub Copilot
 
 Configuration file: `~/.copilot-cli/config.json`
 
+> **Note (v1.0.40+)**: Use the `COPILOT_HOME` environment variable to override the default configuration directory. The `--config-dir` flag is deprecated in favor of `COPILOT_HOME`. Set it in your shell profile to keep a consistent config location across all invocations:
+>
+> ```bash
+> export COPILOT_HOME=~/.config/copilot-cli
+> ```
+
 ```json
 {
   "editor": "vim",
@@ -489,6 +495,14 @@ The `/ask` command lets you ask a quick question without affecting your conversa
 /ask What does the `retry` utility in src/utils do?
 ```
 
+The `/chronicle` command opens an interactive timeline of your session's file changes. It shows which files were created, edited, or deleted during the session, letting you review and navigate the history of everything the agent touched:
+
+```
+/chronicle
+```
+
+> **Note**: Session history, file tracking, and `/chronicle` are now available to all users as of v1.0.40. They were previously available only in experimental mode.
+
 The `/env` command shows all loaded environment details — instructions, MCP servers, skills, agents, and plugins — in a single view. Use it to verify that the right resources are active for the current session:
 
 ```
@@ -541,7 +555,16 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 
 > **Note**: `/allow-all on` permissions persist after `/clear` starts a new session, so you don't need to re-enable it each time.
 
+> **Location-based permission persistence (v1.0.37+, now default)**: Individual tool approvals (those you grant via the permission prompt during a session) are now saved per-directory by default. This means approvals carry over across sessions in the same directory — you no longer need to re-approve the same actions every time you start a new session in that folder. To disable persistence for a session, start with `--no-permission-persistence`.
+
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
+
+> **Note**: In autopilot mode, the agent limits itself to **5 continuation messages** by default before pausing for input. You can raise or remove this ceiling at startup with `--max-autopilot-continues`:
+
+```bash
+copilot --autopilot --max-autopilot-continues 20   # allow up to 20 continuations
+copilot --autopilot --max-autopilot-continues 0    # no limit
+```
 
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
@@ -562,6 +585,24 @@ copilot --plan          # start in plan mode (propose without executing)
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+### Prompt Mode (`-p`) Security
+
+When using the `-p` (prompt mode) flag for one-shot non-interactive execution, repository hooks and workspace MCP servers are **disabled by default** for security (secure-by-default behavior). To opt in, set the corresponding environment variables before running the command:
+
+```bash
+# Enable repo hooks in prompt mode
+GITHUB_COPILOT_PROMPT_MODE_REPO_HOOKS=1 copilot -p "Run the linter and fix issues"
+
+# Enable workspace MCP servers in prompt mode
+GITHUB_COPILOT_PROMPT_MODE_WORKSPACE_MCP=1 copilot -p "Query the database schema"
+
+# Enable both
+GITHUB_COPILOT_PROMPT_MODE_REPO_HOOKS=1 GITHUB_COPILOT_PROMPT_MODE_WORKSPACE_MCP=1 \
+  copilot -p "Your prompt here"
+```
+
+> **Note**: This change was introduced in v1.0.40. If you rely on prompt mode in CI pipelines that depend on hooks or workspace MCP servers, set these env vars in your pipeline configuration.
 
 ### Shell Completion
 
