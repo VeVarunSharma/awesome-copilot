@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-05-04
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -374,6 +374,8 @@ Settings: File → Settings → Tools → GitHub Copilot
 
 Configuration file: `~/.copilot-cli/config.json`
 
+> **Note (v1.0.40+)**: The `--config-dir` flag for overriding the configuration directory is deprecated. Use the `COPILOT_HOME` environment variable instead: `COPILOT_HOME=/custom/path copilot`. This environment variable is the preferred and forward-compatible way to set a custom configuration directory.
+
 ```json
 {
   "editor": "vim",
@@ -479,6 +481,14 @@ The `/share html` command exports the current session — including conversation
 
 The exported file contains everything needed to view the session without a network connection and can be shared with teammates or stored for later reference. This complements `/share` (which shares via URL) for cases where an offline or attached format is preferred.
 
+The `/chronicle` command opens an interactive timeline of the session's file changes, organized by file and by turn. Use it to review every edit the agent made in the current session — including which files were changed, at which point in the conversation, and the diff at each step:
+
+```
+/chronicle
+```
+
+> **Note (v1.0.40+)**: Session history and file tracking (which power `/chronicle`) are now available to all users. They were previously an experimental feature.
+
 **Keyboard shortcuts for queuing messages**: Use **Ctrl+Q** or **Ctrl+Enter** to queue a message (send it while the agent is still working). **Ctrl+D** no longer queues messages — it now has its default terminal behavior. If you have muscle memory for Ctrl+D queuing, switch to Ctrl+Q.
 
 **Background running tasks**: Press **Ctrl+X → B** to move the current running task or shell command to the background. The task continues executing while you can type a new message or review earlier output. This is useful for long-running commands where you want to interact with the agent while waiting for the result.
@@ -543,6 +553,12 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
 
+> **Note (v1.0.40+)**: Autopilot mode limits the number of autonomous continuation messages to **5 by default**, preventing runaway sessions. To raise or lower this limit, use the `--max-autopilot-continues` flag at startup:
+>
+> ```bash
+> copilot --autopilot --max-autopilot-continues 10
+> ```
+
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
 ```bash
@@ -562,6 +578,26 @@ copilot --plan          # start in plan mode (propose without executing)
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+The `--prompt` flag (short: `-p`) runs Copilot in non-interactive prompt mode, sending a single prompt and returning output without starting an interactive session:
+
+```bash
+copilot -p "Summarize the changes in the last commit"
+```
+
+The `--attachment` flag (v1.0.41+) attaches files — images or native documents — to the initial prompt in non-interactive mode:
+
+```bash
+copilot -p "Review this design" --attachment mockup.png
+copilot -p "Summarize this PDF" --attachment report.pdf
+```
+
+> **Security (v1.0.40+)**: In prompt mode (`-p`/`--prompt`), repository hooks and workspace MCP servers are **disabled by default** for secure-by-default behaviour. To opt in, set the corresponding environment variables before running:
+>
+> ```bash
+> GITHUB_COPILOT_PROMPT_MODE_REPO_HOOKS=1 copilot -p "..."       # enable repo hooks
+> GITHUB_COPILOT_PROMPT_MODE_WORKSPACE_MCP=1 copilot -p "..."    # enable workspace MCP
+> ```
 
 ### Shell Completion
 
