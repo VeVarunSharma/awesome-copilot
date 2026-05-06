@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-05-06
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -162,7 +162,8 @@ VS Code documentation describes both subagents and the `handoffs` frontmatter pr
 That means you should think about delegation features in product-specific terms:
 
 - **VS Code**: supports subagent concepts, allowlists, and handoff-oriented agent composition
-- **Copilot CLI**: exposes practical orchestration through commands like `/fleet`
+- **Copilot CLI**: exposes practical orchestration through commands like `/fleet`; the `/research` command uses an orchestrator/subagent model internally for more thorough and reliable results
+- **ACP clients (e.g., Zed)**: display the agent's live plan as it works through multi-step tasks, and support listing and switching between custom agents — matching the CLI agent-selection experience
 - **GitHub.com coding agent / cloud agent**: supports custom agents, but some VS Code-specific frontmatter is intentionally ignored
 
 If you share agent files across surfaces, document those differences so users know which behaviors are portable and which are editor-specific.
