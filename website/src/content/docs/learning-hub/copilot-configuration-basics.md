@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-05-07
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -408,6 +408,8 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
+Selecting **`auto`** as your model lets Copilot automatically pick the best available model for each session. As of v1.0.43, auto mode uses **server-side model routing** for improved real-time model selection — Copilot evaluates availability, load, and capability on the server side rather than making a static local choice, giving you better results without manual model switching.
+
 ### CLI Session Commands
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
@@ -489,6 +491,14 @@ The `/ask` command lets you ask a quick question without affecting your conversa
 /ask What does the `retry` utility in src/utils do?
 ```
 
+The `/chronicle` command shows the session history timeline — a log of file changes, tool uses, and agent turns over the course of the current session. It is also accessible via the `/history` alias. Use it to review what the agent did earlier without scrolling through the full conversation:
+
+```
+/chronicle
+```
+
+> **Note**: Session history, file tracking, and `/chronicle` were previously experimental features. As of v1.0.40, they are available to all users without enabling experimental mode.
+
 The `/env` command shows all loaded environment details — instructions, MCP servers, skills, agents, and plugins — in a single view. Use it to verify that the right resources are active for the current session:
 
 ```
@@ -562,6 +572,25 @@ copilot --plan          # start in plan mode (propose without executing)
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+When running in autopilot mode, Copilot limits the number of automatic continuation messages to **5 by default**. Use the `--max-autopilot-continues` flag to adjust this limit:
+
+```bash
+copilot --autopilot --max-autopilot-continues 10 "Implement the user avatar upload feature"
+```
+
+Set it to `0` to disable automatic continuations and require explicit user input at each step.
+
+### Prompt Mode File Attachments
+
+In non-interactive (prompt) mode, use the `--attachment` flag to attach files — images or supported native documents — to the initial prompt:
+
+```bash
+copilot -p "Review this diagram and suggest improvements" --attachment diagram.png
+copilot -p "Summarize the contents of this PDF" --attachment design-doc.pdf
+```
+
+Multiple attachments can be specified by repeating the flag.
 
 ### Shell Completion
 
