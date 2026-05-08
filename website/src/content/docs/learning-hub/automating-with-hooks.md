@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-08
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -89,7 +89,7 @@ Hooks can trigger on several lifecycle events:
 |-------|---------------|------------------|
 | `sessionStart` | Agent session begins or resumes | Initialize environments, log session starts, validate project state |
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
-| `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
+| `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance; **intercept and respond directly**, bypassing the LLM entirely |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
 | `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits |
 | `postToolUseFailure` | When a tool call **fails with an error** | Log errors for debugging, send failure alerts, track error patterns |
@@ -434,6 +434,53 @@ Scan user prompts for potential security threats and log session activity:
 ```
 
 This pattern is useful for enterprise environments that need to audit AI interactions for compliance.
+
+### Responding Directly from a userPromptSubmitted Hook (v1.0.44+)
+
+The `userPromptSubmitted` hook can now **handle requests directly** without passing them to the LLM at all. When your hook script writes a response to stdout, the CLI uses that response instead of making an AI model call. This enables powerful patterns like:
+
+- **FAQ bots**: Detect known questions and return canned answers instantly, with no AI quota consumed
+- **Security gates**: Block or redirect prompts that match certain patterns before they reach the model
+- **Prompt routing**: Implement custom routing logic before requests reach Copilot
+
+To return a response directly, write JSON to stdout containing a `response` key:
+
+```bash
+#!/usr/bin/env bash
+# scripts/faq-hook.sh
+# Intercept common FAQ questions and return pre-written answers.
+
+INPUT=$(cat)
+PROMPT=$(echo "$INPUT" | jq -r '.prompt // empty')
+
+if echo "$PROMPT" | grep -qi "how do I deploy"; then
+  echo '{"response": "To deploy, run `npm run deploy:prod`. Check the deployment guide at docs/deployment.md for details."}'
+  exit 0
+fi
+
+# Exit without output to let the normal LLM flow continue
+exit 0
+```
+
+Configure the hook in `hooks.json`:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "userPromptSubmitted": [
+      {
+        "type": "command",
+        "bash": "./scripts/faq-hook.sh",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+> **Note**: If your hook exits `0` without writing a `response` to stdout, the prompt proceeds normally to the LLM. Only include the `response` field when you want to intercept the request.
 
 ### Notification on Session End
 

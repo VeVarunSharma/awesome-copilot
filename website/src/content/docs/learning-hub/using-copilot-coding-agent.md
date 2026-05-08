@@ -438,6 +438,10 @@ A: The agent has built-in timeouts. If it can't make progress, it will open a PR
 
 A: Yes. The coding agent can work on multiple issues in parallel, each in its own branch. Use Mission Control on GitHub.com to track all active agent sessions.
 
+**Q: How many steps does the agent take in autopilot mode?**
+
+A: In autopilot mode, the agent limits itself to **5 continuation messages** by default before pausing for your review. You can raise this limit with the `--max-autopilot-continues` flag. For example, `copilot --max-autopilot-continues 10` allows up to 10 continuations before the agent pauses. This default prevents runaway autonomous loops on complex tasks.
+
 **Q: Does the coding agent use my custom agents and skills?**
 
 A: Yes. You can specify which agent to use when assigning work — the coding agent adopts that agent's persona, tools, and guardrails. Skills are loaded automatically when the agent determines they're relevant to the task, based on the skill's description.

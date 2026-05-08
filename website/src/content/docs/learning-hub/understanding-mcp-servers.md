@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-05-08
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -178,6 +178,7 @@ These are especially useful for plugins and installer scripts that need to self-
 
 Some MCP servers require authentication to connect to protected resources. GitHub Copilot CLI supports several authentication approaches:
 
+- **`client_credentials` OAuth grant type (v1.0.40+)**: Some enterprise MCP servers use the client credentials flow for service-to-service authentication. The CLI supports this grant type natively, enabling **fully headless authentication** without a browser redirect or device code flow — ideal for CI pipelines and unattended automation.
 - **OAuth**: MCP servers can use the OAuth flow to authenticate with external services. The CLI handles the browser redirect and token storage automatically. This also works when running in ACP (Agent Coordination Protocol) mode.
 - **Device code flow (RFC 8628)**: When the CLI runs in a **headless or CI environment** where a browser redirect is not possible, it automatically falls back to the device code flow. You'll see a URL and a code to enter on another device to complete authentication.
 - **`/mcp auth`**: If a token expires or you need to switch accounts, run `/mcp auth` inside a session. This opens the re-authentication UI for any OAuth-enabled MCP server and supports account switching. You can re-authenticate without restarting the session.
@@ -239,6 +240,35 @@ Some advanced MCP servers can request **LLM inference** from the Copilot model �
 This enables sophisticated patterns like MCP servers that orchestrate multi-step reasoning, generate structured output, or build more complex AI pipelines — while keeping the user in control with an explicit approval step.
 
 > **Note**: Sampling requires explicit user approval every time a server requests inference. This is a security boundary — MCP servers cannot silently consume your AI quota or exfiltrate context without your knowledge.
+
+## MCP Tasks (Experimental, v1.0.41+)
+
+MCP Tasks is an experimental feature that allows MCP tools to signal that they should run as **non-blocking background agents** rather than synchronous tool calls. When an MCP tool declares `taskSupport: "required"` in its capability metadata, Copilot CLI runs that tool invocation as an independent background agent.
+
+These background agents are trackable using the `list_agents` and `read_agent` tools, just like agents launched via the `task` tool in the CLI. This enables long-running operations — such as deep indexing, extended analysis, or multi-step processing — to run in parallel without blocking the main conversation.
+
+**Enabling MCP Tasks**:
+
+MCP Tasks requires experimental mode. Enable it with:
+
+```
+/experimental on
+```
+
+Or launch the CLI with:
+
+```bash
+copilot --experimental
+```
+
+Once enabled, MCP servers that advertise `taskSupport: "required"` will automatically use the background agent model. You can track their progress with:
+
+```
+list_agents    # see all active background agents
+read_agent     # get results from a completed background agent
+```
+
+> **Note**: This is an experimental feature and the API may change. Check the [copilot-cli changelog](https://github.com/github/copilot-cli/blob/main/changelog.md) for updates.
 
 ## Finding MCP Servers
 
