@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-09
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -89,7 +89,7 @@ Hooks can trigger on several lifecycle events:
 |-------|---------------|------------------|
 | `sessionStart` | Agent session begins or resumes | Initialize environments, log session starts, validate project state |
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
-| `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
+| `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance; **intercept and respond directly** without an LLM call |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
 | `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits |
 | `postToolUseFailure` | When a tool call **fails with an error** | Log errors for debugging, send failure alerts, track error patterns |
@@ -117,6 +117,40 @@ cat <<EOF
 }
 EOF
 ```
+
+### userPromptSubmitted Direct Response (LLM Bypass)
+
+> **New in v1.0.44**: `userPromptSubmitted` hooks can now handle requests directly, bypassing the LLM entirely and returning a response without making a model call.
+
+When your `userPromptSubmitted` hook script writes a JSON object containing a `response` key to stdout, Copilot CLI uses that as the assistant's reply and skips the model call entirely. This enables powerful patterns like:
+
+- **FAQ bots**: Return canned answers for common questions without consuming quota
+- **Prompt blockers with explanations**: Deny a prompt and provide a helpful message explaining why
+- **Interceptors**: Route specific request patterns to alternative logic or external systems
+
+Example hook that intercepts a specific command and responds directly:
+
+```bash
+#!/usr/bin/env bash
+# Read the prompt from stdin (JSON input)
+INPUT=$(cat)
+PROMPT=$(echo "$INPUT" | grep -o '"prompt":"[^"]*"' | sed 's/"prompt":"//;s/"//')
+
+# Intercept the /status command and respond directly
+if echo "$PROMPT" | grep -qi "^/status"; then
+  STATUS=$(git status --short 2>/dev/null | wc -l | tr -d ' ')
+  cat <<EOF
+{
+  "response": "**Repo status**: $STATUS changed file(s). Run \`git status\` for details."
+}
+EOF
+  exit 0
+fi
+
+# For all other prompts, exit without output to let the LLM handle it
+```
+
+When the hook outputs a `response` field, the LLM is not called and no quota is consumed. If the hook exits without writing a `response` (or exits with a non-zero code to block the prompt), normal processing continues.
 
 ### Extension Hooks Merging
 
@@ -586,7 +620,7 @@ For team-wide hooks that everyone should use, `.github/hooks/` is the recommende
 
 **Q: Can hooks access the user's prompt text?**
 
-A: Yes, for `userPromptSubmitted` events the prompt content is available via JSON input to the hook script. Other hooks like `preToolUse` and `postToolUse` receive context about the tool being called. See the [GitHub Copilot hooks documentation](https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-hooks) for details.
+A: Yes. For `userPromptSubmitted` events, the prompt content is available via JSON input to the hook script. In addition, as of v1.0.44, hooks can **respond directly** by writing a JSON object with a `response` key to stdout — the CLI returns that response to the user without making any model call. Other hooks like `preToolUse` and `postToolUse` receive context about the tool being called. See the [GitHub Copilot hooks documentation](https://docs.github.com/en/copilot/concepts/agents/coding-agent/about-hooks) for details.
 
 **Q: What happens if a hook times out?**
 
