@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-05-10
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -179,6 +179,7 @@ These are especially useful for plugins and installer scripts that need to self-
 Some MCP servers require authentication to connect to protected resources. GitHub Copilot CLI supports several authentication approaches:
 
 - **OAuth**: MCP servers can use the OAuth flow to authenticate with external services. The CLI handles the browser redirect and token storage automatically. This also works when running in ACP (Agent Coordination Protocol) mode.
+- **`client_credentials` grant (v1.0.40+)**: For MCP servers that support the OAuth `client_credentials` grant type, the CLI authenticates fully headlessly — no browser redirect or device code required. This is ideal for CI pipelines and automated environments where no human interaction is possible.
 - **Device code flow (RFC 8628)**: When the CLI runs in a **headless or CI environment** where a browser redirect is not possible, it automatically falls back to the device code flow. You'll see a URL and a code to enter on another device to complete authentication.
 - **`/mcp auth`**: If a token expires or you need to switch accounts, run `/mcp auth` inside a session. This opens the re-authentication UI for any OAuth-enabled MCP server and supports account switching. You can re-authenticate without restarting the session.
 - **Microsoft Entra ID (Azure AD)**: MCP servers that authenticate via Microsoft Entra ID are fully supported. Once you complete the initial login, the CLI caches the authentication and **will not show the consent screen on subsequent connections** — you authenticate once per session rather than every time the server reconnects.
@@ -239,6 +240,40 @@ Some advanced MCP servers can request **LLM inference** from the Copilot model �
 This enables sophisticated patterns like MCP servers that orchestrate multi-step reasoning, generate structured output, or build more complex AI pipelines — while keeping the user in control with an explicit approval step.
 
 > **Note**: Sampling requires explicit user approval every time a server requests inference. This is a security boundary — MCP servers cannot silently consume your AI quota or exfiltrate context without your knowledge.
+
+## MCP Tasks (Experimental)
+
+> **Available in v1.0.41+ with experimental mode enabled** (e.g., `/experimental on` or the `--experimental` flag).
+
+MCP servers can declare individual tools as **tasks** — long-running operations that execute as non-blocking background agents rather than blocking the main conversation. This allows you to kick off a slow or compute-heavy MCP tool call without freezing the session while it runs.
+
+A tool advertises task support via the `taskSupport: "required"` field in its tool definition. When Copilot invokes such a tool, it spawns a background agent to handle the operation.
+
+**How it works**:
+1. The agent calls an MCP tool that has `taskSupport: "required"`.
+2. The CLI spawns a background agent to run the tool call asynchronously.
+3. The background agent is assigned an `agent_id` that you can use to track progress.
+4. The main conversation continues while the task runs.
+5. When the task completes, you can retrieve the result with `read_agent`.
+
+**Tracking MCP tasks from within a session**:
+
+```
+# List all background agents (including running MCP tasks)
+list_agents
+
+# Read results from a completed task
+read_agent <agent_id>
+```
+
+For MCP server authors, declaring task support in your tool definition enables this pattern automatically — users running compatible clients get non-blocking execution with no extra work.
+
+**Practical use cases for MCP Tasks**:
+- Running long database migrations or batch queries without blocking the chat
+- Kicking off slow code analysis pipelines while continuing to work
+- Parallelizing multiple independent MCP operations in a single session
+
+> **Note**: MCP Tasks require both the CLI to have experimental mode enabled and the MCP server's tool to advertise `taskSupport: "required"`. Standard MCP tools without this flag continue to run synchronously.
 
 ## Finding MCP Servers
 

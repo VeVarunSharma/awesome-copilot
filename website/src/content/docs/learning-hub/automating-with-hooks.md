@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-10
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -89,7 +89,7 @@ Hooks can trigger on several lifecycle events:
 |-------|---------------|------------------|
 | `sessionStart` | Agent session begins or resumes | Initialize environments, log session starts, validate project state |
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
-| `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
+| `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance; intercept and handle requests directly without calling the LLM |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
 | `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits |
 | `postToolUseFailure` | When a tool call **fails with an error** | Log errors for debugging, send failure alerts, track error patterns |
@@ -392,6 +392,65 @@ The output fields are:
 This enables sophisticated patterns like normalizing file paths, enforcing naming conventions, adding required flags, or surfacing policy context—without blocking the tool entirely.
 
 > **Note**: Both `modifiedArgs` and `updatedInput` are accepted field names for the replacement arguments (for cross-tool compatibility).
+
+### Intercepting and Handling Prompts Directly with userPromptSubmitted
+
+> **New in v1.0.44**: `userPromptSubmitted` hooks can now **return a response directly**, bypassing the LLM entirely. This is useful for intercepting specific prompts and providing deterministic, fast answers — for example, serving cached responses, enforcing prompt policies, or redirecting to a different workflow.
+
+When a `userPromptSubmitted` hook exits with code `0` and writes a JSON payload to stdout with a `response` field, the CLI uses that response as the assistant's reply without sending the prompt to the language model at all:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "userPromptSubmitted": [
+      {
+        "type": "command",
+        "bash": "./scripts/prompt-handler.sh",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+Example hook script that intercepts "status" queries and returns a cached report:
+
+```bash
+#!/usr/bin/env bash
+# scripts/prompt-handler.sh
+# Reads the submitted prompt and returns a direct response for known queries
+
+INPUT=$(cat)
+PROMPT=$(echo "$INPUT" | jq -r '.prompt // empty')
+
+# Intercept "status" queries and return a cached system status report
+if echo "$PROMPT" | grep -qi "system status"; then
+  STATUS=$(cat .github/hooks/cached-status.md 2>/dev/null || echo "No cached status available.")
+  jq -n --arg response "$STATUS" '{"response": $response}'
+  exit 0
+fi
+
+# For all other prompts, exit without a response to let the LLM handle them
+exit 0
+```
+
+The `response` field in the JSON output becomes the assistant's reply. If the hook exits with code `0` but writes no JSON (or JSON without a `response` field), the prompt is forwarded to the LLM as normal. If the hook exits with a **non-zero code**, the prompt is **blocked** entirely.
+
+This three-way behavior gives hooks precise control over every prompt:
+
+| Hook Exit Code | Stdout | Behavior |
+|---------------|--------|----------|
+| `0` | JSON with `response` | Hook response is returned; LLM is skipped |
+| `0` | No response JSON | Prompt forwarded to LLM normally |
+| Non-zero | Any | Prompt is blocked (not sent to LLM) |
+
+**Use cases for direct response handling**:
+- Serve cached or pre-computed answers for common queries to save quota
+- Implement a prompt allowlist — only forward approved queries to the LLM
+- Route specific prompts to alternate commands or scripts rather than the AI
+- Enforce governance policies that require deterministic, auditable responses
 
 ### Governance Audit
 
