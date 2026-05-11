@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-11
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -89,7 +89,7 @@ Hooks can trigger on several lifecycle events:
 |-------|---------------|------------------|
 | `sessionStart` | Agent session begins or resumes | Initialize environments, log session starts, validate project state |
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
-| `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
+| `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance; **handle the request directly without calling the LLM** _(v1.0.44+)_ |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
 | `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits |
 | `postToolUseFailure` | When a tool call **fails with an error** | Log errors for debugging, send failure alerts, track error patterns |
@@ -434,6 +434,48 @@ Scan user prompts for potential security threats and log session activity:
 ```
 
 This pattern is useful for enterprise environments that need to audit AI interactions for compliance.
+
+### Short-Circuiting Prompts with userPromptSubmitted _(v1.0.44+)_
+
+As of v1.0.44, `userPromptSubmitted` hooks can **handle a request directly** — returning a response without calling the LLM at all. When the hook outputs a valid response to stdout and exits with code `0`, the CLI uses the hook's output as the final response, bypassing the model entirely.
+
+This unlocks lightweight automation patterns such as canned responses, FAQ bots, or local lookups that don't need AI reasoning:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "userPromptSubmitted": [
+      {
+        "type": "command",
+        "bash": "./scripts/shortcircuit-handler.sh",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+Example handler that intercepts a known command without calling the LLM:
+
+```bash
+#!/usr/bin/env bash
+# scripts/shortcircuit-handler.sh
+# Read the prompt from JSON input
+PROMPT=$(echo "$COPILOT_HOOK_INPUT" | jq -r '.prompt // ""')
+
+if [[ "$PROMPT" == "/status" ]]; then
+  # Return a response directly — no LLM call is made
+  echo '{"response": "All systems operational. Last build: passed."}'
+  exit 0
+fi
+
+# Fall through for normal prompts — let the LLM handle it
+exit 1
+```
+
+> **How it works**: If the hook exits `0` and writes a `response` field to stdout, that response is shown to the user and the LLM call is skipped. Any other exit code passes the prompt through to the model as normal.
 
 ### Notification on Session End
 

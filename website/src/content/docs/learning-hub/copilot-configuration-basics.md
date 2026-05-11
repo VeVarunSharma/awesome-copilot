@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-05-11
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -542,6 +542,20 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 > **Note**: `/allow-all on` permissions persist after `/clear` starts a new session, so you don't need to re-enable it each time.
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
+
+The `/autopilot` command _(v1.0.45+)_ toggles the current session between **interactive** mode and **autopilot** mode. In autopilot mode, the agent works through the full task without pausing for your input at each step—similar to pressing Shift+Tab to cycle through modes:
+
+```
+/autopilot         # toggle between interactive and autopilot modes
+```
+
+> **`/autopilot` vs `/allow-all`**: These are different controls. `/autopilot` switches the overall _working mode_ (interactive ↔ autopilot), while `/allow-all` specifically controls whether the agent requests permission before each tool call. You can combine them: use `/autopilot` to enter hands-free mode and `/allow-all on` to also skip per-tool confirmations.
+
+The `/fork` command _(v1.0.45+)_ creates a new independent session branched from the current one. The forked session starts with the same context as the original, but changes in one session do not affect the other — useful for exploring alternative approaches or testing ideas without disrupting an ongoing task:
+
+```
+/fork              # fork the current session into a new independent session
+```
 
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 

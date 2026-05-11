@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-05-11
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -131,6 +131,25 @@ The important behavior is different from a single chat turn:
 - subagents share the same filesystem, so overlapping writes should be avoided
 
 That makes `/fleet` a practical way to launch subagents even if you are not authoring custom agent files yourself.
+
+## Rubber-duck sub-agents _(v1.0.42+, experimental)_
+
+The **rubber-duck agent** is a built-in subagent that uses a complementary model to critique and refine the primary agent's plans and implementations. When enabled, it acts as a second opinion — catching errors, surfacing edge cases, and verifying reasoning before the main agent commits to a course of action.
+
+For GPT-based sessions in particular, the rubber-duck agent is powered by Claude, giving GPT users access to cross-model review without switching their primary model.
+
+To enable the rubber-duck agent, use the `/experimental` command and then enable it from the experimental features menu. When active, the rubber-duck subagent appears in the session timeline with its resolved model (e.g., `Rubber-duck(claude-opus-4.7)`), so you can see when it contributed.
+
+```text
+/experimental       # open the experimental features menu to enable rubber-duck
+```
+
+This is especially useful for:
+- Complex plans and refactors where a second model perspective reduces errors
+- GPT sessions that benefit from Claude's reasoning for verification passes
+- Any task where you want autonomous cross-model quality checks without manual review
+
+> **Note**: The rubber-duck agent is currently available as an experimental feature. Enable it via `/experimental` to try it.
 
 ## Orchestration patterns that work well
 
