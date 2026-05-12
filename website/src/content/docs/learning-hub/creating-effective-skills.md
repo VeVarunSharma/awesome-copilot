@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-05-12
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -363,7 +363,7 @@ A: Store skill folders in your repository's `.github/skills/` directory. They're
 
 **Q: Can agents chain multiple skills?**
 
-A: Agents can discover and invoke multiple skills during a conversation based on user intent. Each skill invocation is independent, but agents maintain conversation context across invocations.
+A: Yes — as of v1.0.44, **multiple skills can be invoked in a single message**. You can include more than one skill slash command in the same prompt (e.g., `@generate-tests @add-docs`), and both skills will run. Agents can also discover and invoke multiple skills during a conversation based on user intent. Each skill invocation is independent, but agents maintain conversation context across invocations.
 
 **Q: Should skills include code examples?**
 

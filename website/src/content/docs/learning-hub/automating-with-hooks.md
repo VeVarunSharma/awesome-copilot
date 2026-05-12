@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-12
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -89,7 +89,7 @@ Hooks can trigger on several lifecycle events:
 |-------|---------------|------------------|
 | `sessionStart` | Agent session begins or resumes | Initialize environments, log session starts, validate project state |
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
-| `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
+| `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance; **intercept and respond directly without an LLM call** |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
 | `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits |
 | `postToolUseFailure` | When a tool call **fails with an error** | Log errors for debugging, send failure alerts, track error patterns |
@@ -117,6 +117,33 @@ cat <<EOF
 }
 EOF
 ```
+
+### userPromptSubmitted Direct Responses
+
+As of v1.0.44, `userPromptSubmitted` hooks can **handle a request entirely without forwarding it to the LLM**. When your hook script writes JSON to stdout containing a `response` key, that text is returned to the user directly, and no model call is made.
+
+This is useful for:
+- **Canned responses** to common questions (e.g., returning a link to internal docs for "how do I deploy?")
+- **Policy enforcement** — block or redirect certain prompts with a custom message
+- **Offline or lightweight answers** — respond with pre-computed data without incurring a model call
+
+Example hook that intercepts a specific prompt pattern:
+
+```bash
+#!/usr/bin/env bash
+# Read the JSON input provided by the CLI
+PROMPT=$(echo "$COPILOT_HOOK_INPUT" | jq -r '.prompt // ""')
+
+if echo "$PROMPT" | grep -qi "how do I deploy"; then
+  echo '{"response": "Deployment guide: https://internal.example.com/deploy-guide"}'
+  exit 0
+fi
+
+# Return no output (or an empty object) to let the LLM handle the request normally
+echo '{}'
+```
+
+When `response` is absent (or empty), the hook exits normally and the prompt is forwarded to the model as usual.
 
 ### Extension Hooks Merging
 

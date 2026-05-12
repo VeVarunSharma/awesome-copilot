@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-05-12
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -542,6 +542,22 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 > **Note**: `/allow-all on` permissions persist after `/clear` starts a new session, so you don't need to re-enable it each time.
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
+
+The `/autopilot` command (v1.0.45+) is a dedicated slash command that toggles between **interactive mode** and **autopilot mode** mid-session:
+
+```
+/autopilot        # toggle autopilot mode on or off
+```
+
+While `/allow-all` provides granular `on`/`off`/`show` subcommands, `/autopilot` is a quick toggle for flipping between modes during an active session without breaking your flow.
+
+The `/fork` command (v1.0.45+) forks the current session into a new **independent** session. The fork starts with the same conversation history as the parent, but subsequent changes in either session do not affect the other:
+
+```
+/fork             # fork the current session into a new independent session
+```
+
+Use `/fork` when you want to explore an alternative approach or experiment with a risky change without losing your current session's progress. It's similar to creating a git branch — you can try different directions and discard the fork if the experiment doesn't pan out.
 
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
