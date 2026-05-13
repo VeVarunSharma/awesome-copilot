@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-05-13
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -419,6 +419,8 @@ GitHub Copilot CLI has two commands for managing session state, with distinct be
 
 Both commands accept an optional prompt argument to seed the new session with an opening message, for example `/new Add error handling to the login flow`.
 
+> **Tip (v1.0.44+)**: Slash commands can appear **anywhere mid-input**, not just at the start of a message. This means you can combine regular text with a command in the same message, for example: `Here's my approach—/fork to explore a different one`. Multiple skills can also be invoked in a single message.
+
 The `/session rename` command renames the current session. When called **without a name argument**, it automatically generates a session name based on the conversation history:
 
 ```
@@ -542,6 +544,23 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 > **Note**: `/allow-all on` permissions persist after `/clear` starts a new session, so you don't need to re-enable it each time.
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
+
+The `/autopilot` command (added in v1.0.45) is a shorthand for toggling between interactive and autopilot modes mid-session:
+
+```
+/autopilot        # toggle autopilot mode on or off
+```
+
+This is equivalent to `/allow-all on` / `/allow-all off` but faster to type when you want to quickly switch between modes during a working session.
+
+The `/fork` command (added in v1.0.45) forks the current session into a new, independent session that shares the same conversation history up to the fork point:
+
+```
+/fork                    # fork into a new unnamed session
+/fork "my-branch-name"   # fork and give the new session a name
+```
+
+Forked sessions display their origin in the sessions dialog so you can track where each fork came from. This is useful when you want to explore two different approaches to the same problem without losing either thread — fork the session, try one approach, then switch back to the original and try another.
 
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 

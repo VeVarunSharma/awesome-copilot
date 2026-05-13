@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-13
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -89,7 +89,7 @@ Hooks can trigger on several lifecycle events:
 |-------|---------------|------------------|
 | `sessionStart` | Agent session begins or resumes | Initialize environments, log session starts, validate project state |
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
-| `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
+| `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance; **handle requests directly without making a model call (v1.0.44+)** |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
 | `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits |
 | `postToolUseFailure` | When a tool call **fails with an error** | Log errors for debugging, send failure alerts, track error patterns |
@@ -501,7 +501,43 @@ The `subagentStart` hook fires when the main agent spawns a subagent (e.g., via 
 
 This is especially useful in multi-agent workflows where subagents may not automatically inherit context from the parent session.
 
-### Plugin Hook Environment Variables
+### Handling Requests Without a Model Call (userPromptSubmitted)
+
+Starting in v1.0.44, `userPromptSubmitted` hooks can **handle a request directly** and return a response to the user without making any model call at all. Your hook script writes a JSON response to stdout containing a `response` field, and the CLI uses that as the final answer.
+
+This is ideal for commands that don't need AI reasoning — for example, a `/status` shortcut that always prints the current git branch and open issues:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "userPromptSubmitted": [
+      {
+        "type": "command",
+        "bash": "scripts/prompt-handler.sh",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+```bash
+#!/usr/bin/env bash
+# scripts/prompt-handler.sh
+# Read the prompt from JSON input on stdin
+PROMPT=$(cat | jq -r '.prompt // ""')
+
+# Only intercept the /status command; let everything else pass through
+if [[ "$PROMPT" == "/status"* ]]; then
+  BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+  ISSUES=$(gh issue list --limit 3 --json number,title --jq '.[] | "#\(.number) \(.title)"' 2>/dev/null | tr '\n' '; ' || echo "unavailable")
+  echo "{\"response\": \"**Branch**: \`$BRANCH\`\\n\\n**Open issues**: $ISSUES\"}"
+fi
+# If no response is written, the hook is skipped and the LLM is called normally
+```
+
+When the hook writes a `response` field, the CLI displays it immediately and skips the model entirely. If the hook exits without writing a `response`, the prompt is forwarded to the model as normal — so you can intercept only the prompts you care about.
 
 When hooks are defined inside a **plugin**, Copilot CLI automatically injects two extra environment variables so scripts can locate project-specific and plugin-specific directories:
 
