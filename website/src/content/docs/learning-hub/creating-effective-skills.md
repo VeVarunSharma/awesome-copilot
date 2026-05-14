@@ -347,7 +347,7 @@ Use [scripts/parse-test-output.sh](scripts/parse-test-output.sh) to extract stru
 
 **Q: How do I invoke a skill?**
 
-A: Skills can be invoked in two ways. Users can type the skill name as a `/command` in VS Code Chat (e.g., `/generate-tests`). Agents can also discover and invoke skills automatically based on the skill's description and the user's intent.
+A: Skills can be invoked in two ways. Users can type the skill name as a `/command` in VS Code Chat or Copilot CLI (e.g., `/generate-tests`). Slash commands can appear anywhere in your message — not just at the start — and you can invoke **multiple skills in a single message** (e.g., `/generate-tests /explain-architecture`). Agents can also discover and invoke skills automatically based on the skill's description and the user's intent.
 
 **Q: How are skills different from prompts?**
 

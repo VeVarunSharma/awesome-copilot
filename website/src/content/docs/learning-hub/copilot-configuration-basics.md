@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-05-14
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -416,6 +416,7 @@ GitHub Copilot CLI has two commands for managing session state, with distinct be
 |---------|-----------|
 | `/new [prompt]` | Starts a fresh conversation while keeping the current session backgrounded. You can switch back to backgrounded sessions. |
 | `/clear [prompt]` | Abandons the current session entirely and starts a new one. Backgrounded sessions are not affected. MCP servers configured in your project are preserved in the new session. |
+| `/fork [name]` | Forks the current session into a new independent session, copying the full conversation history. The optional `name` argument labels the forked session. The fork and the original can diverge independently from that point forward. |
 
 Both commands accept an optional prompt argument to seed the new session with an opening message, for example `/new Add error handling to the login flow`.
 
@@ -542,6 +543,14 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 > **Note**: `/allow-all on` permissions persist after `/clear` starts a new session, so you don't need to re-enable it each time.
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
+
+The `/autopilot` command (new in v1.0.45) toggles between **interactive** and **autopilot** modes mid-session:
+
+```
+/autopilot        # toggle autopilot on or off
+```
+
+In autopilot mode the agent runs autonomously — executing tools and making decisions without pausing for confirmation. In interactive mode the agent pauses to ask permission before sensitive operations. Use `/autopilot` when you want to switch modes during an active session without restarting, for example to let a long-running task complete unattended and then switch back to interactive when you return.
 
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 

@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-14
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -89,7 +89,7 @@ Hooks can trigger on several lifecycle events:
 |-------|---------------|------------------|
 | `sessionStart` | Agent session begins or resumes | Initialize environments, log session starts, validate project state |
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
-| `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
+| `userPromptSubmitted` | User submits a prompt | Log/audit prompts; or **handle requests directly**, bypassing the LLM and returning a response without a model call |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
 | `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits |
 | `postToolUseFailure` | When a tool call **fails with an error** | Log errors for debugging, send failure alerts, track error patterns |
@@ -392,6 +392,59 @@ The output fields are:
 This enables sophisticated patterns like normalizing file paths, enforcing naming conventions, adding required flags, or surfacing policy context—without blocking the tool entirely.
 
 > **Note**: Both `modifiedArgs` and `updatedInput` are accepted field names for the replacement arguments (for cross-tool compatibility).
+
+### Handling Requests Directly with userPromptSubmitted
+
+> **New in v1.0.44**: `userPromptSubmitted` hooks can now **handle requests directly**, bypassing the LLM entirely and returning a response without making a model call. This enables use cases like canned FAQ responses, prompt interception, automated task routing, and local command execution — all without consuming any model quota.
+
+To handle a request directly, write a JSON object to stdout with a `response` field. When the CLI sees a `response` key in the hook's stdout, it presents that text to the user and skips the model call entirely:
+
+```bash
+#!/usr/bin/env bash
+# scripts/handle-prompt.sh
+# Intercept common questions and answer them locally
+
+INPUT=$(cat)
+PROMPT=$(echo "$INPUT" | jq -r '.prompt // empty' | tr '[:upper:]' '[:lower:]')
+
+case "$PROMPT" in
+  *"what is the on-call rotation"*|*"who is on call"*)
+    echo '{"response": "Check the on-call schedule at https://internal.example.com/oncall — updates every Monday."}'
+    exit 0
+    ;;
+  *"deploy"*|*"release"*)
+    echo '{"response": "Deployments must go through the release pipeline. See the runbook at https://internal.example.com/deploy."}'
+    exit 0
+    ;;
+esac
+
+# No match — let the LLM handle it (exit 0 with no response field)
+exit 0
+```
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "userPromptSubmitted": [
+      {
+        "type": "command",
+        "bash": "./scripts/handle-prompt.sh",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+**When this is useful**:
+- **FAQ interception**: Answer repetitive internal questions (on-call schedules, deployment processes) without a model call
+- **Prompt routing**: Detect intent locally and redirect to specialized workflows
+- **Cost control**: Prevent model calls for requests that have deterministic answers
+- **Policy enforcement**: Block certain prompt categories and return a policy message instead
+
+If the hook exits successfully but writes no `response` field, the prompt is forwarded to the model normally. If the hook writes an empty `response` string, the CLI shows an empty response and skips the model. Use exit code non-zero only if you want to block the prompt entirely (the user sees an error).
 
 ### Governance Audit
 
