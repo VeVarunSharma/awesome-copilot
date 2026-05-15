@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-15
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -89,7 +89,7 @@ Hooks can trigger on several lifecycle events:
 |-------|---------------|------------------|
 | `sessionStart` | Agent session begins or resumes | Initialize environments, log session starts, validate project state |
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
-| `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
+| `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance, or **handle requests directly without calling the LLM** |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
 | `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits |
 | `postToolUseFailure` | When a tool call **fails with an error** | Log errors for debugging, send failure alerts, track error patterns |
@@ -117,6 +117,35 @@ cat <<EOF
 }
 EOF
 ```
+
+### userPromptSubmitted: Handling Requests Directly
+
+The `userPromptSubmitted` hook can do more than just log requests. It can now **handle a user's prompt directly, bypassing the LLM entirely** and returning a response without making a model call. This is useful for routing specific commands to internal tools, returning canned responses, or enforcing guardrails that prevent certain prompts from ever reaching the model.
+
+To handle a request directly, your hook script writes JSON to stdout with a `response` key:
+
+```bash
+#!/usr/bin/env bash
+# Read prompt from environment variable injected by the hook runner
+PROMPT="$COPILOT_HOOK_PROMPT"
+
+# Example: intercept requests for time-sensitive data
+if echo "$PROMPT" | grep -qi "current stock price"; then
+  echo '{"response": "I cannot provide live stock prices. Please check a financial data provider."}'
+  exit 0
+fi
+
+# For all other prompts, exit 0 without a response to let the LLM handle it
+exit 0
+```
+
+When the hook outputs a `response`, the CLI displays it to the user as if the assistant replied — without calling the model. The hook should exit 0 in all cases; a non-zero exit code signals an error, not a direct response.
+
+| Output Field | Description |
+|-------------|-------------|
+| `response` | The text to return directly to the user instead of calling the LLM |
+
+> **Use cases**: Custom command shortcuts, policy-enforced refusals, FAQ bots that answer common questions from a local knowledge base, or redirecting specific prompt patterns to specialized tools.
 
 ### Extension Hooks Merging
 
