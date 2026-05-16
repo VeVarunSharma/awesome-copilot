@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-05-16
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -248,6 +248,12 @@ See [references/test-patterns.md](references/test-patterns.md) for standard patt
 
 Skills can also bundle reference files, templates, and scripts in their folder, giving the AI richer context than a single file can provide. Unlike the older prompt format, skills can be discovered and invoked by agents automatically.
 
+As of v1.0.44+, you can **invoke multiple skills in a single message** and place skill invocations anywhere mid-input — not just at the start of a message. For example:
+
+```
+Implement the API endpoint, then use /generate-tests to create tests for it and /add-error-handling for robust error handling.
+```
+
 **When to use**: For repetitive tasks your team performs regularly, like generating tests, creating documentation, or refactoring patterns.
 
 ### Instructions Files
@@ -408,6 +414,8 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
+For token-based billing users, the model picker now shows **actual token prices** (v1.0.48+) instead of dot indicators, so you can make informed model choices based on cost at a glance.
+
 ### CLI Session Commands
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
@@ -470,6 +478,15 @@ The `/cd` command changes the working directory for the current session. Each se
 ```
 
 This is useful when you have multiple backgrounded sessions each focused on a different project directory.
+
+The `/fork` command (v1.0.45+) forks the current session into a new independent session that inherits the conversation history up to that point:
+
+```
+/fork                          # fork to a new unnamed session
+/fork "experiment-branch-idea" # fork with a specific name
+```
+
+Forked sessions display their origin in the sessions dialog so you can trace where they branched from. This is useful when you want to explore a different approach without discarding your current session — fork it, try the alternative, and keep whichever session produced the better result.
 
 The `/share html` command exports the current session — including conversation history and any research reports — as a **self-contained interactive HTML file**:
 
@@ -543,6 +560,14 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
 
+The `/autopilot` command (v1.0.45+) provides a quick mid-session toggle between **interactive** and **autopilot** modes:
+
+```
+/autopilot          # toggle between interactive and autopilot modes
+```
+
+In **autopilot** mode the agent runs tools and makes changes without pausing for confirmation — equivalent to `/allow-all on`. In **interactive** mode it prompts before executing tools. Use `/autopilot` when you want to quickly switch modes during a session without reaching for the longer `/allow-all on` / `/allow-all off` commands.
+
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
 ```bash
@@ -562,6 +587,15 @@ copilot --plan          # start in plan mode (propose without executing)
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+**Updating to prerelease builds**: The `copilot update` command (and its in-session alias `/update`) now accepts an optional `--prerelease` flag (v1.0.44+) to fetch the latest prerelease build:
+
+```bash
+copilot update             # update to latest stable build
+copilot update --prerelease  # update to latest prerelease build
+```
+
+**Read-only gh CLI auto-approval** (v1.0.46+): In agent sessions, read-only `gh` CLI commands — such as `gh issue list`, `gh pr view`, `gh run status`, and `gh pr diff` — are now automatically approved without prompting for user confirmation. Only write operations (creating issues, pushing, etc.) still require approval. This reduces interruptions during information-gathering tasks.
 
 ### Shell Completion
 

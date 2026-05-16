@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-16
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -89,7 +89,7 @@ Hooks can trigger on several lifecycle events:
 |-------|---------------|------------------|
 | `sessionStart` | Agent session begins or resumes | Initialize environments, log session starts, validate project state |
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
-| `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
+| `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance; **handle requests directly, bypassing the LLM** (v1.0.44+) |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
 | `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits |
 | `postToolUseFailure` | When a tool call **fails with an error** | Log errors for debugging, send failure alerts, track error patterns |
@@ -101,6 +101,36 @@ Hooks can trigger on several lifecycle events:
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
+
+### userPromptSubmitted — Handling Requests Directly (v1.0.44+)
+
+As of v1.0.44, `userPromptSubmitted` hooks can **handle a request entirely on their own**, bypassing the LLM and returning a response without making a model call. This is useful for implementing routing logic, canned responses, simple lookups, or any scenario where you want to intercept a prompt and reply without incurring model usage.
+
+To handle a request directly, output a JSON object from your hook script with a `response` key:
+
+```bash
+#!/usr/bin/env bash
+# Read the incoming prompt from stdin
+PROMPT=$(jq -r '.prompt' <<< "$COPILOT_HOOK_DATA")
+
+# Handle known commands without hitting the LLM
+if [[ "$PROMPT" == "/status" ]]; then
+  BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+  CHANGES=$(git status --short | wc -l | tr -d ' ')
+  echo "{\"response\": \"Branch: $BRANCH | Uncommitted changes: $CHANGES\"}"
+  exit 0
+fi
+
+# For everything else, let the normal LLM flow proceed (exit 0 without response key)
+exit 0
+```
+
+When the hook outputs a `response` key, the CLI presents that text to the user as if the model had replied — no model call is made. If the hook exits without a `response` key (or exits non-zero), the prompt is forwarded to the LLM as usual.
+
+**Use cases for direct handling**:
+- **Slash-command routing**: Implement custom slash commands that run scripts and return results instantly
+- **Canned responses**: Answer frequent questions (e.g., project conventions) from a local knowledge base without model cost
+- **Guard rails with explanation**: Block certain prompts and reply with a reason, without involving the model
 
 ### sessionStart additionalContext
 
