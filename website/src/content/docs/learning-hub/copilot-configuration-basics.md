@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-05-18
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -386,7 +386,7 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | Setting | Description |
 |---------|-------------|
 | `includeCoAuthoredBy` | Include Co-authored-by trailer in commits |
-| `effortLevel` | Default reasoning effort level (`low`, `medium`, `high`) |
+| `effortLevel` | Default reasoning effort level (`none`, `low`, `medium`, `high`) |
 | `autoUpdatesChannel` | Update channel (`stable`, `preview`) |
 | `statusLine` | Show status line in the terminal UI |
 | `include_gitignored` | Include gitignored files in `@` file search |
@@ -406,7 +406,7 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 ### Model Picker
 
-The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
+The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`, or `none`) directly from the picker without leaving the session. Use `none` to disable model reasoning entirely. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
 ### CLI Session Commands
 
@@ -471,6 +471,15 @@ The `/cd` command changes the working directory for the current session. Each se
 
 This is useful when you have multiple backgrounded sessions each focused on a different project directory.
 
+The `/fork` command creates an independent copy of the current session, branching off at the current point in the conversation. You can optionally give the fork a name:
+
+```
+/fork                      # fork with an auto-generated name
+/fork "experiment-v2"      # fork with a specific name
+```
+
+Forked sessions display their origin in the session picker, so you can tell which parent session they branched from. This is useful when you want to explore an alternative approach without losing your current work — fork the session, try your idea, and return to the original if it doesn't pan out.
+
 The `/share html` command exports the current session — including conversation history and any research reports — as a **self-contained interactive HTML file**:
 
 ```
@@ -531,12 +540,18 @@ The `/keep-alive` command prevents the system from sleeping while Copilot CLI is
 
 > **Note**: `/keep-alive` was previously an experimental feature. As of v1.0.36, it is available without enabling experimental mode.
 
-The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, where the agent runs all tools without asking for confirmation. It now supports `on`, `off`, and `show` subcommands:
+The `/allow-all` command (also accessible as `/yolo` or `/autopilot`) enables autopilot mode, where the agent runs all tools without asking for confirmation. It now supports `on`, `off`, and `show` subcommands:
 
 ```
 /allow-all on     # enable allow-all mode
 /allow-all off    # disable allow-all mode
 /allow-all show   # check current allow-all status
+```
+
+You can also use the `/autopilot` alias to toggle autopilot mode inline:
+
+```
+/autopilot        # toggle autopilot on/off
 ```
 
 > **Note**: `/allow-all on` permissions persist after `/clear` starts a new session, so you don't need to re-enable it each time.
@@ -549,7 +564,7 @@ The `--effort` flag (shorthand for `--reasoning-effort`) controls how much compu
 gh copilot --effort high "Refactor the authentication module"
 ```
 
-Accepted values are `low`, `medium`, and `high`. You can also set a default via the `effortLevel` config setting.
+Accepted values are `low`, `medium`, `high`, and `none`. Use `none` to disable model reasoning entirely for faster, lower-cost responses on simple tasks. You can also set a default via the `effortLevel` config setting.
 
 ### CLI Startup Flags
 

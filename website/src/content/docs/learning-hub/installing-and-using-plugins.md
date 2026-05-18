@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-27
+lastUpdated: 2026-05-18
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -208,6 +208,14 @@ copilot --plugin-dir /path/to/my-plugin
 ```
 
 Plugins loaded this way appear in `/plugin list` under a separate **External Plugins** section, clearly distinguished from marketplace-installed plugins. This is useful for testing local plugins in development or loading private plugins that aren't published to any marketplace.
+
+To disable automatic plugin discovery and use only the plugins from a `--plugin-dir` directory (creating a fully deterministic plugin set), set the `COPILOT_PLUGIN_DIR_ONLY` environment variable:
+
+```bash
+COPILOT_PLUGIN_DIR_ONLY=1 copilot --plugin-dir /path/to/my-plugin
+```
+
+This is particularly useful in CI/CD pipelines or automated environments where you need precise control over which plugins are active and want to prevent any user-installed plugins from loading alongside the explicitly specified ones.
 
 ### Where Plugins Are Stored
 

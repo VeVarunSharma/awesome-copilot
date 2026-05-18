@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-05-18
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -93,7 +93,17 @@ Example `.mcp.json` or `.vscode/mcp.json`:
 
 ### Installing MCP Servers from the Registry
 
-GitHub Copilot CLI can install MCP servers directly from the official registry with guided configuration — no manual JSON editing required. During an interactive session, run:
+GitHub Copilot CLI can search and install MCP servers directly from the official registry with guided configuration — no manual JSON editing required.
+
+**Search the registry**: During an interactive session, run:
+
+```
+/mcp search
+```
+
+This opens a searchable picker listing available MCP servers from the registry. Select a server to see its description, then install it directly from the results.
+
+**Install with guided configuration**: To install a specific server, run:
 
 ```
 /mcp install
