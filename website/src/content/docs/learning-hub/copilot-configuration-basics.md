@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-05-19
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -419,6 +419,12 @@ GitHub Copilot CLI has two commands for managing session state, with distinct be
 
 Both commands accept an optional prompt argument to seed the new session with an opening message, for example `/new Add error handling to the login flow`.
 
+The `/session id` subcommand displays the current session ID and copies it to the clipboard — handy when you need to reference a session programmatically or share it with a teammate:
+
+```
+/session id
+```
+
 The `/session rename` command renames the current session. When called **without a name argument**, it automatically generates a session name based on the conversation history:
 
 ```
@@ -470,6 +476,12 @@ The `/cd` command changes the working directory for the current session. Each se
 ```
 
 This is useful when you have multiple backgrounded sessions each focused on a different project directory.
+
+The `/exit print` option prints the full session to the terminal before exiting — useful for capturing a record of what was done:
+
+```
+/exit print
+```
 
 The `/share html` command exports the current session — including conversation history and any research reports — as a **self-contained interactive HTML file**:
 
@@ -543,13 +555,46 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
 
+### Memory Management
+
+The `/memory` command controls Copilot's persistent memory — facts and context that the CLI retains across sessions:
+
+```
+/memory show    # view current memory status and stored memories
+/memory on      # enable memory for this session (persistent across sessions)
+/memory off     # disable memory for this session (persistent across sessions)
+```
+
+When memory is enabled, Copilot can store important context (such as your preferences, project details, or recurring instructions) and recall it in future sessions without you needing to repeat it.
+
+**Memory scopes** control who can see a stored memory:
+
+| Scope | Who can see it | When it applies |
+|-------|---------------|-----------------|
+| **User** | Only you, across all projects | General preferences and habits |
+| **Repository** | You and all collaborators on the repo | Project-specific conventions and context |
+
+When Copilot stores a memory, it shows you which scope applies — either `(for user)` or `(shared with repository collaborators)` — so you always know who has access. If there is no active repository context, only user-scope memory is available.
+
+> **Tip**: Use repository-scoped memory to share persistent context with your team — for example, storing architectural decisions or team conventions that the agent should always be aware of.
+
+### Rubber Duck Debugging
+
+The `/rubber-duck` command (experimental) invokes an independent critique of the agent's current work. Like the classic rubber duck debugging technique, it spawns a separate agent perspective to review the ongoing approach and flag potential issues:
+
+```
+/rubber-duck
+```
+
+This is especially useful mid-task when you want a sanity check before the agent continues. The critique appears in your conversation as a review from the rubber duck agent, and you can incorporate its feedback or dismiss it.
+
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
 ```bash
 gh copilot --effort high "Refactor the authentication module"
 ```
 
-Accepted values are `low`, `medium`, and `high`. You can also set a default via the `effortLevel` config setting.
+Accepted values are `none`, `low`, `medium`, and `high`. The `none` option disables model reasoning entirely, which can speed up responses for straightforward tasks that don't benefit from extended thinking. You can also set a default via the `effortLevel` config setting.
 
 ### CLI Startup Flags
 

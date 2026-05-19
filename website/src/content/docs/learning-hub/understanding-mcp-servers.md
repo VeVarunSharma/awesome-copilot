@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-05-19
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -109,6 +109,18 @@ You can also install a specific server by name without the picker:
 
 This guided flow is the recommended way to add new MCP servers, especially for servers that require multiple configuration values.
 
+#### Searching the Registry (Experimental)
+
+Use `/mcp search` to search the MCP server registry by keyword and install servers directly from the results:
+
+```
+/mcp search postgres
+```
+
+The search returns matching servers from the registry with descriptions, so you can evaluate options and install the right one without leaving your session. This is the fastest way to discover and add new MCP servers when you know what capability you're looking for but not the exact package name.
+
+> **Note**: `/mcp search` is an experimental feature. Enable experimental commands in your settings if it is not yet available in your version.
+
 ### Configuration Fields
 
 **command**: The executable to run the MCP server (e.g., `npx`, `python`, `docker`).
@@ -118,6 +130,20 @@ This guided flow is the recommended way to add new MCP servers, especially for s
 **env**: Environment variables passed to the server process. Use these for connection strings, API keys, and configuration—never hardcode secrets in the JSON file.
 
 **type** (remote servers): The transport type for remote MCP servers (`http` or `sse`). This field can now be omitted — the CLI defaults to `http` when no type is specified, simplifying remote server configuration.
+
+**auth.redirectPort** (OAuth servers): Pin the OAuth callback to a fixed port number. Useful when your firewall or corporate proxy only allows connections on specific ports during the OAuth redirect flow:
+
+```json
+{
+  "my-server": {
+    "command": "npx",
+    "args": ["-y", "my-oauth-mcp-server"],
+    "auth": {
+      "redirectPort": 8080
+    }
+  }
+}
+```
 
 ### Managing Persistent MCP Configuration via Server RPCs
 

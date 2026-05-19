@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-19
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -117,6 +117,19 @@ cat <<EOF
 }
 EOF
 ```
+
+### postToolUse additionalContext
+
+The `postToolUse` hook also supports `additionalContext` in its stdout output. When your hook script returns JSON with an `additionalContext` key, that text is **injected as a system message** for the model — allowing the hook to explain what it changed or provide feedback the agent should take into account for the next step:
+
+```bash
+#!/usr/bin/env bash
+# Format code and tell the agent what was changed
+npx prettier --write .
+echo '{"additionalContext": "Code was auto-formatted by Prettier. Formatting changes have been staged."}'
+```
+
+This is especially useful for formatting hooks that need to signal which files were reformatted, so the agent understands the state of the working tree without re-reading every file.
 
 ### Extension Hooks Merging
 
@@ -572,6 +585,14 @@ echo "Pre-commit checks passed ✅"
 - **Layer hooks, don't overload**: Use multiple hook entries for independent checks rather than one monolithic script.
 
 ## Common Questions
+
+**Q: Do hooks work in prompt mode (`-p`)?**
+
+A: Yes. Repository hooks in `.github/hooks/` are loaded in prompt mode (`-p`) when the current folder is already trusted. If you have not yet confirmed trust for the folder, hooks won't load — trust the folder first (you'll be prompted on first run), and hooks will activate in all subsequent prompt-mode sessions.
+
+**Q: Do hooks fire for sub-agent tool calls?**
+
+A: Yes. The `preToolUse`, `postToolUse`, `subagentStart`, and `subagentStop` hooks all fire correctly for tool calls made by sub-agents — not just by the main agent. This means your security and formatting hooks apply uniformly across the entire agent hierarchy, whether the work is done by the top-level agent or a spawned sub-agent.
 
 **Q: Where do I put hooks configuration files?**
 
