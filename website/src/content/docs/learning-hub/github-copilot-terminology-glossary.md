@@ -3,7 +3,7 @@ title: 'GitHub Copilot Terminology Glossary'
 description: 'A quick reference guide defining common GitHub Copilot and platform-specific terms.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-05-20
 estimatedReadingTime: '8 minutes'
 tags:
   - glossary
@@ -145,6 +145,20 @@ A configuration file (`*.instructions.md`) that provides persistent background c
 **When to use**: For long-lived guidance that applies across many sessions, like coding standards or compliance requirements.
 
 **Learn more**: [What are Agents, Skills, and Instructions](../what-are-agents-skills-instructions/), [Defining Custom Instructions](../defining-custom-instructions/)
+
+---
+
+### Memory
+
+A persistent storage mechanism that lets GitHub Copilot remember facts, preferences, and context across sessions. When memory is enabled, Copilot stores snippets learned during conversations and surfaces relevant memories automatically in future sessions.
+
+Memories are scoped to either the current **user** (visible only to you across all repositories) or a specific **repository** (shared with all collaborators of that repo). Use `/memory show` to review stored memories, and `/memory on` or `/memory off` to enable or disable memory.
+
+**When to use**: For personal workflow preferences, project shortcuts, or team facts that Copilot should recall without you repeating them every session.
+
+**Not a replacement for**: [Instructions](#instruction) (version-controlled standards) or [Skills](#skill) (structured task guidance).
+
+**Learn more**: [Copilot Memory](../copilot-memory/)
 
 ---
 

@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-20
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -102,11 +102,21 @@ Hooks can trigger on several lifecycle events:
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
 
-### sessionStart additionalContext
+> **Sub-agent tool calls**: `preToolUse`, `postToolUse`, `subagentStart`, and `subagentStop` hooks all fire correctly for tool calls made by sub-agents, not just the main agent. This means your security policies and formatters apply consistently across the entire agent tree in multi-agent workflows.
 
-The `sessionStart` hook supports an `additionalContext` field in its output. When your hook script writes JSON to stdout containing an `additionalContext` key, that text is **injected directly into the conversation** at the start of the session. This lets hooks dynamically provide environment-specific context—such as the current git branch, deployment environment, or team onboarding notes—without requiring the user to paste it manually.
+### additionalContext in Hook Output
 
-Example hook script that surfaces context:
+Several hooks support an `additionalContext` field in their output. When your hook script writes JSON to stdout containing an `additionalContext` key, that text is **injected as a system message** into the model's context. This lets hooks dynamically surface environment-specific information—such as the current git branch, deployment environment, or policy notes—without requiring the user to paste it manually.
+
+**Hooks that support `additionalContext`**:
+
+| Hook | Behavior |
+|------|----------|
+| `sessionStart` | Injected at the start of the session |
+| `preToolUse` | Injected alongside any `modifiedArgs` for that tool call |
+| `postToolUse` | Injected as a system message after the tool completes |
+
+Example `sessionStart` hook that surfaces branch context:
 
 ```bash
 #!/usr/bin/env bash
@@ -117,6 +127,16 @@ cat <<EOF
 }
 EOF
 ```
+
+Example `postToolUse` hook that explains a sanitization action:
+
+```bash
+#!/usr/bin/env bash
+# After a tool runs, explain what was logged
+echo '{"additionalContext": "Tool call was logged for compliance audit."}'
+```
+
+> **Note**: Prior to v1.0.49, `additionalContext` in `postToolUse` hook output was silently discarded rather than injected. If you have existing `postToolUse` hooks that emit `additionalContext`, upgrade to v1.0.49 or later to have that text properly surfaced to the model.
 
 ### Extension Hooks Merging
 

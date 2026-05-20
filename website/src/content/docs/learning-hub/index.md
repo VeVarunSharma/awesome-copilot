@@ -10,6 +10,7 @@ Essential concepts to tailor GitHub Copilot beyond its default experience. Start
 [What are Agents, Skills, and Instructions](what-are-agents-skills-instructions/)
 and work through the full track to master every customization primitive. For delegation
 and orchestration patterns, continue with [Agents and Subagents](agents-and-subagents/).
+Learn how Copilot can remember facts and preferences across sessions with [Copilot Memory](copilot-memory/).
 
 ## Reference
 

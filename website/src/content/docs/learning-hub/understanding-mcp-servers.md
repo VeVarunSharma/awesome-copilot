@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-05-20
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -108,6 +108,18 @@ You can also install a specific server by name without the picker:
 ```
 
 This guided flow is the recommended way to add new MCP servers, especially for servers that require multiple configuration values.
+
+### Searching MCP Servers (Experimental)
+
+Use `/mcp search` to search the MCP registry by keyword from within a session:
+
+```
+/mcp search postgres
+```
+
+The command returns matching servers from the registry. From the results, you can jump directly to `/mcp install` to install one. This makes discovering new MCP servers faster without having to browse a catalog separately.
+
+> **Note**: `/mcp search` is an experimental feature. You may see it annotated with "(experimental)" in the help dialog and command picker.
 
 ### Configuration Fields
 
