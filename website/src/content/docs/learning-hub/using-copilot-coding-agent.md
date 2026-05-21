@@ -3,9 +3,8 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-21
 estimatedReadingTime: '12 minutes'
-tags:
   - coding-agent
   - automation
   - agentic
@@ -419,6 +418,19 @@ It's less suited for:
 - All changes go through PR review before merging
 - Use hooks to enforce security scanning on every commit
 - Scope repository permissions appropriately
+- **Secret scanning**: The CLI automatically scans commit messages and PR descriptions for secrets and redacts them before they are published, providing an additional safety net against accidental credential exposure.
+
+### Reviewing Code for Security Vulnerabilities
+
+The `/security-review` slash command performs an on-demand security review of the current code changes, scanning for common vulnerability classes such as injection flaws, authentication weaknesses, and supply chain risks:
+
+```
+/security-review
+```
+
+Run it after the agent completes a coding task to get an immediate vulnerability report before opening a PR for human review. The review covers the staged changes in the current branch and produces a structured report with severity ratings, affected code locations, and remediation suggestions.
+
+> **Tip**: Combine `/security-review` with a `preToolUse` hook that blocks dangerous shell commands for layered security: the hook prevents dangerous commands at runtime, while `/security-review` catches vulnerabilities in the generated code before it is reviewed.
 
 ## Common Questions
 

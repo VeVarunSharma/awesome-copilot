@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-21
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -91,7 +91,8 @@ Hooks can trigger on several lifecycle events:
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
 | `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
-| `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits |
+| `preMcpToolCall` | Before an outgoing MCP tool call is sent to an MCP server | Inspect or modify MCP request metadata, add authentication headers, enforce org policies on MCP usage |
+| `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits, inject additional context |
 | `postToolUseFailure` | When a tool call **fails with an error** | Log errors for debugging, send failure alerts, track error patterns |
 | `PermissionRequest` | When the CLI shows a **permission prompt** to the user | Programmatically approve or deny permission requests, enable auto-approval in CI/headless environments |
 | `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
@@ -101,6 +102,67 @@ Hooks can trigger on several lifecycle events:
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
+
+### preMcpToolCall Hook
+
+The `preMcpToolCall` hook fires **before** the CLI sends a tool call to an MCP server. This gives hook providers an opportunity to inspect or modify the outgoing MCP request metadata — for example, to add authentication tokens, enforce organizational policies on which MCP tools may be called, or log external tool usage for compliance.
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "preMcpToolCall": [
+      {
+        "type": "command",
+        "bash": ".github/hooks/mcp-policy/check-mcp-call.sh",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+The hook receives JSON input describing the target MCP server and the tool being called. Exit with a non-zero code to **block** the call; exit with zero to allow it. Your script can also write modified request metadata to stdout to alter the outgoing call.
+
+> **Use case**: Enforce org-wide policies that restrict which MCP tools can be called (e.g., allow read-only database queries but block schema modifications), or inject headers/tokens required by a secured MCP server.
+
+### postToolUse additionalContext
+
+Beyond logging and formatting, `postToolUse` hooks can now **inject additional context** into the agent's reasoning after a tool completes. When your hook writes JSON containing an `additionalContext` key to stdout, that text is appended to the tool result before the model processes it — useful for surfacing side-channel information like lint results, policy notes, or derived metrics.
+
+```bash
+#!/usr/bin/env bash
+# scripts/post-edit-context.sh
+# After a file edit, report linting status to the agent
+
+INPUT=$(cat)
+LINT_OUTPUT=$(npx eslint --format compact 2>&1 || true)
+
+if [ -n "$LINT_OUTPUT" ]; then
+  ESCAPED=$(echo "$LINT_OUTPUT" | jq -Rs .)
+  echo "{\"additionalContext\": \"Lint results after edit: $ESCAPED\"}"
+fi
+```
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "postToolUse": [
+      {
+        "matcher": "^edit$",
+        "type": "command",
+        "bash": "./scripts/post-edit-context.sh",
+        "cwd": ".",
+        "timeoutSec": 15
+      }
+    ]
+  }
+}
+```
+
+The `additionalContext` is injected as a **system message** so the model sees it as authoritative environment feedback rather than as a user reply. This pattern is especially useful for surfacing linter output, test results, or security scan findings immediately after code edits, enabling the agent to self-correct in the same turn.
 
 ### sessionStart additionalContext
 

@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-05-21
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -530,6 +530,18 @@ The `/keep-alive` command prevents the system from sleeping while Copilot CLI is
 ```
 
 > **Note**: `/keep-alive` was previously an experimental feature. As of v1.0.36, it is available without enabling experimental mode.
+
+The `/memory` command manages Copilot's persistent memory — facts about your projects, preferences, and conventions that carry over across sessions. Memories are scoped per repository or per user and are injected as system context at the start of each session:
+
+```
+/memory on        # enable memory for this session
+/memory off       # disable memory for this session
+/memory show      # display all stored memories and their scopes
+```
+
+When you enable memory, Copilot can remember things like preferred code style, architectural decisions, or frequently referenced resources — reducing the need to repeat the same context each session. The scope shown for each memory (`(for user)` or `(shared with repository collaborators)`) makes it clear who can see it.
+
+> **Managing memory**: Stored memories can be viewed and deleted from the GitHub Copilot Memory UI in repository Settings → Copilot → Memory (repository scope) or in your personal Copilot settings at <https://github.com/settings/copilot/memory> (user scope).
 
 The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, where the agent runs all tools without asking for confirmation. It now supports `on`, `off`, and `show` subcommands:
 
