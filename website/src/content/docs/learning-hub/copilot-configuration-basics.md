@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-05-22
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -542,6 +542,41 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 > **Note**: `/allow-all on` permissions persist after `/clear` starts a new session, so you don't need to re-enable it each time.
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
+
+The `/memory` command controls GitHub Copilot's persistent memory feature, which lets Copilot remember facts and preferences across sessions:
+
+```
+/memory on        # enable persistent memory
+/memory off       # disable persistent memory
+/memory show      # view current memory status and stored memories
+```
+
+Memory can be scoped to your user account (available across all your projects) or to a specific repository (shared with collaborators). When you enable memory, Copilot can recall context from previous sessions — such as your preferred coding style, frequently used patterns, or project-specific notes — without you having to repeat it each time.
+
+The `/security-review` slash command reviews your recent code changes for security vulnerabilities, providing targeted feedback on issues such as injection flaws, authentication weaknesses, and supply chain risks:
+
+```
+/security-review
+```
+
+The command analyzes your current diff or staged changes and highlights potential security concerns with suggested remediations.
+
+> **Note**: `/security-review` is experimental and requires experimental mode to be enabled.
+
+The `/rubber-duck` command invokes an independent critique agent that reviews the current agent's work in progress. It provides an outside perspective without being biased by the active session's assumptions — useful for catching missed requirements, logical errors, or scope creep before a PR is opened:
+
+```
+/rubber-duck
+```
+
+The `/chronicle` command provides tools for reviewing and managing session history:
+
+```
+/chronicle cost-tips    # get personalized recommendations to reduce token usage and cost
+/chronicle search <query>   # search all session content by keyword or topic
+```
+
+Use `cost-tips` after a long session to understand where tokens were spent and how to work more efficiently. Use `search` to quickly find earlier conversations, decisions, or code snippets from past sessions.
 
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 

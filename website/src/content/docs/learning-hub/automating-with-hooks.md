@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-22
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -91,8 +91,9 @@ Hooks can trigger on several lifecycle events:
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
 | `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
-| `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits |
+| `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits, inject follow-up context |
 | `postToolUseFailure` | When a tool call **fails with an error** | Log errors for debugging, send failure alerts, track error patterns |
+| `preMcpToolCall` | Before an outgoing MCP tool call is sent to a remote server | Audit or modify outgoing MCP request metadata, enforce governance on external calls |
 | `PermissionRequest` | When the CLI shows a **permission prompt** to the user | Programmatically approve or deny permission requests, enable auto-approval in CI/headless environments |
 | `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
 | `preCompact` | Before the agent compacts its context window | Save a snapshot, log compaction event, run summary scripts |
@@ -117,6 +118,19 @@ cat <<EOF
 }
 EOF
 ```
+
+### postToolUse additionalContext
+
+`postToolUse` hooks can now inject `additionalContext` into the agent's next turn by writing JSON to stdout with an `additionalContext` key. This lets hooks surface follow-up information after a tool completes — for example, reporting that a formatting step ran, surfacing environment state that changed, or noting a policy check result:
+
+```bash
+#!/usr/bin/env bash
+# After any file edit, report the number of changed lines
+CHANGES=$(git diff --stat | tail -1)
+echo "{\"additionalContext\": \"Formatting complete. Git status: $CHANGES\"}"
+```
+
+This complements the `preToolUse` `additionalContext` field (which injects context before a tool runs) and the `sessionStart` `additionalContext` field (which injects context at session start).
 
 ### Extension Hooks Merging
 
