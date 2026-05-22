@@ -3,7 +3,7 @@ title: "GitHub Copilot CLI for Beginners"
 description: "A source-faithful mirror of the companion GitHub Copilot CLI for Beginners course."
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-03-20
+lastUpdated: 2026-05-22
 ---
 
 ![GitHub Copilot CLI for Beginners](/images/learning-hub/copilot-cli-for-beginners/overview/copilot-banner.png)
@@ -21,12 +21,6 @@ This course is designed for:
 - **Software Developers** who want to use AI from the command line
 - **Terminal users** who prefer keyboard-driven workflows over IDE integrations
 - **Teams looking to standardize** AI-assisted code review and development practices
-
-<a href="https://aka.ms/githubcopilotdevdays" target="_blank">
-  <picture>
-    <img src="/images/learning-hub/copilot-cli-for-beginners/overview/copilot-dev-days.png" alt="GitHub Copilot Dev Days - Find or host an event" width="100%" />
-  </picture>
-</a>
 
 ## 🎯 What You'll Learn
 
@@ -53,7 +47,7 @@ GitHub Copilot has evolved into a family of AI-powered tools. Here's where each 
 | [**GitHub Copilot CLI**](https://docs.github.com/copilot/how-tos/copilot-cli/cli-getting-started)<br>(this course)                  | Your terminal                           | Terminal-native AI coding assistant                      |
 | [**GitHub Copilot**](https://docs.github.com/copilot)                                                                               | VS Code, Visual Studio, JetBrains, etc. | Agent mode, chat, inline suggestions                     |
 | [**Copilot on GitHub.com**](https://github.com/copilot)                                                                             | GitHub                                  | Immersive chat about your repos, create agents, and more |
-| [**GitHub Copilot coding agent**](https://docs.github.com/copilot/using-github-copilot/using-copilot-coding-agent-to-work-on-tasks) | GitHub                                  | Assign issues to agents, get PRs back                    |
+| [**GitHub Copilot cloud agent**](https://docs.github.com/copilot/using-github-copilot/using-copilot-coding-agent-to-work-on-tasks) | GitHub                                  | Assign issues to agents, get PRs back                    |
 
 This course focuses on **GitHub Copilot CLI**, bringing AI assistance directly to your terminal.
 
