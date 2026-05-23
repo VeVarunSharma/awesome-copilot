@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-23
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -96,6 +96,7 @@ Hooks can trigger on several lifecycle events:
 | `PermissionRequest` | When the CLI shows a **permission prompt** to the user | Programmatically approve or deny permission requests, enable auto-approval in CI/headless environments |
 | `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
 | `preCompact` | Before the agent compacts its context window | Save a snapshot, log compaction event, run summary scripts |
+| `preMcpToolCall` | Before the agent sends a tool call to an MCP server | Inspect or modify outgoing MCP request metadata, enforce policies on MCP calls |
 | `subagentStart` | A subagent is spawned by the main agent | Inject additional context into the subagent's prompt, log subagent launches |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
@@ -117,6 +118,23 @@ cat <<EOF
 }
 EOF
 ```
+
+### postToolUse additionalContext
+
+`postToolUse` hooks can inject `additionalContext` into successful tool results. When your hook script writes JSON containing an `additionalContext` key to stdout, that text is surfaced to the agent alongside the tool result — useful for adding annotations, policy notes, or supplementary information tied to specific tool executions.
+
+```bash
+#!/usr/bin/env bash
+# Annotate bash tool results with environment context
+INPUT=$(cat)
+TOOL=$(echo "$INPUT" | jq -r '.tool_name // empty')
+
+if [ "$TOOL" = "bash" ]; then
+  echo "{\"additionalContext\": \"Command executed in $(pwd) on branch $(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo 'no-branch').\"}"
+fi
+```
+
+This complements the `preToolUse` `additionalContext` pattern: `preToolUse` can annotate context *before* a tool runs, and `postToolUse` can annotate context *after* it completes.
 
 ### Extension Hooks Merging
 

@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-05-23
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -84,6 +84,19 @@ tools: ['codebase', 'terminal', 'github']
 | `edit` | Modify files in the workspace |
 
 For MCP server tools, reference them by server name (e.g., `postgres`, `docker`). See [Understanding MCP Servers](../understanding-mcp-servers/) for details.
+
+**deferred-tool-loading** (optional): Set to `true` to enable deferred (lazy) loading for tool discovery. When an agent declares a large number of tools or MCP-backed tools, the CLI can take time to load them all at startup. Deferred loading causes tools to be registered only when first needed, improving startup performance for agents with extensive tool lists.
+
+```yaml
+---
+name: 'Data Platform Expert'
+description: 'Expert for data pipelines with access to many MCP-backed data tools'
+tools: ['codebase', 'terminal', 'postgres', 'bigquery', 'redshift', 'dbt-mcp']
+deferred-tool-loading: true
+---
+```
+
+> **Note**: Deferred tool loading is opt-in. Enabling it may slightly delay the first use of a deferred tool, but avoids paying the startup cost for tools that might never be invoked during a session.
 
 ### Agent Instructions
 
