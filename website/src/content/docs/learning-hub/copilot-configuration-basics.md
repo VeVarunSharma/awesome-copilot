@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-05-24
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -501,16 +501,17 @@ The `/context` command shows a visualization of the current conversation's conte
 /context
 ```
 
-The `/usage` command displays session metrics such as the number of tokens consumed, API calls made, and any quota information for the current session:
+The `/usage` command displays session metrics such as the number of tokens consumed, API calls made, and any quota information for the current session. It now also shows **quota progress bars** for session and weekly limits, giving you a visual indication of remaining budget:
 
 ```
 /usage
 ```
 
-The `/compact` command summarizes the conversation history to free up context window space while preserving the thread of the conversation. Use it when your context is getting full but you do not want to start a fresh session:
+The `/compact` command summarizes the conversation history to free up context window space while preserving the thread of the conversation. Use it when your context is getting full but you do not want to start a fresh session. You can pass optional **focus instructions** to shape what the compaction summary emphasizes:
 
 ```
 /compact
+/compact focus on the database migration changes only
 ```
 
 > **Note**: Skills remain loaded and effective after `/compact`. You do not need to re-invoke them after compacting.
@@ -530,6 +531,49 @@ The `/keep-alive` command prevents the system from sleeping while Copilot CLI is
 ```
 
 > **Note**: `/keep-alive` was previously an experimental feature. As of v1.0.36, it is available without enabling experimental mode.
+
+The `/memory` command lets you enable, disable, or view the status of **Copilot Memory** — persistent context that carries over across sessions. Use it to check whether memory is active or toggle it on or off:
+
+```
+/memory on             # enable Copilot Memory for this session (persistent)
+/memory off            # disable Copilot Memory
+/memory show           # view current memory status and documentation links
+```
+
+Memory stores information across sessions so Copilot can recall preferences, project context, and previous decisions automatically.
+
+The `/security-review` command performs a code review focused on security vulnerabilities. It analyzes staged or recent changes and surfaces potential issues such as injection flaws, authentication gaps, and supply chain risks:
+
+```
+/security-review
+```
+
+The `/rubber-duck` command invokes an independent agent that critiques the current agent's work — helpful for catching blind spots, validating reasoning, or getting a second opinion mid-task:
+
+```
+/rubber-duck
+```
+
+The `/chronicle` command manages your session history and provides insights into your Copilot CLI usage:
+
+```
+/chronicle search <keyword>    # search all session content by keyword or topic
+/chronicle cost-tips           # personalized token usage and cost reduction recommendations
+```
+
+Use `/chronicle search` to find earlier conversations or work, and `/chronicle cost-tips` to understand where tokens are being spent and how to reduce costs.
+
+The `/session id` subcommand displays the current session ID and copies it to the clipboard — useful when you need to share or reference a specific session:
+
+```
+/session id
+```
+
+The `/exit print` option prints the session conversation to the terminal before exiting:
+
+```
+/exit print
+```
 
 The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, where the agent runs all tools without asking for confirmation. It now supports `on`, `off`, and `show` subcommands:
 
@@ -562,6 +606,12 @@ copilot --plan          # start in plan mode (propose without executing)
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+The `--session-id=<id>` flag resumes a known session by UUID, or starts a new session with a specific UUID if no session with that ID exists. This is useful for automation scripts that need to resume a specific known session or create predictably named sessions:
+
+```bash
+copilot --session-id=550e8400-e29b-41d4-a716-446655440000    # resume or create with specific UUID
+```
 
 ### Shell Completion
 

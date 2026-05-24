@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-24
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -91,13 +91,14 @@ Hooks can trigger on several lifecycle events:
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
 | `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
-| `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits |
+| `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits, inject `additionalContext` into the agent's next turn |
 | `postToolUseFailure` | When a tool call **fails with an error** | Log errors for debugging, send failure alerts, track error patterns |
 | `PermissionRequest` | When the CLI shows a **permission prompt** to the user | Programmatically approve or deny permission requests, enable auto-approval in CI/headless environments |
 | `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
 | `preCompact` | Before the agent compacts its context window | Save a snapshot, log compaction event, run summary scripts |
 | `subagentStart` | A subagent is spawned by the main agent | Inject additional context into the subagent's prompt, log subagent launches |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
+| `preMcpToolCall` | Before an MCP tool call is dispatched | Control outgoing MCP request metadata, log or transform MCP requests, enforce policies on MCP tool usage |
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
@@ -296,6 +297,68 @@ The `postToolUseFailure` hook fires when a tool call fails with an error — dis
 The hook receives JSON input describing which tool failed and the error message. This separation lets you write targeted failure-handling logic without adding conditional checks to your `postToolUse` hooks.
 
 > **Note**: Before v1.0.15, `postToolUse` fired for both successful and failed tool calls. If you have existing `postToolUse` hooks that handle failures, migrate that logic to `postToolUseFailure`.
+
+### Injecting Context from postToolUse Hooks
+
+`postToolUse` hooks can return `additionalContext` in their output to inject information into the agent's next turn — for example, surfacing test results, lint output, or custom annotations from an external service immediately after a tool completes. This works exactly the same as `additionalContext` in `preToolUse` and `sessionStart` hooks:
+
+```bash
+#!/usr/bin/env bash
+# scripts/annotate-after-edit.sh
+# Reads the tool result from stdin and appends a code coverage summary.
+
+INPUT=$(cat)
+COVERAGE=$(./scripts/get-coverage.sh 2>/dev/null || echo "unknown")
+
+cat <<EOF
+{
+  "additionalContext": "Current test coverage after this edit: ${COVERAGE}. Consider adding tests if coverage dropped."
+}
+EOF
+```
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "postToolUse": [
+      {
+        "matcher": "^edit$",
+        "type": "command",
+        "bash": "./scripts/annotate-after-edit.sh",
+        "cwd": ".",
+        "timeoutSec": 15
+      }
+    ]
+  }
+}
+```
+
+The injected context is delivered as a system message so the agent sees it in the following turn.
+
+### Controlling MCP Tool Calls with preMcpToolCall
+
+The `preMcpToolCall` hook fires before an MCP tool call is dispatched to the server. Use it to log or audit outgoing MCP requests, enforce policies on which MCP tools are called, or transform request metadata before it leaves the client:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "preMcpToolCall": [
+      {
+        "type": "command",
+        "bash": "./scripts/audit-mcp-call.sh",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+The hook receives JSON input describing the MCP server name, tool name, and arguments. Returning a non-zero exit code blocks the MCP tool call, letting you enforce allow-lists or require human approval for sensitive operations.
+
+
 
 ### Auto-Format After Edits
 
