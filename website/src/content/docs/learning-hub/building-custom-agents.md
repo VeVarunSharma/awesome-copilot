@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-05-25
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -84,6 +84,18 @@ tools: ['codebase', 'terminal', 'github']
 | `edit` | Modify files in the workspace |
 
 For MCP server tools, reference them by server name (e.g., `postgres`, `docker`). See [Understanding MCP Servers](../understanding-mcp-servers/) for details.
+
+**deferred-tool-loading** (optional): When set to `true`, enables opt-in deferred tool loading and tool-search discovery for the agent. This is recommended for agents with large tool lists, as it prevents the agent's context from being filled with tool definitions upfront — tools are discovered and loaded on demand instead.
+
+```yaml
+---
+name: 'Large-Scale Analyst'
+description: 'Data analyst with access to many specialized tools'
+model: Claude Sonnet 4
+deferred-tool-loading: true
+tools: ['codebase', 'terminal', 'postgres-mcp', 'bigquery-mcp', 'dbt-mcp']
+---
+```
 
 ### Agent Instructions
 

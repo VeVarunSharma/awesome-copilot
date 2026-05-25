@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-25
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -89,7 +89,7 @@ Hooks can trigger on several lifecycle events:
 |-------|---------------|------------------|
 | `sessionStart` | Agent session begins or resumes | Initialize environments, log session starts, validate project state |
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
-| `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
+| `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance; can also **handle the request directly** and return a response without calling the AI model (see below) |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
 | `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits |
 | `postToolUseFailure` | When a tool call **fails with an error** | Log errors for debugging, send failure alerts, track error patterns |
@@ -98,6 +98,7 @@ Hooks can trigger on several lifecycle events:
 | `preCompact` | Before the agent compacts its context window | Save a snapshot, log compaction event, run summary scripts |
 | `subagentStart` | A subagent is spawned by the main agent | Inject additional context into the subagent's prompt, log subagent launches |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
+| `preMcpToolCall` | Before the agent calls a tool on an MCP server | Control outgoing MCP request metadata, enforce MCP-specific policies |
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
@@ -117,6 +118,43 @@ cat <<EOF
 }
 EOF
 ```
+
+### postToolUse additionalContext
+
+`postToolUse` hooks can also inject **additional context** into successful tool results. When your hook script writes JSON to stdout containing an `additionalContext` key, that text is injected as a system message for the model alongside the tool's result. This enables patterns like annotating tool outputs with policy notes, surfacing observability data, or providing supplementary context that helps the agent reason about what a tool just did.
+
+```bash
+#!/usr/bin/env bash
+# After a bash tool call, inject context about which environment it ran in
+cat <<EOF
+{
+  "additionalContext": "Command executed in the $(git rev-parse --abbrev-ref HEAD) branch environment."
+}
+EOF
+```
+
+### userPromptSubmitted: Handling Requests Directly
+
+In addition to logging and auditing prompts, `userPromptSubmitted` hooks can now **handle the request entirely** — returning a response to the user without ever calling the AI model. This is useful for scenarios like FAQ bots, prompt interceptors, or enforced redirects.
+
+To handle the request in your hook, write JSON to stdout with a `response` field. The CLI returns this response directly to the user and skips the model call:
+
+```bash
+#!/usr/bin/env bash
+INPUT=$(cat)
+PROMPT=$(echo "$INPUT" | jq -r '.prompt // empty')
+
+# Intercept and respond to a specific command pattern
+if echo "$PROMPT" | grep -qi "^/status"; then
+  echo '{"response": "All systems operational. Current deployment: v2.4.1."}'
+  exit 0
+fi
+
+# For all other prompts, exit normally and let the model handle it
+exit 0
+```
+
+If the hook exits with code `0` and writes a valid `response` field, the AI model is **not called**. This makes `userPromptSubmitted` a lightweight mechanism for building custom slash-command handlers, guardrails, or prompt interceptors without model overhead.
 
 ### Extension Hooks Merging
 
@@ -501,7 +539,29 @@ The `subagentStart` hook fires when the main agent spawns a subagent (e.g., via 
 
 This is especially useful in multi-agent workflows where subagents may not automatically inherit context from the parent session.
 
-### Plugin Hook Environment Variables
+### Controlling Outgoing MCP Calls with preMcpToolCall
+
+The `preMcpToolCall` hook fires **before the agent sends a tool call to an MCP server**. Use it to control or annotate outgoing MCP request metadata — for example, to add tracing headers, validate the request, or enforce organization policies on which MCP tools can be invoked.
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "preMcpToolCall": [
+      {
+        "type": "command",
+        "bash": "./scripts/mcp-policy.sh",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+Like `preToolUse`, this hook can **approve or deny** the MCP tool call based on exit code. This is useful in regulated environments where you need to audit or restrict which MCP server capabilities the agent is permitted to invoke.
+
+
 
 When hooks are defined inside a **plugin**, Copilot CLI automatically injects two extra environment variables so scripts can locate project-specific and plugin-specific directories:
 
