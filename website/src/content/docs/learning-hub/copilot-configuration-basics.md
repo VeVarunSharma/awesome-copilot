@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-05-26
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -392,6 +392,7 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `terminalProgress` | Enable or disable OSC 9;4 terminal progress indicators in the status bar |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -418,6 +419,22 @@ GitHub Copilot CLI has two commands for managing session state, with distinct be
 | `/clear [prompt]` | Abandons the current session entirely and starts a new one. Backgrounded sessions are not affected. MCP servers configured in your project are preserved in the new session. |
 
 Both commands accept an optional prompt argument to seed the new session with an opening message, for example `/new Add error handling to the login flow`.
+
+### Copilot Memory
+
+GitHub Copilot CLI supports **persistent memory** — facts and preferences stored across sessions so the agent doesn't need to be reminded of them every time. Memories are scoped either to the current user (available in all your sessions) or to a specific repository (shared with collaborators).
+
+Control memory with the `/memory` slash command:
+
+```
+/memory on      # Enable memory for this session
+/memory off     # Disable memory for this session
+/memory show    # Display currently stored memories and documentation links
+```
+
+When the agent stores a memory, a confirmation prompt tells you the scope — for example, `(for user)` or `(shared with repository collaborators)` — so you always know who can see it. Memory permission prompts also show the scope, making it clear before anything is stored.
+
+> **Note**: You can delete stored memories from GitHub Copilot settings at [github.com/settings/copilot/memory](https://github.com/settings/copilot/memory) (user memories) or from the repository's Settings → Copilot → Memory page (repository memories).
 
 The `/session rename` command renames the current session. When called **without a name argument**, it automatically generates a session name based on the conversation history:
 

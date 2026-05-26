@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-27
+lastUpdated: 2026-05-26
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -192,12 +192,17 @@ copilot plugin list
 # Update a plugin to the latest version
 copilot plugin update my-plugin
 
+# Update all installed plugins at once
+copilot plugin update --all
+
 # Refresh all marketplace catalogs (fetch the latest list of available plugins)
 copilot plugin marketplace update
 
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+> **Tip**: Use `copilot plugin update --all` to keep all your plugins up to date in one step, especially after upgrading the CLI itself.
 
 ### Loading Plugins from a Local Directory
 
@@ -255,7 +260,7 @@ See [Using the Copilot Coding Agent](../using-copilot-coding-agent/) for details
 
 - **Start with a marketplace plugin** before building your own — there may already be one that fits your needs
 - **Keep plugins focused** — a plugin for "Rails development" is better than a plugin for "everything"
-- **Check for updates regularly** — run `copilot plugin update` to get the latest improvements
+- **Check for updates regularly** — run `copilot plugin update --all` to get the latest improvements for all installed plugins in one step
 - **Review what you install** — plugins run code on your machine, so inspect unfamiliar plugins before installing
 - **Use plugins for team standards** — publish an internal plugin to ensure every team member has the same agents, skills, and hooks
 - **Remove unused plugins** — declutter with `copilot plugin uninstall` to keep your environment clean

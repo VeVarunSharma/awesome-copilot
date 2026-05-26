@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-26
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -99,6 +99,7 @@ Hooks can trigger on several lifecycle events:
 | `subagentStart` | A subagent is spawned by the main agent | Inject additional context into the subagent's prompt, log subagent launches |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
+| `preMcpToolCall` | Before an MCP tool call is sent to an MCP server | Control and enrich outgoing MCP request metadata, add tracing headers, enforce MCP-level policies |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
 
@@ -117,6 +118,24 @@ cat <<EOF
 }
 EOF
 ```
+
+### postToolUse additionalContext
+
+The `postToolUse` hook also supports an `additionalContext` field in its output. When your hook script writes JSON to stdout containing an `additionalContext` key, that text is **injected as a system message** into the agent's context for the current turn. This lets post-execution hooks surface metadata about what just happened—for example, test results, lint warnings, or post-deployment status—without requiring the agent to re-read files.
+
+```bash
+#!/usr/bin/env bash
+# Run tests after a file edit and inject results as context
+INPUT=$(cat)
+TOOL=$(echo "$INPUT" | jq -r '.tool_name // empty')
+
+if [ "$TOOL" = "edit" ]; then
+  RESULT=$(npm test --silent 2>&1 | tail -5)
+  echo "{\"additionalContext\": \"Test results after edit: $RESULT\"}"
+fi
+```
+
+This is particularly useful for surfacing test output, lint results, or validation feedback directly after every edit — without adding it to every agent turn.
 
 ### Extension Hooks Merging
 
@@ -392,6 +411,33 @@ The output fields are:
 This enables sophisticated patterns like normalizing file paths, enforcing naming conventions, adding required flags, or surfacing policy context—without blocking the tool entirely.
 
 > **Note**: Both `modifiedArgs` and `updatedInput` are accepted field names for the replacement arguments (for cross-tool compatibility).
+
+### Intercepting MCP Tool Calls with preMcpToolCall
+
+The `preMcpToolCall` hook fires specifically **before an MCP tool call is sent to an MCP server** — distinct from `preToolUse`, which fires before any agent tool use (including built-in tools like `bash` and `edit`). Use `preMcpToolCall` when you want to control or enrich outgoing MCP requests without affecting regular tool calls.
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "preMcpToolCall": [
+      {
+        "type": "command",
+        "bash": "./scripts/mcp-audit.sh",
+        "cwd": ".",
+        "timeoutSec": 5
+      }
+    ]
+  }
+}
+```
+
+Example use cases for `preMcpToolCall`:
+- **Add tracing headers**: Inject correlation IDs or request metadata into outgoing MCP calls for distributed tracing.
+- **Enforce MCP-level policies**: Block calls to specific MCP tools based on context (e.g., prevent write operations during code review sessions).
+- **Audit MCP usage**: Log every MCP tool call separately from general tool usage for compliance reporting.
+
+The hook receives JSON input describing which MCP server and tool are being called, along with the tool arguments. It can modify the outgoing request metadata or block the call entirely (by returning a non-zero exit code).
 
 ### Governance Audit
 
