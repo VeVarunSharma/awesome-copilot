@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-05-27
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -74,7 +74,6 @@ tools: ['codebase', 'terminal', 'github']
 **model** (recommended): The AI model that powers the agent. Choose based on the complexity of the task—use more capable models for nuanced reasoning.
 
 **tools** (recommended): An array of built-in tools and MCP servers the agent can access. Common tools include:
-
 | Tool | Purpose |
 |------|---------|
 | `codebase` | Search and analyze code across the repository |
@@ -84,6 +83,18 @@ tools: ['codebase', 'terminal', 'github']
 | `edit` | Modify files in the workspace |
 
 For MCP server tools, reference them by server name (e.g., `postgres`, `docker`). See [Understanding MCP Servers](../understanding-mcp-servers/) for details.
+
+**deferred-tool-loading** (optional): Set to `true` to enable opt-in deferred tool loading. This delays loading the agent's full tool list until a tool is actually needed, enabling tool-search discovery for agents with large tool lists. Useful for agents that declare many tools but only use a subset in any given session:
+
+```yaml
+---
+name: 'Full-Stack Specialist'
+description: 'Expert across the full stack with access to many specialized tools'
+model: Claude Sonnet 4
+tools: ['codebase', 'terminal', 'github', 'postgres', 'docker', 'fetch', 'edit']
+deferred-tool-loading: true
+---
+```
 
 ### Agent Instructions
 

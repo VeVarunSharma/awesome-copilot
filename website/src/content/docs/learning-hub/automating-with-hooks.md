@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-27
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -91,8 +91,9 @@ Hooks can trigger on several lifecycle events:
 | `sessionEnd` | Agent session completes or is terminated | Clean up temp files, generate reports, send notifications |
 | `userPromptSubmitted` | User submits a prompt | Log requests for auditing and compliance |
 | `preToolUse` | Before the agent uses any tool (e.g., `bash`, `edit`) | **Approve or deny** tool executions, block dangerous commands, enforce security policies |
-| `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits |
+| `postToolUse` | After a tool **successfully** completes execution | Log results, track usage, format code after edits, inject additional context |
 | `postToolUseFailure` | When a tool call **fails with an error** | Log errors for debugging, send failure alerts, track error patterns |
+| `preMcpToolCall` | Before the agent calls a tool on an MCP server | Control outgoing MCP request metadata, audit or block specific MCP tool calls |
 | `PermissionRequest` | When the CLI shows a **permission prompt** to the user | Programmatically approve or deny permission requests, enable auto-approval in CI/headless environments |
 | `agentStop` | Main agent finishes responding to a prompt | Run final linters/formatters, validate complete changes |
 | `preCompact` | Before the agent compacts its context window | Save a snapshot, log compaction event, run summary scripts |
@@ -117,6 +118,33 @@ cat <<EOF
 }
 EOF
 ```
+
+### postToolUse additionalContext
+
+The `postToolUse` hook also supports the `additionalContext` field in its output. When your hook script writes JSON to stdout containing an `additionalContext` key after a tool successfully completes, that text is **injected into the agent's context for the current turn**. This lets hooks surface post-execution information — such as lint results, code metrics, or policy notes — without interrupting the flow.
+
+```bash
+#!/usr/bin/env bash
+# Output JSON with additionalContext to inject after a tool run
+INPUT=$(cat)
+TOOL=$(echo "$INPUT" | jq -r '.tool_name // empty')
+
+if [ "$TOOL" = "edit" ]; then
+  echo "{\"additionalContext\": \"File was auto-formatted by team policy.\"}"
+fi
+```
+
+### Hook Progress Streaming
+
+Long-running hooks can stream real-time status messages to the Copilot CLI timeline. Write messages to stdout as your script runs and they appear progressively in the session — so users can see what a slow hook is doing instead of waiting in silence.
+
+```bash
+#!/usr/bin/env bash
+echo "Running security scan..."
+run_scanner && echo "Security scan passed ✅" || echo "Security scan failed ❌"
+```
+
+This is especially useful for hooks that run test suites, security scanners, or build pipelines that take more than a few seconds to complete.
 
 ### Extension Hooks Merging
 
