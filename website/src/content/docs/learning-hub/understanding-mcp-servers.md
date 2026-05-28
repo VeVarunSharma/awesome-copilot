@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-05-28
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -265,6 +265,7 @@ MCP server SDKs are available in [Python](https://github.com/modelcontextprotoco
 - **Principle of least privilege**: Only give MCP servers the minimum access they need. Use read-only database connections for analysis agents.
 - **Keep secrets out of config files**: Use `${input:variableName}` for API keys and connection strings, or load from environment variables.
 - **Document your servers**: Add comments or a README explaining which MCP servers your project uses and why.
+- **Monitor token usage**: Run `/mcp` during a session to see per-server token usage broken down by MCP tool calls. This helps identify which servers consume the most context and lets you tune or swap configurations accordingly.
 - **Version control carefully**: Commit `.mcp.json` or `.vscode/mcp.json` for shared server configurations, but use `.gitignore` for any files containing credentials.
 - **Test server connectivity**: Verify MCP servers start correctly before relying on them in agent workflows.
 - **Use the MCP allowlist (experimental)**: In high-security environments, the `MCP_ALLOWLIST` feature flag lets you validate MCP servers against a configured registry, blocking unrecognized servers from loading. MCP servers that are blocked by the allowlist policy are **hidden from `/mcp show`** to avoid confusion — only permitted servers appear in that view. This is an experimental feature for enterprise environments requiring strict control over which MCP servers are permitted.

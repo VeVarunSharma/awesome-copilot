@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-05-28
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -84,6 +84,17 @@ tools: ['codebase', 'terminal', 'github']
 | `edit` | Modify files in the workspace |
 
 For MCP server tools, reference them by server name (e.g., `postgres`, `docker`). See [Understanding MCP Servers](../understanding-mcp-servers/) for details.
+
+**deferred-tool-loading** (optional): Set to `true` to enable opt-in deferred tool loading. When enabled, Copilot uses tool-search discovery instead of loading all tools upfront — useful for agents with large tool lists to reduce initial context pressure:
+
+```yaml
+---
+name: 'Broad Toolset Agent'
+description: 'Agent with many tools that benefit from lazy discovery'
+deferred-tool-loading: true
+tools: ['codebase', 'terminal', 'github', 'fetch', 'edit', 'postgres', 'docker']
+---
+```
 
 ### Agent Instructions
 
@@ -257,6 +268,20 @@ The agent can then query your database, analyze query plans, and suggest optimiz
 ```
 
 Keep agents focused—one persona per file. If you find an agent trying to do too many things, split it into multiple agents or extract common tasks into skills that agents can invoke.
+
+> **Recursive discovery (v1.0.55+)**: Agents and skills are now discovered recursively in subdirectories, so you can organize them into subfolders as your collection grows:
+>
+> ```
+> .github/
+> └── agents/
+>     ├── backend/
+>     │   ├── api-designer.agent.md
+>     │   └── db-expert.agent.md
+>     └── frontend/
+>         └── ui-reviewer.agent.md
+> ```
+>
+> All agents in subdirectories are automatically discovered and available in the agent picker — no additional configuration required.
 
 ## Common Questions
 

@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-28
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -561,6 +561,7 @@ echo "Pre-commit checks passed ✅"
 - Make scripts executable: `chmod +x scripts/pre-commit-check.sh`
 - Test scripts manually before adding them to hooks.json
 - Use reasonable timeouts—formatting a large codebase may need 30+ seconds
+- **Emit progress messages**: Write status lines to stdout during long-running hooks — Copilot CLI (v1.0.55+) streams these in real time in the session timeline, so users see live progress instead of a blank wait.
 
 ## Best Practices
 
