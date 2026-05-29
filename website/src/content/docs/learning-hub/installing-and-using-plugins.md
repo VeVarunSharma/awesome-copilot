@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-27
+lastUpdated: 2026-05-29
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -169,6 +169,12 @@ Reference a plugin by name and marketplace:
 copilot plugin install database-data-management@awesome-copilot
 ```
 
+You can also pin to a specific git ref using the `owner/repo#ref` syntax when installing from a GitHub-hosted marketplace:
+
+```bash
+copilot plugin install my-org/internal-plugins#v2.1.0
+```
+
 Or from an interactive session:
 
 ```
@@ -208,6 +214,19 @@ copilot --plugin-dir /path/to/my-plugin
 ```
 
 Plugins loaded this way appear in `/plugin list` under a separate **External Plugins** section, clearly distinguished from marketplace-installed plugins. This is useful for testing local plugins in development or loading private plugins that aren't published to any marketplace.
+
+#### Skill Precedence with `--plugin-dir`
+
+When the same skill name exists in multiple locations, Copilot uses the following precedence order (highest to lowest):
+
+| Priority | Source | Notes |
+|----------|--------|-------|
+| 1 (highest) | **Project** (`.github/skills/`) | Repository-local skills always win |
+| 2 | **`--plugin-dir`** | Explicitly loaded local plugin directory |
+| 3 | **Personal** (`~/.copilot/skills/`, `~/.agents/`) | User's personal skill library |
+| 4 (lowest) | **Custom** (marketplace-installed plugins) | Installed plugin skills |
+
+This ordering ensures your project's own skills are never silently overridden by an installed plugin.
 
 ### Where Plugins Are Stored
 

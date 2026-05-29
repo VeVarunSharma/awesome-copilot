@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-05-29
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -225,6 +225,15 @@ current data distribution.
 ```
 
 Without the MCP server, the agent would have to guess at database structure and performance characteristics. With it, the agent works with real data.
+
+## Monitoring MCP Token Usage
+
+When working with MCP-heavy sessions, it's useful to understand how many tokens each server is consuming. Copilot CLI provides two places to check this:
+
+- **`/mcp`** — Shows per-server token usage broken down by server name. Each server's tool call history and token consumption is listed separately, so you can quickly identify which server is consuming the most context.
+- **`/context`** — Breaks out MCP tool tokens as a distinct line item in the context window summary, alongside conversation history, instructions, and system context.
+
+This visibility is especially helpful when sessions start running into context limits — you can see at a glance whether a chatty MCP server (e.g., one that returns large database query results) is responsible, and adjust your queries or compact the session accordingly.
 
 ## MCP Sampling (LLM Inference Requests)
 

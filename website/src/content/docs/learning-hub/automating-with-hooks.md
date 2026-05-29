@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-29
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -118,7 +118,28 @@ cat <<EOF
 EOF
 ```
 
-### Extension Hooks Merging
+### Hook Progress Streaming
+
+Long-running hooks (such as a slow linter, a test suite, or a remote API call) can now stream real-time status messages back to the user via the Copilot CLI timeline. Instead of a silent spinner during the hook's execution, you can emit progress updates as newline-delimited JSON to stdout:
+
+```bash
+#!/usr/bin/env bash
+# scripts/run-tests.sh
+# Stream progress messages during a long test run
+
+echo '{"type":"progress","message":"Installing dependencies..."}'
+npm ci --silent
+
+echo '{"type":"progress","message":"Running unit tests..."}'
+npm test --silent
+
+echo '{"type":"progress","message":"Running integration tests..."}'
+npm run test:integration --silent
+```
+
+Each line that matches `{"type":"progress","message":"..."}` is surfaced as a live status message in the hook's timeline entry. All other stdout output is captured as before and displayed when the hook completes.
+
+This is especially useful for `preToolUse`, `agentStop`, and `sessionStart` hooks that call slow external services or run multi-step validation pipelines.
 
 When multiple IDE extensions (or a mix of extensions and a `hooks.json` file) each define hooks, all hook definitions are **merged** rather than the last one overwriting the others. This means you can layer hooks from different sources—a project's `.github/hooks/` file, an extension you have installed, and a personal settings file—and all of them will fire for the relevant events.
 
