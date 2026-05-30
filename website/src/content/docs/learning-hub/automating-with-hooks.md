@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-30
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -98,6 +98,7 @@ Hooks can trigger on several lifecycle events:
 | `preCompact` | Before the agent compacts its context window | Save a snapshot, log compaction event, run summary scripts |
 | `subagentStart` | A subagent is spawned by the main agent | Inject additional context into the subagent's prompt, log subagent launches |
 | `subagentStop` | A subagent completes before returning results | Audit subagent outputs, log subagent activity |
+| `preMcpToolCall` | Before an MCP tool call is dispatched to a server | Control outgoing MCP request metadata, add headers, log MCP calls for auditing |
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
@@ -121,6 +122,23 @@ EOF
 ### Extension Hooks Merging
 
 When multiple IDE extensions (or a mix of extensions and a `hooks.json` file) each define hooks, all hook definitions are **merged** rather than the last one overwriting the others. This means you can layer hooks from different sources—a project's `.github/hooks/` file, an extension you have installed, and a personal settings file—and all of them will fire for the relevant events.
+
+### Hook Progress Streaming
+
+Long-running hooks can now stream real-time status messages into the timeline while they execute. When your hook script writes progress messages to stdout, Copilot CLI displays them as the hook runs — so users can follow along instead of seeing a blank spinner.
+
+To emit progress messages from your hook script, write lines to stdout during execution:
+
+```bash
+#!/usr/bin/env bash
+echo "Running security scan..."
+npx secretlint .
+echo "Scanning dependencies..."
+npm audit
+echo "Security checks passed ✅"
+```
+
+Each line of output appears in the timeline as the hook executes. This is especially useful for hooks that run multiple steps (linting, type-checking, scanning) where users benefit from knowing which step is in progress.
 
 ### Cross-Platform Event Name Compatibility
 

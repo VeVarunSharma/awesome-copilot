@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-27
+lastUpdated: 2026-05-30
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -174,6 +174,14 @@ Or from an interactive session:
 ```
 /plugin install database-data-management@awesome-copilot
 ```
+
+You can also pin a specific version or branch when installing from a marketplace using the `owner/repo#ref` syntax:
+
+```bash
+copilot plugin install database-data-management@awesome-copilot#v1.2.0
+```
+
+This is useful for locking a team to a known-good plugin version or testing a pre-release branch before rolling it out broadly.
 
 > **Deprecation notice**: Installing plugins directly from a GitHub repository URL, raw URL, or local file path (e.g., `copilot plugin install github/awesome-copilot`) is deprecated and will be removed in a future release. Use marketplace-based installation instead.
 

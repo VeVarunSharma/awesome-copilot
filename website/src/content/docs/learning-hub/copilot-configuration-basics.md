@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-05-30
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -392,6 +392,9 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `permissions.disableBypassPermissionsMode` | Prevent enabling allow-all/yolo mode that bypasses all permission prompts — useful for enforcing security policies |
+| `terminalProgress` | Enable or disable OSC 9;4 terminal progress indicators |
+| `builtInAgents.rubberDuck` | Enable or disable the built-in rubber duck debugging agent (toggle via `copilot config`) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 

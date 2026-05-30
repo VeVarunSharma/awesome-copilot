@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-05-30
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -259,6 +259,19 @@ If your team has internal tools or proprietary APIs, you can build custom MCP se
 | **Prompts** | Pre-built conversation templates | Common troubleshooting flows |
 
 MCP server SDKs are available in [Python](https://github.com/modelcontextprotocol/python-sdk), [TypeScript](https://github.com/modelcontextprotocol/typescript-sdk), and other languages. Browse the [Agents Directory](../../agents/) for examples of agents built around MCP server expertise.
+
+## Monitoring MCP Token Usage
+
+MCP tools consume tokens like any other part of your conversation. GitHub Copilot CLI provides visibility into this usage at multiple levels:
+
+- **`/mcp`**: Run `/mcp` in a session to see per-server token usage — how many tokens each MCP server has consumed in the current session.
+- **`/context`**: The context window view breaks out MCP tool tokens separately, so you can see how much of your context window is occupied by MCP tool interactions vs. regular conversation.
+
+This visibility helps you identify which MCP servers are consuming the most tokens and optimize your tool usage accordingly. If a server is using unexpectedly high token counts, consider whether all its tools are necessary for your current task.
+
+### GitHub MCP Server Optimization
+
+When `gh` CLI is on your PATH, the **GitHub MCP server automatically omits tools that duplicate built-in `gh` commands**. This reduces unnecessary token usage — the server skips tools for operations that the CLI can handle natively (like listing repos, viewing issues, etc.). You get the full power of the GitHub MCP server for advanced operations while avoiding redundant tool registrations.
 
 ## Best Practices
 
