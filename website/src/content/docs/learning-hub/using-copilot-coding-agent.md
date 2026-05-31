@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-31
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -136,14 +136,15 @@ Use the existing FileUpload component and S3 service.
 
 Custom agents let you give the coding agent a specialized persona, toolset, and instructions for specific types of work. Instead of relying on generic behavior, you can point the coding agent at an agent profile tailored for your task.
 
-**Where custom agents live**: Agent profiles are stored as `.agent.md` files in `.github/agents/` in your repository. For organization-wide agents, place them in the root `agents/` directory.
+**Where custom agents live**: Agent profiles are stored as `.agent.md` files in `.github/agents/` in your repository. Agents are discovered **recursively** in subdirectories, so you can organize them into groups:
 
 ```
 .github/
 └── agents/
-    ├── api-architect.agent.md
-    ├── test-specialist.agent.md
-    └── security-reviewer.agent.md
+    ├── security/
+    │   ├── security-reviewer.agent.md
+    │   └── dependency-auditor.agent.md
+    └── api-architect.agent.md
 ```
 
 **Selecting an agent on GitHub.com**: When prompting the coding agent or assigning it to an issue, use the dropdown menu in the agents panel to select your custom agent instead of the default.
@@ -354,7 +355,17 @@ Or open a remote control tab from inside an existing session, and check or toggl
 /remote off         # disable remote control for this session
 ```
 
-The **Remote** tab in the CLI shows all active coding agent tasks from the repository. Select a task to connect and begin sending steering messages.
+The **Remote** tab in the CLI shows all active coding agent tasks from the repository. Select a task to connect and begin sending steering messages. You can also **delete remote sessions** directly from the session picker when they're no longer needed.
+
+### Keeping Autopilot Focused
+
+When the agent is running in autopilot mode, you can steer it toward a specific objective using `/autopilot`:
+
+```
+/autopilot implement the rate-limiter middleware described in the issue
+```
+
+`/goal` is an alias for the same command. This is useful when the agent has drifted or you want to refocus it without interrupting the session entirely.
 
 ### Resuming from the Session Picker
 

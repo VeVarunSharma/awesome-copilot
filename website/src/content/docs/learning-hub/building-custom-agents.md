@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-05-31
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -247,16 +247,25 @@ The agent can then query your database, analyze query plans, and suggest optimiz
 
 ### Organizing Agents in Your Repository
 
+Agents are discovered **recursively** in subdirectories, so you can organize them into logical groups:
+
 ```
 .github/
 └── agents/
-    ├── security-reviewer.agent.md
-    ├── api-designer.agent.md
-    ├── terraform-expert.agent.md
-    └── release-manager.agent.md
+    ├── security/
+    │   ├── security-reviewer.agent.md
+    │   └── dependency-auditor.agent.md
+    ├── infrastructure/
+    │   ├── terraform-expert.agent.md
+    │   └── kubernetes-admin.agent.md
+    └── api-designer.agent.md
 ```
 
 Keep agents focused—one persona per file. If you find an agent trying to do too many things, split it into multiple agents or extract common tasks into skills that agents can invoke.
+
+### Built-in Agents
+
+In addition to your custom agents, GitHub Copilot CLI ships with built-in agents you can enable or disable via `copilot config`. For example, the **rubber duck** agent (`builtInAgents.rubberDuck`) is a conversational agent designed to help you think through problems by asking clarifying questions rather than jumping to solutions. Enable it when you want a sounding board instead of an implementer.
 
 ## Common Questions
 

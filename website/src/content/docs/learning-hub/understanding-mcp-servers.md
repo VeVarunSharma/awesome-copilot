@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-05-31
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -226,7 +226,16 @@ current data distribution.
 
 Without the MCP server, the agent would have to guess at database structure and performance characteristics. With it, the agent works with real data.
 
-## MCP Sampling (LLM Inference Requests)
+## MCP Token Usage
+
+You can track how many tokens each MCP server is consuming during a session:
+
+- **`/mcp`** — Shows per-server token usage broken out by server, so you can see which servers are most expensive.
+- **`/context`** — Displays a token breakdown that separates MCP tool tokens from other context sources, giving you a clear view of your total context budget.
+
+This is especially useful for diagnosing unexpectedly high token usage in sessions with multiple MCP servers, or when deciding which servers to disable to conserve context.
+
+> **GitHub MCP server optimization**: When the `gh` CLI is on your `PATH`, the GitHub MCP server automatically omits tools that are redundant with `gh` commands. This reduces token usage in every session where you have the GitHub MCP server configured. No configuration is required — the optimization is applied automatically.
 
 Some advanced MCP servers can request **LLM inference** from the Copilot model — a capability defined in the MCP specification as *sampling*. Instead of only receiving tool calls from the AI, these servers can ask Copilot to generate text or make decisions as part of their own logic.
 

@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-05-31
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -362,6 +362,8 @@ Block dangerous commands before they execute. Use the `matcher` field to target 
 
 The `preToolUse` hook receives JSON input with details about the tool being called. Your script can inspect this input and exit with a non-zero code to **deny** the tool execution, or exit with zero to **approve** it.
 
+> **Preventing bypass of permission checks**: To prevent users (or agents) from enabling allow-all/yolo mode — which bypasses all permission prompts — set the `permissions.disableBypassPermissionsMode` option to `true` in your Copilot configuration. When this setting is active, the mode cannot be toggled on, ensuring your `preToolUse` security hooks always remain in effect.
+
 ### Modifying Tool Arguments with preToolUse
 
 Beyond approve/deny, `preToolUse` hooks can also **modify tool arguments** before they are passed to the tool, and inject **additional context** into the agent's reasoning. To do this, write JSON to stdout from your hook script:
@@ -554,6 +556,8 @@ git add -A
 
 echo "Pre-commit checks passed ✅"
 ```
+
+> **Hook progress streaming**: When a hook script prints to stdout, those messages are streamed live to the Copilot CLI timeline while the hook runs. For long-running hooks, use `echo` statements to provide real-time status updates (e.g., "Running linter...", "Running type checker..."). This keeps the user informed during slow operations rather than showing a static spinner.
 
 **Tips for hook scripts**:
 - Use `set -euo pipefail` to fail fast on errors
