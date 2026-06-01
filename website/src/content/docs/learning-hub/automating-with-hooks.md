@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-06-01
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -101,6 +101,8 @@ Hooks can trigger on several lifecycle events:
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
+
+> **Important (v1.0.57+)**: If a `preToolUse` hook itself crashes or encounters an unhandled error during execution, the tool call is now **denied** instead of silently allowed. This ensures that security policies are never bypassed due to a hook script failure — a broken hook fails closed rather than open.
 
 ### sessionStart additionalContext
 
@@ -528,6 +530,35 @@ You can also reference these paths as template variables in your hook configurat
 ```
 
 This is useful for plugins that bundle scripts or data files alongside their hooks, since `{{plugin_data_dir}}` always points to the correct installed location regardless of where the plugin is installed.
+
+## Hook Progress Streaming
+
+For long-running hooks, GitHub Copilot CLI (v1.0.55+) streams real-time status messages from hook scripts directly into the session timeline. This means users see live progress instead of a blank wait indicator while a hook is executing.
+
+To emit progress messages, write lines prefixed with `[progress]` to stdout from your hook script:
+
+```bash
+#!/usr/bin/env bash
+# scripts/full-project-check.sh
+
+echo "[progress] Installing dependencies..."
+npm ci
+
+echo "[progress] Building project..."
+npm run build
+
+echo "[progress] Running tests..."
+npm test
+
+echo "All checks passed ✅"
+```
+
+Each `[progress]` line appears in the timeline as the hook executes, giving users feedback for tasks that take more than a few seconds (builds, test runs, linting large codebases, etc.).
+
+**Tips for progress messages**:
+- Keep messages short and action-oriented: `"Running ESLint..."` not `"Starting to run the ESLint linter on the codebase"`
+- Emit a final message (without `[progress]`) when the hook completes successfully
+- Progress streaming works for both `preToolUse` and `postToolUse` hooks
 
 ## Writing Hook Scripts
 
