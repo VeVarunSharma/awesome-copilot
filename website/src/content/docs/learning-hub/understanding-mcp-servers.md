@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-06-02
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -58,6 +58,8 @@ GitHub Copilot provides several **built-in tools** that are always available:
 | Docker server | Manage containers, inspect logs, deploy services |
 | Sentry server | Fetch error reports, analyze crash data |
 | Figma server | Read design tokens, component specs |
+
+> **Tip (v1.0.56+)**: When the `gh` CLI is on your `PATH`, the built-in GitHub MCP server automatically omits tools that the `gh` CLI already covers (such as repository management and issue operations). This reduces token usage by avoiding duplicate tool definitions and keeps the agent's toolset focused. If you don't have `gh` installed, the full GitHub MCP server tool set is available as normal.
 
 ## Configuring MCP Servers
 

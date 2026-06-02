@@ -3,7 +3,7 @@ title: 'GitHub Copilot Terminology Glossary'
 description: 'A quick reference guide defining common GitHub Copilot and platform-specific terms.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-06-02
 estimatedReadingTime: '8 minutes'
 tags:
   - glossary
@@ -198,6 +198,20 @@ A standardized protocol for connecting AI assistants like GitHub Copilot to exte
 **Learn more**: [Model Context Protocol](https://modelcontextprotocol.io/) | [MCP Specification](https://spec.modelcontextprotocol.io/) | [Understanding MCP Servers](../understanding-mcp-servers/)
 
 **Related terms**: [Tools](#tools), [Built-in Tool](#built-in-tool)
+
+---
+
+### Rubber Duck Agent
+
+A built-in Copilot agent (`/rubber-duck`) that provides **adversarial feedback** on your code and designs. Rather than helping you implement or fix things, the Rubber Duck agent plays devil's advocate — critiquing your approach, surfacing edge cases, questioning assumptions, and stress-testing your reasoning. The name is a nod to the classic "rubber duck debugging" technique, extended to cover design reviews and code walkthroughs.
+
+**When to use**: When you want a critical review of your code or design before committing to an approach. It's particularly useful for catching blind spots, validating architectural decisions, or getting feedback on designs you might be too close to.
+
+**How to invoke**: Use the `/rubber-duck` slash command in a Copilot session and describe the code or design you want reviewed.
+
+**Configuration**: The rubber duck agent can be enabled or disabled via the `builtInAgents.rubberDuck` setting in `copilot config`.
+
+**Related terms**: [Agent](#agent), [Built-in Tool](#built-in-tool)
 
 ---
 
