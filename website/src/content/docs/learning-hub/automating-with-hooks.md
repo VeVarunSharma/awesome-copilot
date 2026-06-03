@@ -101,6 +101,8 @@ Hooks can trigger on several lifecycle events:
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
+>
+> **Important (v1.0.57+)**: If a `preToolUse` hook itself exits with an error (non-zero exit code or throws an exception), the tool call is **denied** — the hook error is treated as a rejection signal. In earlier versions, a hook error would silently allow the tool call to proceed. Review any `preToolUse` hooks that may error under normal conditions to ensure they behave as intended.
 
 ### sessionStart additionalContext
 
