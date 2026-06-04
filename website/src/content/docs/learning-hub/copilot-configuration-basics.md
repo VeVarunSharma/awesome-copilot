@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-06-04
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -408,6 +408,8 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
+> **Free and Student plan users (token-based billing)**: If you are on a Free or Student plan with token-based billing, the model picker restricts selection to **Auto** model. An explanation is shown inline in the picker. Upgrading to a paid plan unlocks full model selection.
+
 ### CLI Session Commands
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
@@ -507,6 +509,8 @@ The `/usage` command displays session metrics such as the number of tokens consu
 /usage
 ```
 
+> **Claude thinking tokens**: When using a model that supports extended reasoning (e.g., Claude Sonnet with high effort), thinking (reasoning) tokens are reported separately in `/usage` output and end-of-session summaries so you can see the full cost of your session.
+
 The `/compact` command summarizes the conversation history to free up context window space while preserving the thread of the conversation. Use it when your context is getting full but you do not want to start a fresh session:
 
 ```
@@ -542,6 +546,14 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 > **Note**: `/allow-all on` permissions persist after `/clear` starts a new session, so you don't need to re-enable it each time.
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
+
+The `/rubber-duck` command asks Copilot for adversarial feedback on your code or design — deliberately challenging your assumptions, surfacing edge cases, and pointing out potential weaknesses you might not have considered:
+
+```
+/rubber-duck
+```
+
+Use `/rubber-duck` when you want a critical second opinion before finalizing a design or submitting code for review. Unlike `/review` (which assesses code quality), `/rubber-duck` actively debates your approach to help you discover blind spots early.
 
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
