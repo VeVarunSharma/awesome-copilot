@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-06-05
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -392,6 +392,8 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `builtInAgents.rubberDuck` | Enable or disable the built-in Rubber Duck debugging agent (`true` / `false`; enabled by default) |
+| `builtInAgents.rubberDuckAutoInvoke` | Allow the Rubber Duck agent to appear automatically when the agent detects you may be stuck (`true` / `false`; disabled by default) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -513,9 +515,50 @@ The `/compact` command summarizes the conversation history to free up context wi
 /compact
 ```
 
+You can optionally pass focus instructions to shape what the compaction summary preserves:
+
+```
+/compact Focus on the authentication changes we discussed
+```
+
 > **Note**: Skills remain loaded and effective after `/compact`. You do not need to re-invoke them after compacting.
 
 > **ACP sessions (v1.0.39+)**: The `/compact`, `/context`, `/usage`, and `/env` commands are now available in ACP (Agent Coordination Protocol) sessions, allowing remote ACP clients to surface session details and manage context from within their own automated workflows.
+
+The `/voice` command lets you dictate prompts using a local speech-to-text model instead of typing. Start a voice recording, speak your prompt, and Copilot transcribes it into the input field:
+
+```
+/voice
+```
+
+This is useful when you want to describe a complex task verbally, or when you prefer hands-free input during a long session.
+
+The `/autopilot` command (with `/goal` as an alias) focuses an autopilot session on a specific objective. Instead of simply enabling autopilot mode, you can describe what you want accomplished:
+
+```
+/autopilot Implement the rate-limiting middleware described in the issue
+/goal Fix all type errors in the auth module
+```
+
+The agent works autonomously toward the stated objective, reporting back when it is done or when it needs input.
+
+### Scheduled Prompts (Experimental)
+
+> **Note**: Scheduled prompts are an experimental feature. Run `/experimental on` to enable them.
+
+The `/every` and `/after` commands let you schedule prompts to run on a recurring or one-time basis from within a Copilot CLI session:
+
+```
+/every 30m Check for new failing tests and summarize them
+/after 1h Remind me to commit my work
+```
+
+| Command | Behaviour |
+|---------|-----------|
+| `/every <interval> <prompt>` | Repeats the prompt on the specified interval (e.g., `5m`, `1h`) until you stop it |
+| `/after <delay> <prompt>` | Runs the prompt once after the specified delay |
+
+Use scheduled prompts for recurring checks during long coding sessions — for example, polling a build status, summarizing new test failures, or reminding yourself to review changes before committing.
 
 The `/statusline` command (with `/footer` as an alias) lets you control which items appear in the terminal status bar. You can show or hide individual indicators like the working directory, current branch, effort level, context window usage, and quota. The **changes** toggle shows a running count of added/removed lines for the session — useful when tracking the scope of an ongoing edit:
 

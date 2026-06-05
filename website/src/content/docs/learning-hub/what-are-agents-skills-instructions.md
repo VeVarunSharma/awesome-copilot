@@ -3,8 +3,8 @@ title: 'What are Agents, Skills, and Instructions'
 description: 'Understand the primary customization primitives that extend GitHub Copilot for specific workflows.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
-estimatedReadingTime: '7 minutes'
+lastUpdated: 2026-06-05
+estimatedReadingTime: '8 minutes'
 prev: false
 ---
 
@@ -28,6 +28,14 @@ In products that support delegation, a primary agent can also launch temporary s
 - You want Copilot to proactively execute commands or fetch context via MCP.
 - You need persona-level guardrails that persist throughout a coding session.
 - You want a coordinator that can delegate narrower work to subagents.
+
+### Built-in agents
+
+In addition to custom agents you author, GitHub Copilot CLI ships several **built-in agents** that activate automatically or can be invoked on demand:
+
+- **Rubber Duck** — A rubber-duck debugging companion. When you're stuck, the Rubber Duck agent asks clarifying questions to help you think through the problem out loud and arrive at the solution yourself. It is enabled by default since v1.0.58. You can disable it globally with `copilot config set builtInAgents.rubberDuck false`, or control whether it appears automatically during sessions with `builtInAgents.rubberDuckAutoInvoke` (automatic invocation is disabled by default).
+
+Built-in agents follow the same agent model as custom agents — you can inspect their behavior in `/env` and override settings via your config file.
 
 ## Skills
 
