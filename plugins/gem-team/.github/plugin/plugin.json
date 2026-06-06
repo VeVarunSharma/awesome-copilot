@@ -1,31 +1,27 @@
 {
-  "name": "gem-team",
-  "description": "A modular multi-agent team for complex project execution with DAG-based planning, parallel execution, TDD verification, and automated testing with energetic team lead.",
-  "version": "1.2.1",
+  "agents": [
+    "./agents"
+  ],
   "author": {
-    "name": "Awesome Copilot Community"
+    "email": "mubaidr@gmail.com",
+    "name": "mubaidr",
+    "url": "https://github.com/mubaidr"
   },
-  "repository": "https://github.com/github/awesome-copilot",
-  "license": "MIT",
+  "description": "Multi-agent orchestration framework for spec-driven development and automated verification.",
   "keywords": [
     "multi-agent",
     "orchestration",
-    "dag-planning",
-    "parallel-execution",
     "tdd",
-    "verification",
-    "automation",
-    "security",
-    "prd"
+    "testing",
+    "e2e",
+    "devops",
+    "security-audit",
+    "code-review",
+    "prd",
+    "mobile"
   ],
-  "agents": [
-    "./agents/gem-orchestrator.md",
-    "./agents/gem-researcher.md",
-    "./agents/gem-planner.md",
-    "./agents/gem-implementer.md",
-    "./agents/gem-browser-tester.md",
-    "./agents/gem-devops.md",
-    "./agents/gem-reviewer.md",
-    "./agents/gem-documentation-writer.md"
-  ]
+  "license": "Apache-2.0",
+  "name": "gem-team",
+  "repository": "https://github.com/mubaidr/gem-team",
+  "version": "1.13.0"
 }
