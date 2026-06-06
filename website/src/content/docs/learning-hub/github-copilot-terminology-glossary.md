@@ -3,7 +3,7 @@ title: 'GitHub Copilot Terminology Glossary'
 description: 'A quick reference guide defining common GitHub Copilot and platform-specific terms.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-06-06
 estimatedReadingTime: '8 minutes'
 tags:
   - glossary
@@ -167,6 +167,21 @@ The identity, tone, and behavioral characteristics defined for an [Agent](#agent
 If you have existing prompts, consider migrating them to skills. See [Creating Effective Skills](../creating-effective-skills/) for guidance.
 
 **See**: [Skill](#skill)
+
+---
+
+### Rubber Duck
+
+A **built-in conversational agent** in GitHub Copilot CLI that acts as a sounding board for thinking through problems out loud. Unlike task-focused agents, the Rubber Duck's role is to ask clarifying questions, reflect your reasoning back to you, and help you find the answer yourself — rather than providing direct solutions.
+
+**Key characteristics**:
+- Enabled by default as of v1.0.58
+- Automatically invoked when the CLI detects you may benefit from thinking through a problem
+- Automatic invocation can be controlled via the `builtInAgents.rubberDuckAutoInvoke` config setting (set to `false` to disable auto-invocation; Rubber Duck remains available to invoke manually)
+
+**When to use**: When you're stuck on a tricky problem and want to talk it through rather than receive a direct code suggestion.
+
+**Related terms**: [Built-in Tool](#built-in-tool), [Agent](#agent)
 
 ---
 

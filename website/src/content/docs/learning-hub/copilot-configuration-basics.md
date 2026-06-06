@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-06-06
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -386,12 +386,14 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | Setting | Description |
 |---------|-------------|
 | `includeCoAuthoredBy` | Include Co-authored-by trailer in commits |
-| `effortLevel` | Default reasoning effort level (`low`, `medium`, `high`) |
+| `effortLevel` | Default reasoning effort level (`low`, `medium`, `high`, `max`) |
 | `autoUpdatesChannel` | Update channel (`stable`, `preview`) |
 | `statusLine` | Show status line in the terminal UI |
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `builtInAgents.rubberDuckAutoInvoke` | Control whether the Rubber Duck built-in agent is invoked automatically (default: `false` as of v1.0.60) |
+| `showTipsOnStartup` | Control whether startup tips are displayed when the CLI launches |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -447,7 +449,7 @@ You can also press **x** on a highlighted session in the session picker (`--resu
 
 In the session picker, press **`s`** to cycle the sort order: relevance, last used, created, or name. The picker also shows the branch name and idle/in-use status for each session.
 
-The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history, reverting both the conversation and any file changes made after that point. You can also trigger it by pressing **double-Esc**:
+The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history, reverting both the conversation and any file changes made after that point. You can also trigger it by pressing **double-Esc**. As of v1.0.60, the picker displays **working-tree diff stats** (`+added −removed`) at each checkpoint so you can see at a glance how much changed before deciding where to roll back to:
 
 ```
 /rewind
@@ -489,7 +491,7 @@ The `/ask` command lets you ask a quick question without affecting your conversa
 /ask What does the `retry` utility in src/utils do?
 ```
 
-The `/env` command shows all loaded environment details — instructions, MCP servers, skills, agents, and plugins — in a single view. Use it to verify that the right resources are active for the current session:
+The `/env` command shows all loaded environment details — instructions, MCP servers, skills, agents, and plugins — in a single view. Use it to verify that the right resources are active for the current session. As of v1.0.60, `/env` also **shows hook counts and source provenance** for active hooks, so you can see exactly which hooks are loaded and where they came from:
 
 ```
 /env
@@ -531,6 +533,14 @@ The `/keep-alive` command prevents the system from sleeping while Copilot CLI is
 
 > **Note**: `/keep-alive` was previously an experimental feature. As of v1.0.36, it is available without enabling experimental mode.
 
+The `/voice` command (v1.0.59+) lets you **dictate prompts using local speech-to-text models** instead of typing. When you run `/voice`, the CLI listens via your microphone, transcribes your speech locally, and inserts the resulting text as your prompt:
+
+```
+/voice
+```
+
+This is useful for hands-free coding sessions, capturing longer thoughts faster than typing, or accessibility scenarios. All speech processing happens on-device — audio is not sent to any cloud service.
+
 The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, where the agent runs all tools without asking for confirmation. It now supports `on`, `off`, and `show` subcommands:
 
 ```
@@ -549,7 +559,7 @@ The `--effort` flag (shorthand for `--reasoning-effort`) controls how much compu
 gh copilot --effort high "Refactor the authentication module"
 ```
 
-Accepted values are `low`, `medium`, and `high`. You can also set a default via the `effortLevel` config setting.
+Accepted values are `low`, `medium`, and `high`. As of v1.0.60, a `max` reasoning effort level is also available for Anthropic models (e.g., Claude Sonnet 4.6) and all effort levels are accessible on every plan. You can also set a default via the `effortLevel` config setting.
 
 ### CLI Startup Flags
 
