@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-06-07
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -386,12 +386,14 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | Setting | Description |
 |---------|-------------|
 | `includeCoAuthoredBy` | Include Co-authored-by trailer in commits |
-| `effortLevel` | Default reasoning effort level (`low`, `medium`, `high`) |
+| `effortLevel` | Default reasoning effort level (`low`, `medium`, `high`, `max`) |
 | `autoUpdatesChannel` | Update channel (`stable`, `preview`) |
 | `statusLine` | Show status line in the terminal UI |
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `builtInAgents.rubberDuck` | Enable or disable the built-in Rubber Duck agent (enabled by default since v1.0.58) |
+| `builtInAgents.rubberDuckAutoInvoke` | Allow the Rubber Duck agent to invoke itself automatically when it detects you may benefit from thinking aloud (disabled by default) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -406,7 +408,37 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 ### Model Picker
 
-The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
+The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`, `max`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
+
+> **v1.0.56+**: Free and Student plan users can now select any model from the picker — not just Auto. The picker also shows the accurate total context window size for each model per pricing tier, so you can make an informed choice.
+
+> **v1.0.60+**: The `max` reasoning effort level is now available for Anthropic models, and all effort levels (`low`, `medium`, `high`, `max`) are available on every plan.
+
+### Built-in Agents
+
+GitHub Copilot CLI ships with a set of **built-in agents** that are always available without any setup. The most notable is the **Rubber Duck** agent.
+
+#### Rubber Duck Agent
+
+The Rubber Duck agent is a conversational thinking partner that helps you work through problems by asking clarifying questions and reflecting your thinking back to you — much like explaining a problem to a rubber duck in classic debugging lore.
+
+**Since v1.0.58, the Rubber Duck agent is enabled by default.** You can interact with it at any time during a session. It's particularly useful when you're stuck, need to validate your approach, or want to think through edge cases before asking the agent to write code.
+
+To disable it or control auto-invocation:
+
+```json
+{
+  "builtInAgents.rubberDuck": false,
+  "builtInAgents.rubberDuckAutoInvoke": false
+}
+```
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `builtInAgents.rubberDuck` | `true` (v1.0.58+) | Enable or disable the Rubber Duck agent |
+| `builtInAgents.rubberDuckAutoInvoke` | `false` | When enabled, the agent automatically invokes Rubber Duck when it detects an ambiguous or complex request |
+
+Use `copilot config` to set these values from the terminal without editing the JSON file directly.
 
 ### CLI Session Commands
 
@@ -433,6 +465,7 @@ You can also name a session at startup with the `--name` flag, and resume it by 
 ```bash
 copilot --name "auth-refactor"          # start a session with a given name
 copilot --resume="auth-refactor"        # resume that session by name
+copilot -r "auth-refactor"             # -r is a shorthand for --resume (v1.0.60+)
 ```
 
 The `/session delete` command removes sessions you no longer need:
@@ -452,6 +485,8 @@ The `/rewind` command opens a timeline picker that lets you roll back the conver
 ```
 /rewind
 ```
+
+> **v1.0.60+**: The rewind timeline picker now shows **working-tree diff stats** (`+added −removed`) alongside each checkpoint, so you can see at a glance how much each step changed before deciding where to roll back to. Rewind also no longer deletes ignored files when rolling back to a previous snapshot.
 
 Use `/rewind` when you want to branch off from a different point in the conversation, rather than just undoing the most recent turn.
 
@@ -481,6 +516,8 @@ The exported file contains everything needed to view the session without a netwo
 
 **Keyboard shortcuts for queuing messages**: Use **Ctrl+Q** or **Ctrl+Enter** to queue a message (send it while the agent is still working). **Ctrl+D** no longer queues messages — it now has its default terminal behavior. If you have muscle memory for Ctrl+D queuing, switch to Ctrl+Q.
 
+> **v1.0.60+**: **Ctrl+S** now **stashes and pops the current prompt** — press it to tuck away what you're typing, and press it again to restore it. This is useful when you need to quickly send a different message without losing your draft.
+
 **Background running tasks**: Press **Ctrl+X → B** to move the current running task or shell command to the background. The task continues executing while you can type a new message or review earlier output. This is useful for long-running commands where you want to interact with the agent while waiting for the result.
 
 The `/ask` command lets you ask a quick question without affecting your conversation history. The current session context is preserved, so you can use it for one-off lookups without derailing an ongoing task. Responses are rendered as full markdown, including tables and formatted links:
@@ -495,11 +532,15 @@ The `/env` command shows all loaded environment details — instructions, MCP se
 /env
 ```
 
+> **v1.0.60+**: `/env` now also shows **hook counts and source provenance** for every active hook, so you can confirm exactly which hook files are loaded and where they came from (repository, user profile, or plugin).
+
 The `/context` command shows a visualization of the current conversation's context window usage — how many tokens are consumed and how much headroom remains:
 
 ```
 /context
 ```
+
+> **v1.0.60+**: `/context` now **separates Custom Instructions from the system prompt** in its breakdown, making it easier to see how much of your context budget is used by your own instructions versus the model's built-in prompt. It also cross-references per-server MCP tool token costs with `/mcp`.
 
 The `/usage` command displays session metrics such as the number of tokens consumed, API calls made, and any quota information for the current session:
 
@@ -543,13 +584,22 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
 
+The `/every` and `/after` commands are **experimental** scheduled prompt features that let you queue work to happen automatically at a set time or interval:
+
+```
+/every 30m "Summarize what you've done in the last 30 minutes"  # repeat every 30 minutes
+/after 2h "Run the full test suite and report results"          # run once after 2 hours
+```
+
+> **Note**: These commands are experimental as of v1.0.58. Enable experimental features via `copilot config` if they are not available in your version.
+
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
 ```bash
 gh copilot --effort high "Refactor the authentication module"
 ```
 
-Accepted values are `low`, `medium`, and `high`. You can also set a default via the `effortLevel` config setting.
+Accepted values are `low`, `medium`, `high`, and `max` (Anthropic models only). All effort levels are available on every plan as of v1.0.60. You can also set a default via the `effortLevel` config setting.
 
 ### CLI Startup Flags
 
