@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-06-08
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -361,6 +361,8 @@ Block dangerous commands before they execute. Use the `matcher` field to target 
 ```
 
 The `preToolUse` hook receives JSON input with details about the tool being called. Your script can inspect this input and exit with a non-zero code to **deny** the tool execution, or exit with zero to **approve** it.
+
+> **Security guarantee (v1.0.57+)**: If a `preToolUse` hook script itself errors or crashes unexpectedly (e.g., due to a missing dependency, a syntax error, or a runtime exception), the tool call is **denied** rather than silently allowed. This ensures that a broken security gate fails closed rather than open — your policies are enforced even if the hook script has a bug.
 
 ### Modifying Tool Arguments with preToolUse
 

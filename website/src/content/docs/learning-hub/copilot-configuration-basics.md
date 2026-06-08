@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-06-08
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -406,7 +406,9 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 ### Model Picker
 
-The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
+The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`, `max`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
+
+> **New in v1.0.60**: A `max` reasoning effort level is now available for Anthropic models, and all effort levels (`low`, `medium`, `high`, `max`) are now available on every subscription plan.
 
 ### CLI Session Commands
 
@@ -453,7 +455,7 @@ The `/rewind` command opens a timeline picker that lets you roll back the conver
 /rewind
 ```
 
-Use `/rewind` when you want to branch off from a different point in the conversation, rather than just undoing the most recent turn.
+Use `/rewind` when you want to branch off from a different point in the conversation, rather than just undoing the most recent turn. The timeline picker now displays **working-tree diff stats** (`+added −removed`) at each checkpoint, so you can see the scope of changes before you commit to rewinding.
 
 The `/undo` command reverts the last turn—including any file changes the agent made—letting you course-correct without manually undoing edits:
 
@@ -488,6 +490,14 @@ The `/ask` command lets you ask a quick question without affecting your conversa
 ```
 /ask What does the `retry` utility in src/utils do?
 ```
+
+The `/voice` command lets you dictate prompts using local speech-to-text models. Instead of typing, you speak your prompt and the CLI transcribes it and sends it to the agent:
+
+```
+/voice
+```
+
+This is useful for hands-free workflows, accessibility needs, or when you want to describe a complex task conversationally. The transcription runs locally without sending audio to any external service.
 
 The `/env` command shows all loaded environment details — instructions, MCP servers, skills, agents, and plugins — in a single view. Use it to verify that the right resources are active for the current session:
 
@@ -549,7 +559,49 @@ The `--effort` flag (shorthand for `--reasoning-effort`) controls how much compu
 gh copilot --effort high "Refactor the authentication module"
 ```
 
-Accepted values are `low`, `medium`, and `high`. You can also set a default via the `effortLevel` config setting.
+Accepted values are `low`, `medium`, `high`, and `max`. You can also set a default via the `effortLevel` config setting.
+
+### Rubber Duck Agent
+
+The **Rubber Duck** built-in agent is designed to help you think through problems by asking clarifying questions rather than immediately implementing solutions. It follows the classic rubber duck debugging concept — explaining your problem out loud often reveals the answer.
+
+Rubber Duck is now **enabled by default** as of v1.0.58. When you describe a problem that seems stuck or ambiguous, it may be automatically invoked to help you clarify your thinking before the agent proceeds.
+
+You can control automatic invocation with the `builtInAgents.rubberDuckAutoInvoke` setting (disabled by default, meaning you opt in):
+
+```json
+{
+  "builtInAgents": {
+    "rubberDuckAutoInvoke": true
+  }
+}
+```
+
+### Experimental Features
+
+Some Copilot CLI features ship behind an experimental flag before becoming generally available. Enable experimental features in a session with:
+
+```
+/experimental on
+```
+
+**Scheduled Prompts** (experimental): Schedule prompts to run automatically at a time offset or on a repeating interval, without leaving your session:
+
+```
+/every 30m check if any new GitHub issues have been opened and summarize them
+/after 2h run the full test suite and report results
+```
+
+- `/every <interval> <prompt>` — repeats the prompt on a schedule (e.g., every 30 minutes)
+- `/after <delay> <prompt>` — runs the prompt once after the specified delay
+
+This is useful for long-running tasks where you want periodic updates, or for automating follow-up checks without leaving the session.
+
+**New GitHub UI** (experimental): A redesigned interface provides quick access to issues, pull requests, and gists from within the CLI. Toggle the new theme with:
+
+```
+/theme
+```
 
 ### CLI Startup Flags
 
