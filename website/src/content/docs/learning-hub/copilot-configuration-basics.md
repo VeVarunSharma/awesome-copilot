@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-06-09
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -392,6 +392,8 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `builtInAgents.rubberDuckAutoInvoke` | Control automatic Rubber Duck agent invocation (disabled by default; set to `true` to re-enable automatic invocation) |
+| `showTipsOnStartup` | Control whether startup tips are shown |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -433,6 +435,7 @@ You can also name a session at startup with the `--name` flag, and resume it by 
 ```bash
 copilot --name "auth-refactor"          # start a session with a given name
 copilot --resume="auth-refactor"        # resume that session by name
+copilot -r "auth-refactor"             # -r is a shorthand for --resume
 ```
 
 The `/session delete` command removes sessions you no longer need:
@@ -452,6 +455,8 @@ The `/rewind` command opens a timeline picker that lets you roll back the conver
 ```
 /rewind
 ```
+
+The Rewind picker shows **working-tree diff stats** (`+added −removed`) at each checkpoint, so you can see at a glance how many lines changed before deciding where to roll back to.
 
 Use `/rewind` when you want to branch off from a different point in the conversation, rather than just undoing the most recent turn.
 
@@ -483,6 +488,16 @@ The exported file contains everything needed to view the session without a netwo
 
 **Background running tasks**: Press **Ctrl+X → B** to move the current running task or shell command to the background. The task continues executing while you can type a new message or review earlier output. This is useful for long-running commands where you want to interact with the agent while waiting for the result.
 
+**Diff view navigation**: The `/diff` view now supports vim-style navigation keys — **`g`** (jump to top), **`G`** (jump to bottom), **`Ctrl+D`** (half-page down), and **`Ctrl+U`** (half-page up). You can also click a diff line with the mouse to select it. The `/diff` command defaults to a branch diff when there are no unstaged changes.
+
+The `/voice` command lets you **dictate prompts using local speech-to-text models** instead of typing. Once invoked, it records your speech and transcribes it directly into the prompt input:
+
+```
+/voice
+```
+
+This is useful in hands-free workflows or when you want to describe a complex change verbally rather than typing it out. The transcription runs locally — no audio is sent to a remote server.
+
 The `/ask` command lets you ask a quick question without affecting your conversation history. The current session context is preserved, so you can use it for one-off lookups without derailing an ongoing task. Responses are rendered as full markdown, including tables and formatted links:
 
 ```
@@ -495,17 +510,25 @@ The `/env` command shows all loaded environment details — instructions, MCP se
 /env
 ```
 
-The `/context` command shows a visualization of the current conversation's context window usage — how many tokens are consumed and how much headroom remains:
+The `/context` command shows a visualization of the current conversation's context window usage — how many tokens are consumed and how much headroom remains. It also **separates Custom Instructions from the system prompt** in the display, making it easier to see exactly what instructions are active. Cross-references per-server MCP tool token costs with `/mcp` are also shown:
 
 ```
 /context
 ```
 
-The `/usage` command displays session metrics such as the number of tokens consumed, API calls made, and any quota information for the current session:
+The `/usage` command displays session metrics such as the number of tokens consumed, API calls made, and any quota information for the current session. It also shows **cache write tokens alongside cache read tokens** for a full picture of caching activity:
 
 ```
 /usage
 ```
+
+The `/billing` command (available as a help topic) provides an overview of AI credit usage features — how credits are consumed, what counts towards your quota, and how to monitor remaining allowances:
+
+```
+/billing
+```
+
+Use `/billing` when you need a quick overview of how your AI credit usage is tracked and calculated.
 
 The `/compact` command summarizes the conversation history to free up context window space while preserving the thread of the conversation. Use it when your context is getting full but you do not want to start a fresh session:
 
@@ -550,6 +573,36 @@ gh copilot --effort high "Refactor the authentication module"
 ```
 
 Accepted values are `low`, `medium`, and `high`. You can also set a default via the `effortLevel` config setting.
+
+### Rubber Duck Agent
+
+The **Rubber Duck** built-in agent is now **enabled by default** as of v1.0.58. When enabled, Copilot can automatically invoke the Rubber Duck agent to help you think through problems by asking clarifying questions and encouraging structured reasoning — similar to the classic rubber duck debugging technique.
+
+You can control automatic invocation with the `builtInAgents.rubberDuckAutoInvoke` setting (set it to `false` to disable automatic invocation while keeping the agent available for manual use):
+
+```json
+{
+  "builtInAgents": {
+    "rubberDuckAutoInvoke": false
+  }
+}
+```
+
+### Scheduled Prompts (Experimental)
+
+When experimental mode is active (`/experimental on`), you can **schedule prompts** to run automatically at a future time or on a recurring interval using the `/every` and `/after` commands:
+
+```
+/experimental on
+
+/after 30m "Run the test suite and summarize any failures"
+/every 1h "Check for new issues opened in the last hour and triage them"
+```
+
+- **`/after <duration> "<prompt>"`** — runs the prompt once after the specified delay
+- **`/every <interval> "<prompt>"`** — runs the prompt repeatedly at the given interval
+
+Scheduled prompts are useful for periodic health checks, recurring summaries, or automations you want to run while you focus on other work.
 
 ### CLI Startup Flags
 
