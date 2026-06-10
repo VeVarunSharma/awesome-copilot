@@ -3,7 +3,7 @@ title: 'What are Agents, Skills, and Instructions'
 description: 'Understand the primary customization primitives that extend GitHub Copilot for specific workflows.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-06-10
 estimatedReadingTime: '7 minutes'
 prev: false
 ---
@@ -21,6 +21,17 @@ Agents are configuration files (`*.agent.md`) that describe:
 When you assign an issue to Copilot or open the **Agents** panel in VS Code, these configurations let you swap in a specialized assistant. Each agent in this repo lives under `agents/` and includes metadata about the tools it depends on.
 
 In products that support delegation, a primary agent can also launch temporary subagents for focused work such as planning, research, or review. See [Agents and Subagents](../agents-and-subagents/) for the coordination model.
+
+### Built-in agents
+
+In addition to custom agents you create, GitHub Copilot CLI ships with **built-in agents** that are available in every session without any configuration. The most notable is the **Rubber Duck** agent — a thinking-partner agent that helps you reason through problems by asking clarifying questions and reflecting your ideas back to you. It is enabled by default (v1.0.58+).
+
+You can control the Rubber Duck agent with two settings in your `settings.json`:
+
+| Setting | Description |
+|---------|-------------|
+| `builtInAgents.rubberDuck` | Enable or disable the Rubber Duck agent entirely |
+| `builtInAgents.rubberDuckAutoInvoke` | Allow Rubber Duck to activate automatically when it detects you are stuck (disabled by default) |
 
 ### When to reach for an agent
 

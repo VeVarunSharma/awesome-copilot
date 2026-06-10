@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-06-10
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -392,6 +392,12 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `builtInAgents.rubberDuck` | Enable or disable the built-in Rubber Duck thinking-partner agent |
+| `builtInAgents.rubberDuckAutoInvoke` | Control whether Rubber Duck is automatically invoked during sessions (disabled by default) |
+| `beepOnSchedule` | Control whether the terminal beeps on completion of a scheduled `/every` or `/after` task |
+| `showTipsOnStartup` | Control whether startup tips and hints are shown when the CLI launches |
+| `tabs` | Configure home tab bar visibility, order, and which tabs are hidden |
+| `permissions.disableBypassPermissionsMode` | Prevent enabling allow-all/yolo mode for sessions |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -550,6 +556,33 @@ gh copilot --effort high "Refactor the authentication module"
 ```
 
 Accepted values are `low`, `medium`, and `high`. You can also set a default via the `effortLevel` config setting.
+
+The `/settings` command (v1.0.61+) opens an **interactive dialog** to browse and edit all user settings without manually editing JSON files:
+
+```
+/settings
+```
+
+The settings dialog lists every available configuration key with its current value. Use arrow keys to navigate, press Enter to select a setting, and edit its value directly in the dialog. Changes are persisted immediately to your user `settings.json`.
+
+The `/worktree` command (v1.0.61+, also aliased as `/move`) creates a new git worktree and switches the current session into it, carrying along any uncommitted changes:
+
+```
+/worktree <branch-name>     # create a worktree on a new branch
+/worktree <existing-branch> # switch to an existing branch in a worktree
+```
+
+This is useful when you want to work on multiple branches simultaneously without stashing, or when you want to hand off the current working tree to a fresh session on a different branch. You can also create a worktree for an open pull request directly from the **Pull Requests** screen.
+
+The `/every` and `/after` commands (v1.0.58+ experimental, enhanced in v1.0.61+) let you **schedule prompts** to run at a specific time or on a recurring interval:
+
+```
+/every 30m Review the test output and summarise any failures
+/after 2h Check if the deployment completed successfully
+/every "weekdays at 9am" Triage new GitHub issues and label them
+```
+
+Both commands accept **natural language** — you can describe the schedule as a cron expression, a calendar time, or a relative duration. To cancel a scheduled task, use `/every cancel` or find it in the schedule manager. The `beepOnSchedule` setting in `settings.json` controls whether a terminal beep sounds when a scheduled task completes.
 
 ### CLI Startup Flags
 
