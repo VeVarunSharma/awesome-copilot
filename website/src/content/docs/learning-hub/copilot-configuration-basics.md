@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-06-11
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -392,6 +392,9 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `tabs` | Configure home tab bar visibility, order, and hidden tabs (v1.0.61+) |
+| `builtInAgents.rubberDuckAutoInvoke` | Control whether the Rubber Duck agent is automatically invoked (v1.0.60+) |
+| `beepOnSchedule` | Disable completion beeps for scheduled `/every` and `/after` runs (v1.0.61+) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -407,6 +410,16 @@ These files follow the same format as `config.json` and are loaded after the glo
 ### Model Picker
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
+
+### Interactive Settings Dialog
+
+The `/settings` command opens an interactive full-screen dialog where you can browse and edit all user settings in one place — no manual config file editing required (v1.0.61+):
+
+```
+/settings
+```
+
+Use arrow keys to navigate settings, Enter to edit, and Escape to close. Changes are written to your `config.json` immediately.
 
 ### CLI Session Commands
 
@@ -428,11 +441,12 @@ The `/session rename` command renames the current session. When called **without
 
 Auto-generated names help you find sessions quickly when switching between multiple backgrounded sessions.
 
-You can also name a session at startup with the `--name` flag, and resume it by name later:
+You can also name a session at startup with the `--name` flag, and resume it by name later (use `-r` as a shorthand for `--resume`):
 
 ```bash
 copilot --name "auth-refactor"          # start a session with a given name
-copilot --resume="auth-refactor"        # resume that session by name
+copilot -r "auth-refactor"              # resume that session by name (-r is shorthand for --resume)
+copilot --resume="auth-refactor"        # long form
 ```
 
 The `/session delete` command removes sessions you no longer need:
@@ -522,6 +536,32 @@ The `/statusline` command (with `/footer` as an alias) lets you control which it
 ```
 /statusline             # show the statusline configuration menu
 ```
+
+The `/voice` command lets you dictate prompts using local speech-to-text models (v1.0.59+). When invoked, it activates your microphone, transcribes your speech, and inserts the text directly into the prompt:
+
+```
+/voice
+```
+
+This is useful for hands-free input, long prompts that are faster to speak, or accessibility scenarios.
+
+The `/worktree` command (aliased `/move`) creates a new git worktree and switches the current session into it, moving any uncommitted changes along (v1.0.61+):
+
+```
+/worktree <branch-name>
+```
+
+This is ideal when you want to start working on a different branch mid-session without losing your current changes. You can also create a worktree for a pull request directly from the pull requests screen.
+
+The `/every` and `/after` commands let you schedule prompts to run at a future time or on a recurring basis (v1.0.58+). Use natural language — cron expressions, calendar times, or relative durations:
+
+```
+/every 30m Check for new issues and summarize them
+/after 2h Run the test suite and report results
+/every weekday at 9am Summarize open pull requests
+```
+
+Use `/experimental on` to enable these commands if they don't appear in your version. The `beepOnSchedule` config setting controls whether a completion beep plays when a scheduled run finishes.
 
 The `/keep-alive` command prevents the system from sleeping while Copilot CLI is active. This is useful during long-running agent sessions on laptops or machines with aggressive sleep settings:
 
