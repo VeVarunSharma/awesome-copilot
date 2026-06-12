@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-06-12
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -550,6 +550,75 @@ gh copilot --effort high "Refactor the authentication module"
 ```
 
 Accepted values are `low`, `medium`, and `high`. You can also set a default via the `effortLevel` config setting.
+
+> **Note (v1.0.60+)**: The maximum reasoning effort level is now available on **every plan**, including free and student tiers. Use the `←` / `→` arrow keys in the model picker to adjust effort without leaving the session.
+
+The `/settings` command opens an interactive full-screen dialog for browsing and editing all user settings in one place (v1.0.61+). Instead of manually editing `~/.copilot-cli/config.json`, you can navigate settings visually and save changes without leaving the session:
+
+```
+/settings
+```
+
+Settings you change through the dialog are written back to your config file immediately.
+
+### Scheduled Prompts
+
+GitHub Copilot CLI lets you schedule prompts to run automatically at a future time or on a recurring basis (v1.0.61+, with experimental flag enabled):
+
+```
+/after 30 minutes check if the build finished
+/after 9am tomorrow send the daily standup summary
+/every weekday at 9am generate a standup summary
+/every 2 hours run the test suite and report failures
+```
+
+The `/after` command runs a prompt once at a specified time. The `/every` command runs a prompt on a recurring schedule. Both commands accept natural language time expressions — you don't need cron syntax.
+
+```
+/after in 1 hour review my open PRs
+/every monday at 10am check for stale issues
+/every 30 minutes summarize background task progress
+```
+
+To enable scheduling, make sure experimental features are active:
+
+```
+/experimental
+```
+
+You can control notification behavior with the `beepOnSchedule` setting — set it to `false` to silence the terminal bell that fires when a scheduled prompt completes.
+
+### Git Worktrees
+
+The `/worktree` command (aliased as `/move`) creates a new git worktree and switches the CLI session into it, carrying any uncommitted changes along (v1.0.61+):
+
+```
+/worktree
+```
+
+This is especially useful when you want to start working on a different branch or PR without committing half-done changes. You can also create a worktree for a pull request directly from the pull requests screen in the CLI.
+
+### Built-in Agents
+
+GitHub Copilot CLI ships with a set of **built-in agents** that are always available, regardless of what custom agents you have installed. You can configure their behavior through settings:
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `builtInAgents.rubberDuck` | Enable or disable the Rubber Duck built-in agent | `true` |
+| `builtInAgents.rubberDuckAutoInvoke` | Allow the Rubber Duck agent to invoke automatically when relevant | `false` |
+
+The **Rubber Duck agent** is a thinking-out-loud companion. When enabled (the default since v1.0.58), it can join your session to help you reason through a problem before the main agent acts. Auto-invocation (off by default) lets it surface automatically when the main agent detects that thinking out loud would help clarify the goal.
+
+Configure via `copilot config` or by editing `~/.copilot-cli/config.json`:
+
+```json
+{
+  "builtInAgents": {
+    "rubberDuck": true,
+    "rubberDuckAutoInvoke": false
+  }
+}
+```
 
 ### CLI Startup Flags
 
