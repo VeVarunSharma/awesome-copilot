@@ -3,7 +3,7 @@ title: '02 · Context and Conversations'
 description: 'Learn how to give Copilot CLI richer context and build stronger multi-turn conversations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-03-20
+lastUpdated: 2026-06-12
 ---
 
 ![Chapter 02: Context and Conversations](/images/learning-hub/copilot-cli-for-beginners/02/chapter-header.png)
@@ -311,13 +311,19 @@ copilot --continue
 # Pick from a list of sessions interactively
 copilot --resume
 
+# -r is a shorthand for --resume (saves some typing!)
+copilot -r
+
 # Or resume a specific session by ID
-copilot --resume abc123
+copilot --resume=abc123
+
+# Or resume by the name you gave the session
+copilot --resume="my book app review"
 ```
 
 > 💡 **How do I find a session ID?** You don't need to memorize them. Running `copilot --resume` without an ID shows an interactive list of your previous sessions, their names, IDs, and when they were last active. Just pick the one you want.
 >
-> **What about multiple terminals?** Each terminal window is its own session with its own context. If you have Copilot CLI open in three terminals, that's three separate sessions. Running `--resume` from any terminal lets you browse all of them. The `--continue` flag grabs whichever session was closed most recently, no matter which terminal it was in.
+> **What about multiple terminals?** Each terminal window is its own session with its own context. If you have Copilot CLI open in three terminals, that's three separate sessions. Running `--resume` from any terminal lets you browse all of them. The `--continue` flag grabs the session from the current working directory first; if none exists there, it picks the most recently active session.
 >
 > **Can I switch sessions without restarting?** Yes. Use the `/resume` slash command from inside an active session:
 > ```
