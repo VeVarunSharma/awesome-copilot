@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-06-13
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -257,6 +257,8 @@ The agent can then query your database, analyze query plans, and suggest optimiz
 ```
 
 Keep agents focused—one persona per file. If you find an agent trying to do too many things, split it into multiple agents or extract common tasks into skills that agents can invoke.
+
+> **Discovery in subdirectories**: Copilot CLI now discovers custom agents in **nested** `.github/agents` and `.claude/agents` directories even when the session is started from a subdirectory of the repository root. This means you can organize agents within monorepo sub-packages and they will still be found automatically.
 
 ## Common Questions
 
