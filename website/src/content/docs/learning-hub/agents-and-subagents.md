@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-06-14
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -175,7 +175,7 @@ No. Most of the time the main agent launches them when it decides the task benef
 
 **Can a subagent use a different model or tool set?**
 
-Yes, when the delegated worker is a custom agent with its own frontmatter.
+Yes, when the delegated worker is a custom agent with its own frontmatter. You can also configure the default model, reasoning effort, and context tier for all subagents globally via **user settings** or through the interactive **`/subagents` picker** (also accessible as `/agents`). This lets you tune how much reasoning compute subagents use—for example, using a faster model for lightweight research tasks and a more capable one for complex implementation work—without editing each agent file individually.
 
 **Are subagents always parallel?**
 

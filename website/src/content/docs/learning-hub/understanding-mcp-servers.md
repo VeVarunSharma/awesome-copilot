@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-06-14
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -66,6 +66,7 @@ MCP servers are configured per-workspace. GitHub Copilot CLI discovers server de
 | File | Scope | Notes |
 |------|-------|-------|
 | `.mcp.json` | Repository root | Preferred for repo-shared configuration |
+| `.github/mcp.json` | Repository root (GitHub-style) | Auto-loaded by Copilot CLI; equivalent to `.mcp.json` |
 | `.vscode/mcp.json` | VS Code workspace | VS Code–compatible workspace config |
 | `devcontainer.json` | Dev container | Available when running inside a container |
 
@@ -184,6 +185,7 @@ Some MCP servers require authentication to connect to protected resources. GitHu
 - **Microsoft Entra ID (Azure AD)**: MCP servers that authenticate via Microsoft Entra ID are fully supported. Once you complete the initial login, the CLI caches the authentication and **will not show the consent screen on subsequent connections** — you authenticate once per session rather than every time the server reconnects.
 - **API keys via environment variables**: Pass secrets through the `env` field in the MCP server configuration (see examples above). Never hardcode credentials in `.mcp.json`.
 - **`${input:variableName}` prompts**: VS Code will prompt for these values at runtime, keeping secrets out of committed files.
+- **Corporate forward proxies (Kerberos/SPNEGO)**: When operating behind a corporate proxy that requires Negotiate authentication, Copilot CLI automatically authenticates using the Kerberos/SPNEGO protocol. No extra configuration is needed — the CLI detects the proxy challenge and handles the authentication handshake transparently.
 
 > **Tip**: If your MCP server uses OAuth with Dynamic Client Registration but hosts its authorization metadata at a non-standard URL (as some enterprise servers like Atlassian Rovo do), Copilot CLI handles this automatically.
 

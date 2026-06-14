@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-06-14
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -392,8 +392,21 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `tabs` | Configure home tab bar visibility, order, and hidden tabs |
+| `beepOnSchedule` | Disable completion beeps for scheduled `/every` and `/after` runs |
+| `builtInAgents.rubberDuckAutoInvoke` | Control automatic rubber duck agent invocation (disabled by default) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
+
+### Interactive Settings Editor
+
+Instead of editing `config.json` directly, you can browse and modify all user settings through the built-in **`/settings`** dialog. This opens a full interactive UI inside the CLI where every setting is listed with a description, making it easy to discover available options without consulting documentation.
+
+```
+/settings
+```
+
+Changes made in `/settings` are saved to your persistent configuration immediately.
 
 In addition to the main config file, GitHub Copilot CLI reads two optional per-project files for repository-specific overrides:
 
