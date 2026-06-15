@@ -3,7 +3,7 @@ title: 'Defining Custom Instructions'
 description: 'Learn how to create persistent, context-aware instructions that guide GitHub Copilot automatically across your codebase.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-03-22
+lastUpdated: 2026-06-15
 estimatedReadingTime: '8 minutes'
 tags:
   - instructions
@@ -97,6 +97,21 @@ export function UserProfile({ userId, onUpdate }: UserProfileProps) {
 - Copilot reads these instructions whenever it generates or suggests code for matching files
 - Standards are enforced consistently without developers needing to remember every rule
 - New team members benefit from institutional knowledge automatically
+
+## Where to Store Instruction Files
+
+Copilot CLI discovers instruction files from several locations, each with a different scope:
+
+| Location | Scope | Use Case |
+|----------|-------|----------|
+| `.github/instructions/*.instructions.md` | Repository | Team-wide standards version-controlled with the project |
+| `$HOME/.copilot/instructions/**/*.instructions.md` | User (all repos) | Personal preferences that apply across every project |
+
+**Repository-level instructions** (`.github/instructions/`) are the most common. Commit them alongside your code so the whole team benefits automatically.
+
+**User-level instructions** (`$HOME/.copilot/instructions/`) are ideal for personal conventions you want everywhere — editor preferences, preferred comment style, or language idioms — without adding them to every project's repository.
+
+> **Tip**: User-level instructions can be organized into subdirectories, and the `**` glob pattern means all `.instructions.md` files in any subfolder are discovered automatically.
 
 ## Scoping Instructions Effectively
 
