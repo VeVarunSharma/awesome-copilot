@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-06-16
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -131,6 +131,22 @@ The important behavior is different from a single chat turn:
 - subagents share the same filesystem, so overlapping writes should be avoided
 
 That makes `/fleet` a practical way to launch subagents even if you are not authoring custom agent files yourself.
+
+### Configuring Subagent Model, Reasoning, and Context
+
+You can configure the model, reasoning effort, and context tier that subagents use via the **`/subagents`** picker (also accessible as **`/agents`**). Open it during a session to fine-tune how subagents perform:
+
+```text
+/subagents
+```
+
+The picker lets you choose:
+
+- **Model** — which AI model each subagent uses (e.g., a faster model for exploration, a more capable one for implementation)
+- **Reasoning effort** — the depth of reasoning applied per turn
+- **Context tier** — how much context is made available to each subagent
+
+These settings can also be configured in your user settings file, allowing you to set defaults for all subagents without selecting them interactively each time.
 
 ## Orchestration patterns that work well
 
