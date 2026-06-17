@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-06-17
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -419,6 +419,27 @@ It's less suited for:
 - All changes go through PR review before merging
 - Use hooks to enforce security scanning on every commit
 - Scope repository permissions appropriately
+
+### Security Review with `/security-review`
+
+The **`/security-review`** slash command runs a comprehensive security analysis of your codebase or a specific file, checking for OWASP vulnerabilities, authentication flaws, injection risks, and supply chain issues. This command is now **generally available** to all users — it no longer requires the `--experimental` flag:
+
+```
+/security-review
+/security-review src/auth/
+```
+
+Use `/security-review` at the end of a coding session or as part of your PR workflow to catch security issues before they reach review.
+
+### Diagnosing Issues with `/diagnose`
+
+If a coding agent session behaves unexpectedly — producing incorrect output, getting stuck, or making surprising decisions — use **`/diagnose`** to analyze the session logs:
+
+```
+/diagnose
+```
+
+This command inspects the current session's logs and surfaces a diagnostic summary: what the agent attempted, where it encountered issues, and what corrective steps may help. It's especially useful when reviewing completed or failed agent sessions to understand what went wrong.
 
 ## Common Questions
 

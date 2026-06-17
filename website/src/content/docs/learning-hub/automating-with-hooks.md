@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-06-17
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -181,6 +181,27 @@ Hooks support two types: `"command"` for running local shell scripts, and `"http
 **powershell**: The command or script to execute on Windows systems. Either `bash` or `powershell` (or both) must be provided.
 
 **matcher** *(optional)*: A regular expression matched against the tool name. When present, the hook only fires for tools whose name fully matches the regex. For example, `"^bash$"` ensures the hook only runs for the `bash` tool, not for `edit` or other tools. This is particularly useful for `preToolUse` and `postToolUse` hooks where you want to target a specific tool.
+
+You can also target multiple tools using a pipe-separated pattern. For example, `"Edit|Write"` fires the hook after either an `Edit` or `Write` tool call — useful for running formatters after any file-modification tool:
+
+```json
+{
+  "version": 1,
+  "hooks": {
+    "postToolUse": [
+      {
+        "type": "command",
+        "matcher": "Edit|Write",
+        "bash": "npx prettier --write .",
+        "cwd": ".",
+        "timeoutSec": 30
+      }
+    ]
+  }
+}
+```
+
+> **Note (v1.0.63+)**: `postToolUse` matchers are fully honored as of v1.0.63. In earlier versions, `matcher` entries on `postToolUse` hooks could be silently dropped, causing the hook to fire for all tools regardless of the matcher.
 
 > **Important (v1.0.36+)**: Prior to v1.0.36, the `matcher` field was silently ignored — hooks with a `matcher` fired for all tool calls regardless of the regex. After upgrading to v1.0.36 or later, only tool calls whose name fully matches the `matcher` regex will trigger the hook. Review any existing `preToolUse`/`postToolUse` hooks that use `matcher` to ensure they still fire as expected.
 
