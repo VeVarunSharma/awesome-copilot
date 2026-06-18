@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-06-18
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -550,6 +550,24 @@ gh copilot --effort high "Refactor the authentication module"
 ```
 
 Accepted values are `low`, `medium`, and `high`. You can also set a default via the `effortLevel` config setting.
+
+The `/security-review` command runs an automated security audit of the current codebase, checking for common vulnerabilities, insecure patterns, and hardcoded secrets. It is available to all users without requiring experimental mode:
+
+```
+/security-review
+```
+
+The `/app` command opens the GitHub app for the current repository in the browser. If no native app is installed or available, it falls back to the GitHub.com URL:
+
+```
+/app
+```
+
+The `/diagnose` command analyzes session logs to help troubleshoot issues with the current session — useful when MCP servers aren't connecting, tools are behaving unexpectedly, or you want to inspect what happened during a session:
+
+```
+/diagnose
+```
 
 ### CLI Startup Flags
 

@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-06-18
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -39,6 +39,7 @@ When a user selects a custom agent in VS Code or assigns it to an issue via the 
 - Agents can invoke tools, run commands, search codebases, and interact with MCP servers
 - Multiple agents can coexist in a repository, each serving different workflows
 - Agents are stored in `.github/agents/` and are shared with the entire team
+- Custom agents in nested `.github/agents/` and `.claude/agents/` directories are automatically discovered even when you start a session from a **subdirectory** of the repository root — you don't need to be at the repo root for agents to load
 
 ### How Agents Differ from Other Customizations
 
