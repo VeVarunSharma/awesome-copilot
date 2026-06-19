@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-06-19
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -183,6 +183,8 @@ Hooks support two types: `"command"` for running local shell scripts, and `"http
 **matcher** *(optional)*: A regular expression matched against the tool name. When present, the hook only fires for tools whose name fully matches the regex. For example, `"^bash$"` ensures the hook only runs for the `bash` tool, not for `edit` or other tools. This is particularly useful for `preToolUse` and `postToolUse` hooks where you want to target a specific tool.
 
 > **Important (v1.0.36+)**: Prior to v1.0.36, the `matcher` field was silently ignored — hooks with a `matcher` fired for all tool calls regardless of the regex. After upgrading to v1.0.36 or later, only tool calls whose name fully matches the `matcher` regex will trigger the hook. Review any existing `preToolUse`/`postToolUse` hooks that use `matcher` to ensure they still fire as expected.
+
+> **PostToolUse matchers (v1.0.63+)**: As of v1.0.63, `postToolUse` hook matchers (e.g., `"Edit|Write"`) are fully honored. If you had `postToolUse` hooks with a `matcher` that appeared to fire for all tool calls, upgrade to v1.0.63 or later to ensure they only run after the specific tools they target — keeping your formatters and linters scoped correctly.
 
 **cwd**: Working directory for the command (relative to repository root).
 
