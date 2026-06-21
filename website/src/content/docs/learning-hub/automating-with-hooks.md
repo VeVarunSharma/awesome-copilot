@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-06-21
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -180,9 +180,11 @@ Hooks support two types: `"command"` for running local shell scripts, and `"http
 
 **powershell**: The command or script to execute on Windows systems. Either `bash` or `powershell` (or both) must be provided.
 
-**matcher** *(optional)*: A regular expression matched against the tool name. When present, the hook only fires for tools whose name fully matches the regex. For example, `"^bash$"` ensures the hook only runs for the `bash` tool, not for `edit` or other tools. This is particularly useful for `preToolUse` and `postToolUse` hooks where you want to target a specific tool.
+**matcher** *(optional)*: A regular expression matched against the tool name. When present, the hook only fires for tools whose name fully matches the regex. For example, `"^bash$"` ensures the hook only runs for the `bash` tool, not for `edit` or other tools. You can also use pipe-separated alternatives (e.g., `"Edit|Write"`) to target multiple tools in a single hook. This is particularly useful for `preToolUse` and `postToolUse` hooks where you want to target specific tools.
 
 > **Important (v1.0.36+)**: Prior to v1.0.36, the `matcher` field was silently ignored — hooks with a `matcher` fired for all tool calls regardless of the regex. After upgrading to v1.0.36 or later, only tool calls whose name fully matches the `matcher` regex will trigger the hook. Review any existing `preToolUse`/`postToolUse` hooks that use `matcher` to ensure they still fire as expected.
+>
+> **Note (v1.0.63+)**: Pipe-separated matchers like `"Edit|Write"` are now fully honored. In earlier versions these were silently dropped, causing hooks to fire for all tools. If you rely on `postToolUse` hooks with multi-tool matchers (e.g., for formatters that should run after `Edit` or `Write` but not after `bash`), confirm you are on v1.0.63 or later.
 
 **cwd**: Working directory for the command (relative to repository root).
 

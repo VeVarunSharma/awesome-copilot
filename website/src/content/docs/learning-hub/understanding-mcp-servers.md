@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-06-21
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -119,6 +119,21 @@ This guided flow is the recommended way to add new MCP servers, especially for s
 
 **type** (remote servers): The transport type for remote MCP servers (`http` or `sse`). This field can now be omitted — the CLI defaults to `http` when no type is specified, simplifying remote server configuration.
 
+**deferTools** *(optional)*: When `true`, this server's tools are always loaded and available to the model even when the global tool-search feature is enabled. By default, tool search may hide infrequently-used tools to keep the model's context efficient — setting `deferTools: true` opts a server out of that behavior so its tools are always included. Use this for servers whose tools you want the model to consider on every turn regardless of search relevance:
+
+```json
+{
+  "servers": {
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": { "DATABASE_URL": "${input:databaseUrl}" },
+      "deferTools": true
+    }
+  }
+}
+```
+
 ### Managing Persistent MCP Configuration via Server RPCs
 
 In addition to file-based configuration, GitHub Copilot CLI exposes **server RPCs** that let MCP servers and tooling scripts manage the persistent MCP server registry at runtime. This enables programmatic setup — for example, an installer script that registers a server without requiring you to hand-edit a JSON file.
@@ -133,6 +148,12 @@ The available RPCs are:
 | `mcp.config.remove` | Remove a server from the persistent configuration |
 
 These are especially useful for plugins and installer scripts that need to self-register or de-register their MCP server as part of install/uninstall flows, without requiring the user to manually edit config files.
+
+### Plugin-Provided MCP Servers
+
+Installed plugins can ship and register their own MCP servers. When you install a plugin via the plugin marketplace, any MCP servers it declares are automatically discovered and made available in your session — you don't need to manually add them to `.mcp.json`. These plugin-provided servers appear alongside your manually-configured servers in `/mcp show` and other MCP management commands.
+
+> **Note**: Plugin-provided MCP servers are subject to the same org policy restrictions as manually configured servers. If your organization has an MCP allowlist, plugin servers that aren't on the allowlist will be blocked.
 
 ### Common MCP Server Configurations
 
