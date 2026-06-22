@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-06-22
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -125,6 +125,16 @@ name: generate-tests
 ```yaml
 description: 'Generate comprehensive unit tests for a component, covering happy path, edge cases, and error conditions'
 ```
+
+### Optional Fields
+
+**argument-hint**: A short hint shown to the user when they invoke the skill via slash command, describing what argument (if any) the skill expects. This appears in the command picker as contextual guidance.
+
+```yaml
+argument-hint: 'function or file to test'
+```
+
+For example, a skill named `generate-tests` with `argument-hint: 'function or file to test'` would show `/generate-tests <function or file to test>` in the picker. Use this to make it clear whether a skill expects a target or can be invoked without arguments.
 
 ### Description Best Practices
 

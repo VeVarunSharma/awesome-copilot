@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-06-22
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -255,6 +255,8 @@ The agent can then query your database, analyze query plans, and suggest optimiz
     ├── terraform-expert.agent.md
     └── release-manager.agent.md
 ```
+
+> **Note**: Copilot also discovers agents stored in `.claude/agents/` directories — both at the repository root and in nested subdirectories. This makes repositories that follow Claude Code's agent layout compatible out of the box.
 
 Keep agents focused—one persona per file. If you find an agent trying to do too many things, split it into multiple agents or extract common tasks into skills that agents can invoke.
 

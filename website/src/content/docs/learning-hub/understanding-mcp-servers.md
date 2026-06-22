@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-06-22
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -107,6 +107,14 @@ You can also install a specific server by name without the picker:
 /mcp install @modelcontextprotocol/server-postgres
 ```
 
+To browse the registry interactively before installing, use the registry subcommand:
+
+```
+/mcp registry
+```
+
+This opens a browsable view of the registry so you can discover available servers, read descriptions, and install them in one flow.
+
 This guided flow is the recommended way to add new MCP servers, especially for servers that require multiple configuration values.
 
 ### Configuration Fields
@@ -118,6 +126,18 @@ This guided flow is the recommended way to add new MCP servers, especially for s
 **env**: Environment variables passed to the server process. Use these for connection strings, API keys, and configuration—never hardcode secrets in the JSON file.
 
 **type** (remote servers): The transport type for remote MCP servers (`http` or `sse`). This field can now be omitted — the CLI defaults to `http` when no type is specified, simplifying remote server configuration.
+
+**deferTools** (optional): When set to `true`, the server's tools are kept always available even when tool search is enabled. This is useful for lightweight utility servers whose tools you want Copilot to consider on every turn, rather than only when the search heuristic selects them.
+
+```json
+{
+  "my-utility-server": {
+    "command": "npx",
+    "args": ["-y", "@example/my-utility-server"],
+    "deferTools": true
+  }
+}
+```
 
 ### Managing Persistent MCP Configuration via Server RPCs
 
