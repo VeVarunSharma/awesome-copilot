@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-06-23
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -226,6 +226,27 @@ tools: ['codebase', 'terminal', 'postgres-mcp']
 ```
 
 The agent can then query your database, analyze query plans, and suggest optimizations—all within the conversation. For setup details, see [Understanding MCP Servers](../understanding-mcp-servers/).
+
+### Keeping MCP Tools Always Available (`deferTools`)
+
+By default, when tool search is active the CLI dynamically decides which tools to surface based on relevance to the current task. If you want an MCP server's tools to always appear in the agent's tool list regardless of the task context, add `deferTools: true` to the server entry in the agent's frontmatter:
+
+```yaml
+---
+name: 'Database Administrator'
+description: 'Expert DBA for PostgreSQL performance tuning, query optimization, and schema design'
+tools: ['codebase', 'terminal', 'postgres-mcp']
+mcpServers:
+  postgres-mcp:
+    command: npx
+    args: ['-y', '@modelcontextprotocol/server-postgres']
+    env:
+      DATABASE_URL: '${input:databaseUrl}'
+    deferTools: true
+---
+```
+
+This is useful for agents that work with a specific external system on every turn — for example, a DBA agent where the database query tools should always be ready without waiting for tool search to decide they are relevant.
 
 ## Best Practices
 

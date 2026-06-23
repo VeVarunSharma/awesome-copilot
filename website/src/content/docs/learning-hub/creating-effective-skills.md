@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-06-23
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -135,6 +135,22 @@ The `description` field is critical for agent discovery. Write it so that agents
 ❌ **Poor**: `'Commit helper'`
 
 Include trigger keywords and contextual cues that help agents match the skill to user intent.
+
+### Optional Fields
+
+**argument-hint**: A short prompt shown to users when they invoke the skill via a slash command, guiding them on what argument to provide.
+
+```yaml
+argument-hint: 'File, package, or module to migrate'
+```
+
+When a user types `/my-skill` in the chat input, the CLI displays this hint in the input area so they know what optional or required argument to include. This makes skills more discoverable and self-documenting without needing to describe arguments in the skill body.
+
+Examples from the repository:
+- `argument-hint: 'Optional: time range ("last 2 weeks"), category, or "review prep"'` — guides users on filtering options
+- `argument-hint: 'Optional: specific area to focus on, e.g. "architecture only"'` — clarifies scope for analysis skills
+
+**Rule of thumb**: Add an `argument-hint` whenever your skill is more useful with a user-supplied argument. Leave it out for skills that are fully self-contained and need no input.
 
 ## Real Examples from the Repository
 
