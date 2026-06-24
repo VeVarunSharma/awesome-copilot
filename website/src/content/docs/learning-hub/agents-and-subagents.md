@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-06-24
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -131,6 +131,20 @@ The important behavior is different from a single chat turn:
 - subagents share the same filesystem, so overlapping writes should be avoided
 
 That makes `/fleet` a practical way to launch subagents even if you are not authoring custom agent files yourself.
+
+## Built-in subagents in Copilot CLI
+
+GitHub Copilot CLI ships with two built-in subagents that the main agent can invoke automatically:
+
+- **`task`**: handles focused, self-contained execution tasks
+- **`explore`**: performs research and codebase exploration in an isolated context
+
+You can configure and control these built-in subagents using the `/subagents` command inside a session. This includes:
+
+- **Enabling or disabling** the `task` and `explore` built-in subagents for a session (useful if you want to prevent automatic delegation for a specific workflow)
+- **Configuring the rubber-duck subagent**, which the CLI uses for self-review. The rubber-duck subagent challenges the main agent's reasoning before committing to an approach. You can configure it to use a **complementary model strategy** — the CLI automatically picks a model from an opposite model family (e.g., if the main agent uses a Claude model, the rubber-duck uses a GPT model, and vice versa) to get a different perspective.
+
+> **Tip**: Disabling the `task` and `explore` subagents keeps all work in the main agent's context, which can be useful when you want full visibility into every step of a workflow without delegation.
 
 ## Orchestration patterns that work well
 

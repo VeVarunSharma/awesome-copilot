@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-06-24
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -118,6 +118,23 @@ This guided flow is the recommended way to add new MCP servers, especially for s
 **env**: Environment variables passed to the server process. Use these for connection strings, API keys, and configuration—never hardcode secrets in the JSON file.
 
 **type** (remote servers): The transport type for remote MCP servers (`http` or `sse`). This field can now be omitted — the CLI defaults to `http` when no type is specified, simplifying remote server configuration.
+
+**deferTools**: Controls whether the server's tools are loaded lazily (deferred) when tool search is enabled. By default, tools may be deferred to keep the active tool list focused. Set `deferTools: false` to ensure this server's tools are **always available**, even when tool search is active — useful for servers whose tools you rely on constantly.
+
+```json
+{
+  "servers": {
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": {
+        "DATABASE_URL": "${input:databaseUrl}"
+      },
+      "deferTools": false
+    }
+  }
+}
+```
 
 ### Managing Persistent MCP Configuration via Server RPCs
 

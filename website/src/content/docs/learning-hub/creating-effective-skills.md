@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-06-24
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -125,6 +125,28 @@ name: generate-tests
 ```yaml
 description: 'Generate comprehensive unit tests for a component, covering happy path, edge cases, and error conditions'
 ```
+
+### Optional Fields
+
+**argument-hints**: Declare named parameters your skill accepts. When present, the CLI prompts the user for each argument before the skill runs, and passes the values to the skill instructions as context. This is useful for skills that need user input (component names, feature flags, target directories, etc.).
+
+```yaml
+---
+name: create-component
+description: 'Scaffold a new React component with tests and documentation'
+argument-hints:
+  - name: component-name
+    description: 'The name of the component to create (PascalCase, e.g. UserProfile)'
+  - name: include-stories
+    description: 'Whether to generate a Storybook story file (yes/no)'
+---
+```
+
+Each entry in `argument-hints` has two fields:
+- **`name`**: The parameter identifier (used as a variable name in the skill instructions)
+- **`description`**: Shown to the user as a prompt — write this as a clear instruction
+
+> **Note**: `argument-hints` is recognized by GitHub Copilot CLI. Availability on other surfaces (VS Code, GitHub.com coding agent) depends on each client's support for the full Agent Skills specification.
 
 ### Description Best Practices
 
