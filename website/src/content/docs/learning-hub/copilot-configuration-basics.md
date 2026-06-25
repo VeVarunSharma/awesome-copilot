@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-06-25
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -408,6 +408,18 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
+**Model family aliases (v1.0.64+)**: Instead of typing the full model name, you can use short family aliases in the `model` setting or when selecting via `/model`:
+
+| Alias | Maps to |
+|-------|---------|
+| `opus` | Latest Opus-family model |
+| `sonnet` | Latest Sonnet-family model |
+| `haiku` | Latest Haiku-family model |
+| `gpt` | Latest GPT-family model |
+| `gemini` | Latest Gemini-family model |
+
+Using an alias means you automatically follow the latest available model in that family without updating your config when a new version ships.
+
 ### CLI Session Commands
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
@@ -463,13 +475,19 @@ The `/undo` command reverts the last turn—including any file changes the agent
 
 Use `/undo` when the agent's last response went in an unwanted direction and you want to try a different approach from that point.
 
-The `/cd` command changes the working directory for the current session. Each session maintains its own working directory that persists when you switch between sessions:
+The `/cd` command changes the working directory for the current session. Each session maintains its own working directory that persists when you switch between sessions, and custom agents in the new directory are discovered automatically (v1.0.65+):
 
 ```
 /cd ~/projects/my-other-repo
 ```
 
 This is useful when you have multiple backgrounded sessions each focused on a different project directory.
+
+The `/branch` command (alias for `/fork`, v1.0.64+) creates a new branch from the current session state. This naming matches Claude Code's command naming, making it easier to switch between the two tools:
+
+```
+/branch my-feature-branch
+```
 
 The `/share html` command exports the current session — including conversation history and any research reports — as a **self-contained interactive HTML file**:
 
@@ -523,6 +541,8 @@ The `/statusline` command (with `/footer` as an alias) lets you control which it
 /statusline             # show the statusline configuration menu
 ```
 
+An opt-in **CI check status item** (v1.0.65+) can show whether the current branch's CI checks are passing, running, or failing — directly in the status bar. Enable it via `/statusline` to get a constant at-a-glance view of CI health without leaving your session.
+
 The `/keep-alive` command prevents the system from sleeping while Copilot CLI is active. This is useful during long-running agent sessions on laptops or machines with aggressive sleep settings:
 
 ```
@@ -543,6 +563,8 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
 
+> **Autopilot enhancements (v1.0.64+)**: When autopilot mode is active, the agent now **automatically handles** `ask_user`, elicitation, sampling, and permission prompts without surfacing dialogs. After the agent calls `task_complete`, the CLI automatically **returns to interactive mode**, so you're not left in autopilot for the next prompt. Both behaviours also apply when launching with `--autopilot`.
+
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
 ```bash
@@ -562,6 +584,15 @@ copilot --plan          # start in plan mode (propose without executing)
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+**Git worktree support — experimental (v1.0.64+)**: The `--worktree` flag (shorthand `-w`) creates or reuses a git worktree under `<repo>.worktrees/` and starts the CLI session inside it. Enable the flag after turning on experimental features with `/experimental`:
+
+```bash
+copilot --worktree          # create/reuse a worktree with an auto-generated name
+copilot --worktree my-task  # create/reuse a worktree named "my-task"
+```
+
+Worktrees let you run Copilot on a parallel branch without disturbing your main working tree — useful when you want the agent to explore a refactoring independently while you continue in the main branch.
 
 ### Shell Completion
 

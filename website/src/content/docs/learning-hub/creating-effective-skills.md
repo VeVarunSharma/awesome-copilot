@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-06-25
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -124,6 +124,24 @@ name: generate-tests
 **description**: Brief summary of what the skill does and when to use it (10–1024 characters, wrapped in single quotes)
 ```yaml
 description: 'Generate comprehensive unit tests for a component, covering happy path, edge cases, and error conditions'
+```
+
+### Optional Fields
+
+**argument-hint** *(v1.0.64+)*: A short string that appears as a placeholder in the skill invocation prompt, telling the user (or agent) what argument to pass when invoking the skill. This is especially helpful for skills that accept a subject or target as input.
+
+```yaml
+argument-hint: '<component name or file path>'
+```
+
+When a user invokes the skill via `/generate-tests`, the CLI shows the hint so they know what to type next. Example:
+
+```yaml
+---
+name: generate-tests
+description: 'Generate comprehensive unit tests for the specified component, covering happy path, edge cases, and error conditions'
+argument-hint: '<component name or file path>'
+---
 ```
 
 ### Description Best Practices
@@ -342,6 +360,34 @@ Execute the project's test suite:
 
 Use [scripts/parse-test-output.sh](scripts/parse-test-output.sh) to extract structured failure data.
 ```
+
+## Managing Skills with the CLI (v1.0.65+)
+
+The `copilot skill` subcommand lets you manage skills directly from the command line without manually editing configuration files. You can also use `/skill` (or `/skills`) as a slash command inside an interactive Copilot session.
+
+```bash
+# List all currently loaded skills
+copilot skill list
+
+# Add a skill from a local directory
+copilot skill add ./path/to/my-skill
+
+# Add a skill from a URL
+copilot skill add https://example.com/skills/my-skill.zip
+
+# Remove a skill by name
+copilot skill remove my-skill-name
+```
+
+Inside an interactive session:
+
+```
+/skill list
+/skill add ./skills/generate-tests
+/skill remove generate-tests
+```
+
+This is particularly useful for quickly trying out a skill from the [Awesome Copilot skills directory](../../skills/) before committing to installing it as part of a plugin.
 
 ## Common Questions
 

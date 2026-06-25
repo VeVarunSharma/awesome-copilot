@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-06-25
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -102,11 +102,17 @@ Hooks can trigger on several lifecycle events:
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
 
-### sessionStart additionalContext
+### Hook additionalContext
 
-The `sessionStart` hook supports an `additionalContext` field in its output. When your hook script writes JSON to stdout containing an `additionalContext` key, that text is **injected directly into the conversation** at the start of the session. This lets hooks dynamically provide environment-specific context—such as the current git branch, deployment environment, or team onboarding notes—without requiring the user to paste it manually.
+Several hooks support an `additionalContext` field in their output. When your hook script writes JSON to stdout containing an `additionalContext` key, that text is **injected directly into the model-facing prompt** for that event. This lets hooks dynamically supply context that the agent sees and can act on.
 
-Example hook script that surfaces context:
+| Hook event | When `additionalContext` is used |
+|------------|----------------------------------|
+| `sessionStart` | Injected at the very start of the session |
+| `userPromptSubmitted` | Injected alongside the user's prompt each turn (v1.0.65+) |
+| `preToolUse` / `postToolUse` | Can explain why a modification was made or provide extra context for the tool call |
+
+**Example — `sessionStart` injecting environment context:**
 
 ```bash
 #!/usr/bin/env bash
@@ -117,6 +123,20 @@ cat <<EOF
 }
 EOF
 ```
+
+**Example — `userPromptSubmitted` supplying per-prompt context (v1.0.65+):**
+
+```bash
+#!/usr/bin/env bash
+# Append team guidelines to every prompt the user submits
+cat <<'EOF'
+{
+  "additionalContext": "Reminder: all changes must follow CONTRIBUTING.md conventions and pass CI before merging."
+}
+EOF
+```
+
+This is useful for compliance scenarios where you need certain information in every prompt without relying on the user to include it.
 
 ### Extension Hooks Merging
 
