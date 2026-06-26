@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-06-26
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -102,9 +102,12 @@ Hooks can trigger on several lifecycle events:
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
 
-### sessionStart additionalContext
+### additionalContext in Hook Output
 
-The `sessionStart` hook supports an `additionalContext` field in its output. When your hook script writes JSON to stdout containing an `additionalContext` key, that text is **injected directly into the conversation** at the start of the session. This lets hooks dynamically provide environment-specific context—such as the current git branch, deployment environment, or team onboarding notes—without requiring the user to paste it manually.
+The `sessionStart` and `userPromptSubmitted` hooks both support an `additionalContext` field in their output. When your hook script writes JSON to stdout containing an `additionalContext` key, that text is **injected directly into the conversation**. This lets hooks dynamically provide environment-specific context—such as the current git branch, deployment environment, or team onboarding notes—without requiring the user to paste it manually.
+
+- **`sessionStart`**: Context is injected once at the beginning of the session.
+- **`userPromptSubmitted`**: Context is injected with each user prompt, letting you enrich every request with live data (e.g., current branch, active ticket, environment state).
 
 Example hook script that surfaces context:
 

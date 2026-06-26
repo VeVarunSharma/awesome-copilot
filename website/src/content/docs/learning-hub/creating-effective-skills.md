@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-06-26
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -125,6 +125,15 @@ name: generate-tests
 ```yaml
 description: 'Generate comprehensive unit tests for a component, covering happy path, edge cases, and error conditions'
 ```
+
+### Optional Fields
+
+**argument-hint**: A short prompt shown to users when they invoke the skill with `/skill-name`, hinting what argument or context they should provide:
+```yaml
+argument-hint: 'Paste the code you want to analyze, or reference a file'
+```
+
+This hint appears in the slash-command picker so users know what to type after the skill name. Use it whenever your skill benefits from a specific input to produce the best output.
 
 ### Description Best Practices
 
@@ -342,6 +351,58 @@ Execute the project's test suite:
 
 Use [scripts/parse-test-output.sh](scripts/parse-test-output.sh) to extract structured failure data.
 ```
+
+## Managing Skills from the Command Line
+
+GitHub Copilot CLI provides a `copilot skill` subcommand (also accessible as `/skill` or `/skills` inside a session) for managing your skills library without editing config files manually.
+
+### List Available Skills
+
+See all skills currently loaded in the session:
+
+```bash
+copilot skill list
+```
+
+Or inside a session:
+```
+/skills
+```
+
+### Add a Skill
+
+Add a skill from a local directory, a file, or a remote URL:
+
+```bash
+# From a local directory
+copilot skill add ./my-skill-folder
+
+# From a URL (e.g., a SKILL.md hosted on GitHub)
+copilot skill add https://raw.githubusercontent.com/org/repo/main/skills/my-skill/SKILL.md
+```
+
+Inside a session, use the `/skill` alias:
+```
+/skill add ./my-skill-folder
+```
+
+This makes it easy to try skills from the Awesome Copilot repository or share them with your team without installing a full plugin.
+
+### Remove a Skill
+
+Remove a skill by name:
+
+```bash
+copilot skill remove generate-tests
+```
+
+### Why This Matters
+
+The `copilot skill` command simplifies the workflow for experimenting with and distributing skills:
+
+- **No manual file management**: Add skills from URLs or directories without copying files around
+- **Quick iteration**: Add, test, and remove skills without modifying configuration files
+- **Easy sharing**: Team members can add a shared skill with a single command pointing to a remote URL
 
 ## Common Questions
 

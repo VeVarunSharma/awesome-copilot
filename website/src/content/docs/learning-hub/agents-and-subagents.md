@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-06-26
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -145,6 +145,23 @@ Run parallel subagents for different lenses - correctness, security, code qualit
 ### Research, then act
 
 Use one subagent to gather facts and another to implement with those facts. This pattern is especially helpful when you want the main thread to stay free of exploratory noise.
+
+### Rubber-duck subagent
+
+The **rubber-duck** is a built-in subagent in Copilot CLI that provides a second-opinion perspective on the main agent's plans. It works by analysing the main agent's proposed approach from a different angle — particularly useful for catching blind spots before implementation begins.
+
+You can configure the rubber-duck subagent in `/subagents`:
+
+```
+/subagents
+```
+
+From the subagent settings panel, you can enable the rubber-duck and choose its **model strategy**. The **complementary model strategy** is especially powerful: it automatically selects a model from the *opposite* AI family to the main agent's model. For example, if your main session is using an Anthropic Claude model, the rubber-duck will use a GPT model — giving you a genuinely different perspective rather than a variation of the same model's tendencies.
+
+This pattern is most useful when you want to:
+- Catch assumptions baked into one model's reasoning
+- Get a second opinion before large refactors
+- Validate a plan before the agent writes code
 
 ## Repository examples you can inspect
 
