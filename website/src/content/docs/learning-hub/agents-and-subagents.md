@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-06-27
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -131,6 +131,23 @@ The important behavior is different from a single chat turn:
 - subagents share the same filesystem, so overlapping writes should be avoided
 
 That makes `/fleet` a practical way to launch subagents even if you are not authoring custom agent files yourself.
+
+## Configuring Subagent Behavior
+
+For usage-based billing users, Copilot CLI exposes subagent resource controls in `/settings` (v1.0.65+):
+
+```text
+/settings
+```
+
+From the settings panel you can configure:
+
+- **Subagent concurrency**: the maximum number of subagents that can run in parallel at once
+- **Subagent depth limit**: how many levels of nesting are allowed when one subagent spawns another
+
+These controls let you balance throughput against cost. Raising concurrency speeds up tasks that decompose into many independent tracks; lowering the depth limit prevents runaway recursive delegation on complex orchestrations.
+
+> **Note**: These settings are available to usage-based billing users. If you do not see them in `/settings`, verify your billing plan.
 
 ## Orchestration patterns that work well
 

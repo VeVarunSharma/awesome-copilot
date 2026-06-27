@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-06-27
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -424,7 +424,7 @@ It's less suited for:
 
 **Q: How long does the coding agent take?**
 
-A: Typically 5–30 minutes depending on the complexity of the task and the size of the codebase. You'll receive a notification when the PR is ready.
+A: Typically 5–30 minutes depending on the complexity of the task and the size of the codebase. Copilot CLI (v1.0.65+) will send a desktop notification when the agent needs your attention or when an idle session is waiting for input — so you can safely switch to other work without polling the terminal.
 
 **Q: Can I use the coding agent with private repositories?**
 

@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-06-27
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -342,6 +342,22 @@ Execute the project's test suite:
 
 Use [scripts/parse-test-output.sh](scripts/parse-test-output.sh) to extract structured failure data.
 ```
+
+## Reviewing Proposed Skill Changes
+
+When the Copilot coding agent proposes changes to skills in your repository, you can review them interactively using the `/chronicle skills review` command in Copilot CLI (v1.0.65+):
+
+```text
+/chronicle skills review
+```
+
+This opens an interactive flow that presents each proposed draft skill change and lets you:
+
+- **Accept** — apply the change to the skill
+- **Reject** — discard the proposed change
+- **Defer** — skip the change for now and come back to it later
+
+This is especially useful when the coding agent has autonomously updated skill instructions based on patterns it observed during a task. Reviewing changes this way keeps you in control of what gets added to your skills folder.
 
 ## Common Questions
 
