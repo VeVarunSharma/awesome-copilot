@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-06-28
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -125,6 +125,16 @@ name: generate-tests
 ```yaml
 description: 'Generate comprehensive unit tests for a component, covering happy path, edge cases, and error conditions'
 ```
+
+### Optional Fields
+
+**argument-hint**: A short hint shown to users when the skill is invoked via slash command, describing any arguments the skill accepts. This is particularly useful for skills that take a target file, component name, or other user-provided input.
+
+```yaml
+argument-hint: '<file or component name>'
+```
+
+The hint is displayed inline in the CLI's input prompt when the user types the skill's slash command, so they know what to provide before sending. This field is supported in GitHub Copilot CLI; it is currently ignored for the Copilot cloud agent on GitHub.com.
 
 ### Description Best Practices
 
@@ -342,6 +352,56 @@ Execute the project's test suite:
 
 Use [scripts/parse-test-output.sh](scripts/parse-test-output.sh) to extract structured failure data.
 ```
+
+## Managing Skills with the CLI
+
+GitHub Copilot CLI 1.0.65+ includes a dedicated `copilot skill` subcommand (and its in-session `/skill` alias) for managing skills without editing config files by hand.
+
+### Listing available skills
+
+```bash
+copilot skill list
+```
+
+Inside an active session you can also use:
+
+```text
+/skill
+/skills
+```
+
+Both show the skills currently available to your session, including their names and descriptions.
+
+### Adding a skill
+
+```bash
+# Add from a local directory
+copilot skill add ./path/to/my-skill/
+
+# Add from a URL (e.g., a raw GitHub URL pointing to a SKILL.md)
+copilot skill add https://raw.githubusercontent.com/org/repo/main/skills/my-skill/SKILL.md
+
+# Add from a file path
+copilot skill add /absolute/path/to/SKILL.md
+```
+
+The skill is registered in your persistent configuration and becomes available in new and resumed sessions.
+
+### Removing a skill
+
+```bash
+copilot skill remove my-skill-name
+```
+
+### Why use the CLI over manual config?
+
+The `copilot skill` subcommand is the recommended way to manage personal or ad-hoc skills:
+
+- **No JSON editing** — the CLI updates your configuration file automatically.
+- **URL installs** — pull a skill directly from a GitHub URL without cloning the repository.
+- **Instant discovery** — newly added skills appear in the next session without restarting.
+
+For team-wide skills that everyone in a repository should have, the `.github/skills/` directory is still the right place — those are version-controlled and automatically available to all collaborators.
 
 ## Common Questions
 
