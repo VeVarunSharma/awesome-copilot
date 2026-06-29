@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-06-29
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -136,9 +136,65 @@ The `description` field is critical for agent discovery. Write it so that agents
 
 Include trigger keywords and contextual cues that help agents match the skill to user intent.
 
-## Real Examples from the Repository
+### Optional Fields
 
-The awesome-copilot repository includes skill folders demonstrating production patterns.
+**argument-hint**: A short description of the argument the skill expects when invoked (e.g., from an agent or via a `/command`). This hint is surfaced to the invoking agent so it knows what context to pass when calling the skill.
+
+```yaml
+argument-hint: 'The function or file to generate tests for'
+```
+
+For example, a `generate-tests` skill might hint that it expects the name or path of a specific function. Without this field the agent has to infer the right argument from the skill's description and instructions alone.
+
+> **Platform note**: `argument-hint` is supported in the Copilot CLI (v1.0.64+). It is currently ignored for the Copilot cloud agent on GitHub.com, so it is safe to include in shared skill files without breaking anything on that surface.
+
+## Managing Skills from the CLI
+
+The Copilot CLI provides a `copilot skill` subcommand (also available as `/skill` or `/skills` inside a session) for listing, adding, and removing skills without manually copying files.
+
+### List installed skills
+
+```bash
+copilot skill list
+```
+
+This shows all skills currently available in your session, including skills loaded from your repository's `.github/skills/` directory and any personal skills from `~/.agents/skills/`.
+
+### Add a skill
+
+You can add a skill from a local file path, a directory, or a remote URL:
+
+```bash
+# Add from a local SKILL.md file
+copilot skill add path/to/my-skill/SKILL.md
+
+# Add an entire skill folder
+copilot skill add path/to/my-skill/
+
+# Add directly from a URL (e.g. a raw GitHub URL)
+copilot skill add https://raw.githubusercontent.com/org/repo/main/skills/generate-tests/SKILL.md
+```
+
+Installing from a URL makes it easy to pick up community skills from the [Awesome Copilot Skills Directory](../../skills/) without cloning the repository.
+
+### Remove a skill
+
+```bash
+copilot skill remove generate-tests
+```
+
+Use the skill's `name` field (as declared in its frontmatter) to remove it.
+
+### Using skills in a session
+
+Inside a running Copilot CLI session, use the `/skills` slash command (or its alias `/skill`) to see which skills are loaded and to manage them interactively:
+
+```
+/skills            # list loaded skills
+/skill add ...     # add a skill during the session
+```
+
+## Real-World Examples from the Repository
 
 ### Conventional Commits
 

@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-06-29
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -132,7 +132,34 @@ The important behavior is different from a single chat turn:
 
 That makes `/fleet` a practical way to launch subagents even if you are not authoring custom agent files yourself.
 
-## Orchestration patterns that work well
+### Configuring subagents with /subagents
+
+Use the `/subagents` command to view and configure the built-in subagents available in your session:
+
+```
+/subagents
+```
+
+This opens a configuration panel listing the available subagents and their settings.
+
+### The rubber-duck subagent
+
+One of the most useful built-in subagents is the **rubber-duck subagent**. When you're stuck on a problem, the rubber-duck subagent gives you a second opinion by running the same query through a complementary AI model—one from a different model family than your current session model.
+
+```
+/subagents    # open subagent settings to configure rubber-duck
+```
+
+The rubber-duck uses a **complementary model strategy**: if you're currently using a Claude model, the rubber-duck will use a GPT model, and vice versa. This means you get a genuinely different perspective rather than the same reasoning expressed in slightly different words.
+
+**When the rubber-duck is useful**:
+- You're getting an answer that doesn't feel right and want a second opinion
+- A code suggestion compiles but the approach seems off
+- You want to stress-test a design decision against a different reasoning style
+
+The rubber-duck reports back to your main agent, which can synthesize the two perspectives into a final recommendation.
+
+
 
 ### Coordinator and worker
 

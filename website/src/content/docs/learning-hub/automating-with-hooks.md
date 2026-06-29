@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-06-29
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -118,7 +118,24 @@ cat <<EOF
 EOF
 ```
 
-### Extension Hooks Merging
+### userPromptSubmitted additionalContext
+
+The `userPromptSubmitted` hook also supports `additionalContext` in its output (Copilot CLI v1.0.65+). When your hook returns JSON with an `additionalContext` key, that text is **injected into the model-facing prompt** for that turn. This lets hooks enrich individual user messages with dynamic information—such as the current user's role, the active environment, or a security policy reminder—without modifying the message the user typed.
+
+```bash
+#!/usr/bin/env bash
+# Add context to every user prompt based on the current environment
+ENVIRONMENT=$(cat .env.current 2>/dev/null || echo "development")
+cat <<EOF
+{
+  "additionalContext": "Current deployment environment: ${ENVIRONMENT}. Apply environment-appropriate safety checks."
+}
+EOF
+```
+
+> **Note**: Unlike `sessionStart`, where `additionalContext` is injected once at the start, the `userPromptSubmitted` `additionalContext` is injected fresh with each prompt, making it useful for per-turn dynamic context.
+
+
 
 When multiple IDE extensions (or a mix of extensions and a `hooks.json` file) each define hooks, all hook definitions are **merged** rather than the last one overwriting the others. This means you can layer hooks from different sources—a project's `.github/hooks/` file, an extension you have installed, and a personal settings file—and all of them will fire for the relevant events.
 
