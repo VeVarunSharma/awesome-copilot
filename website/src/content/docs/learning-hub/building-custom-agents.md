@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-07-01
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -72,6 +72,18 @@ tools: ['codebase', 'terminal', 'github']
 **description** (required): A clear summary of what the agent does. This is shown in the agent picker and helps users find the right agent.
 
 **model** (recommended): The AI model that powers the agent. Choose based on the complexity of the task—use more capable models for nuanced reasoning.
+
+**reasoning_effort** (optional): Controls how much reasoning effort the model applies. Supported values are `low`, `medium`, and `high`. Useful for tuning the speed/quality trade-off: use `high` for complex security or architecture reviews, and `low` for quick formatting or analysis tasks where latency matters more than depth.
+
+```yaml
+---
+name: 'Security Reviewer'
+description: 'In-depth security audit agent for OWASP vulnerabilities and supply chain risks'
+model: Claude Sonnet 5
+reasoning_effort: high
+tools: ['codebase', 'terminal', 'github']
+---
+```
 
 **tools** (recommended): An array of built-in tools and MCP servers the agent can access. Common tools include:
 
@@ -240,10 +252,12 @@ The agent can then query your database, analyze query plans, and suggest optimiz
 
 | Scenario | Recommended Model |
 |----------|-------------------|
-| Complex reasoning, security review | Claude Sonnet 4 or higher |
-| Code generation, refactoring | GPT-4.1 |
+| Complex reasoning, security review | Claude Sonnet 5 (with `reasoning_effort: high`) |
+| Code generation, refactoring | Claude Sonnet 4 or GPT-4.1 |
 | Quick analysis, simple tasks | Claude Haiku or GPT-4.1-mini |
 | Large codebase understanding | Models with larger context windows |
+
+> **New in v1.0.67**: Claude Sonnet 5 is now available as a supported model. Claude Opus 4.8 Fast replaces Claude Opus 4.6 Fast (deprecated in v1.0.66).
 
 ### Organizing Agents in Your Repository
 

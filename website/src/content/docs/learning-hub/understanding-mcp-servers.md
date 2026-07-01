@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-07-01
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -108,6 +108,12 @@ You can also install a specific server by name without the picker:
 ```
 
 This guided flow is the recommended way to add new MCP servers, especially for servers that require multiple configuration values.
+
+### Enabling and Disabling MCP Servers
+
+You can toggle individual MCP servers on or off from within the CLI without removing their configuration. Open the MCP list view with `/mcp list` and use the toggle control next to each server to enable or disable it. Disabled servers remain in your configuration but are not started and their tools are not available until re-enabled.
+
+This is useful when you want to temporarily deactivate a server (for example, to reduce startup time or avoid unintended tool calls) without losing its configuration.
 
 ### Configuration Fields
 

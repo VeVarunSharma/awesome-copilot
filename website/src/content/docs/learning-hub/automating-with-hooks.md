@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-07-01
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -117,6 +117,22 @@ cat <<EOF
 }
 EOF
 ```
+
+### userPromptSubmitted additionalContext
+
+The `userPromptSubmitted` hook also supports `additionalContext` in its output. Any text returned in this field is **injected into the model-facing prompt** alongside the user's message. This lets you enrich every user prompt with dynamic context—for example, appending the current user's role, relevant policy guidelines, or real-time environment state:
+
+```bash
+#!/usr/bin/env bash
+# Append team context to every user prompt
+cat <<EOF
+{
+  "additionalContext": "Team: Platform Engineering. Coding standards: see CONTRIBUTING.md. Current sprint: Sprint 42."
+}
+EOF
+```
+
+> **Tip**: Use `userPromptSubmitted` `additionalContext` sparingly — it adds tokens to every prompt. Reserve it for context that's genuinely necessary turn-by-turn, and use `sessionStart` `additionalContext` for context that only needs to be set once at session start.
 
 ### Extension Hooks Merging
 
