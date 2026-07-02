@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-07-02
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -344,6 +344,14 @@ Use [scripts/parse-test-output.sh](scripts/parse-test-output.sh) to extract stru
 ```
 
 ## Common Questions
+
+**Q: How does Copilot CLI discover which skills to use automatically?**
+
+A: By default the CLI uses the skill's `description` field to match skills to your request. You can also enable **embeddings-based retrieval** for richer semantic matching. Run `/settings` and toggle the `dynamicRetrieval` option, or start the CLI with `--dynamic-retrieval skills=on`. When enabled, the CLI builds a local embeddings index of your skills so it can surface the most relevant ones even when the description does not contain an exact keyword match. You can disable it again with `--dynamic-retrieval skills=off`.
+
+**Q: How do I review or accept proposed skill changes made by the CLI?**
+
+A: The `/chronicle skills review` command opens an interactive review flow that lists draft skill changes the agent has proposed. For each draft you can **accept**, **reject**, or **defer** the change. This is useful when the coding agent has suggested improvements to a skill based on its experience completing tasks, and you want to evaluate them one by one before committing.
 
 **Q: How do I invoke a skill?**
 

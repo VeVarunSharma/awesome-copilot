@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-07-02
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -131,6 +131,17 @@ The important behavior is different from a single chat turn:
 - subagents share the same filesystem, so overlapping writes should be avoided
 
 That makes `/fleet` a practical way to launch subagents even if you are not authoring custom agent files yourself.
+
+### Configuring subagent concurrency and depth limits
+
+For users on usage-based billing, the CLI allows you to tune how many subagents can run in parallel and how deep the delegation chain can go. Open `/settings` and look for the **subagent concurrency** and **depth limit** controls.
+
+| Setting | What it controls |
+|---------|-----------------|
+| **Concurrency** | Maximum number of subagents running simultaneously in a `/fleet` session |
+| **Depth limit** | Maximum delegation depth — how many layers of subagents a coordinator can spawn |
+
+Raising concurrency speeds up large `/fleet` tasks but increases token spend. Depth limits guard against runaway recursive delegation chains that can exhaust budget unexpectedly.
 
 ## Orchestration patterns that work well
 

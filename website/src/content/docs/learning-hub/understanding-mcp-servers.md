@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-07-02
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -268,6 +268,22 @@ MCP server SDKs are available in [Python](https://github.com/modelcontextprotoco
 - **Version control carefully**: Commit `.mcp.json` or `.vscode/mcp.json` for shared server configurations, but use `.gitignore` for any files containing credentials.
 - **Test server connectivity**: Verify MCP servers start correctly before relying on them in agent workflows.
 - **Use the MCP allowlist (experimental)**: In high-security environments, the `MCP_ALLOWLIST` feature flag lets you validate MCP servers against a configured registry, blocking unrecognized servers from loading. MCP servers that are blocked by the allowlist policy are **hidden from `/mcp show`** to avoid confusion — only permitted servers appear in that view. This is an experimental feature for enterprise environments requiring strict control over which MCP servers are permitted.
+
+### Toggling MCP Servers On and Off
+
+You can enable or disable individual MCP servers without removing them from your configuration. In the CLI, open the MCP list view with `/mcp list` and use the toggle control next to each server. Disabled servers are kept in your configuration file but not started — useful for temporarily pausing a server during development without losing its settings.
+
+### Controlling MCP Server Instructions
+
+Some MCP servers embed instructions (system prompt text) that are injected into the Copilot system prompt when the server connects. By default the CLI is selective about which server instructions it includes.
+
+If you want to include instructions from **all** connected MCP servers, start the CLI with:
+
+```bash
+copilot --allow-all-mcp-server-instructions
+```
+
+Use this option with care: server-provided instructions expand the system prompt and may override or conflict with your own custom instructions or agent persona. It is most useful in trusted, single-server setups or when a third-party MCP server's instructions are required for correct behaviour.
 
 ### Organization Policy for Third-Party MCP Servers
 

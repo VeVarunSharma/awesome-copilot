@@ -3,7 +3,7 @@ title: 'Defining Custom Instructions'
 description: 'Learn how to create persistent, context-aware instructions that guide GitHub Copilot automatically across your codebase.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-03-22
+lastUpdated: 2026-07-02
 estimatedReadingTime: '8 minutes'
 tags:
   - instructions
@@ -284,6 +284,21 @@ A: Test by asking Copilot to generate code matching your patterns. If it follows
 **Q: Should I document everything in instructions?**
 
 A: No. Instructions are for persistent standards that apply repeatedly. Document one-off decisions in code comments. Use instructions for patterns you want Copilot to follow automatically.
+
+**Q: Can I import one instruction file into another, or share common content?**
+
+A: Yes. Copilot CLI supports **`@-style imports`** in `AGENTS.md`, `CLAUDE.md`, and `.instructions.md` files. Use `@path/to/file` at the start of a line to inline the referenced file's content at that point. This lets you build a shared base instruction and reference it from multiple context files without duplicating the text:
+
+```markdown
+# Project Standards
+
+@.github/instructions/security-and-owasp.instructions.md
+@.github/instructions/react-component-standards.instructions.md
+
+## Additional project-specific rules...
+```
+
+This is especially useful in `AGENTS.md` where you can compose project-wide context from existing instruction files rather than duplicating their content.
 
 ## Best Practices
 
