@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-07-03
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -234,6 +234,38 @@ Also, add a test for the Retry-After header value.
 ```
 
 The agent will read your feedback, make changes, and push new commits to the same PR.
+
+### Autonomous PR Driving with /pr auto
+
+For hands-off iteration, use `/pr auto` in the Copilot CLI to let the agent autonomously fix issues and drive the PR toward a mergeable state:
+
+```
+/pr auto
+```
+
+`/pr auto` starts a **self-paced loop** that:
+
+1. Checks the current CI status and review feedback
+2. Fixes **one failing check or review comment** per run
+3. Paces itself around CI — waits for checks to complete before the next iteration
+4. Continues until all checks are green and reviews are addressed
+
+To go further and automatically merge once everything is green:
+
+```
+/pr automerge
+```
+
+> **Alias**: `/pr automerge` is also available as `/pr agentmerge` — both commands are equivalent.
+
+`/pr automerge` keeps looping through fixes until the PR is fully merged. You can monitor or pause the loop from `/loop` or `/every` inside the session.
+
+| Command | Behavior |
+|---------|----------|
+| `/pr auto` | Fixes issues one at a time, stops when the PR is green |
+| `/pr automerge` (or `/pr agentmerge`) | Keeps fixing and retrying until the PR is merged |
+
+> **Tip**: Use `/pr auto` for supervised iteration (you stay in the loop) and `/pr automerge` when you're confident and want fully hands-off merging.
 
 ## Agent Skills and the Coding Agent
 

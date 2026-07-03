@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-07-03
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -241,6 +241,40 @@ Use this skill when:
 ### What to Avoid
 [Show problematic patterns]
 ```
+
+## Managing Skills with /chronicle
+
+The `/chronicle` command in the Copilot CLI provides a set of skill lifecycle tools, including a review workflow for skills that agents propose during a session.
+
+### Reviewing Proposed Skill Changes
+
+When the Copilot CLI agent proposes new or updated skills during a session (for example, after noticing a repeated workflow), those proposals are saved as **draft skills**. Use `/chronicle skills review` to go through them one at a time:
+
+```
+/chronicle skills review
+```
+
+For each draft, you can:
+
+- **Accept** — Save the skill to your skill library
+- **Reject** — Discard the draft permanently
+- **Defer** — Skip it for now and review it in a future session
+
+This workflow lets the agent collaboratively build a growing skill library over time, while you stay in control of which proposals become permanent.
+
+### Controlling Skills Dynamic Retrieval
+
+By default, the Copilot CLI uses **embeddings-based retrieval** to automatically select which skills are relevant to include in context. You can toggle this with the `/settings` UI or the CLI flag:
+
+```bash
+# Disable dynamic retrieval for skills (include all matching skills)
+copilot --dynamic-retrieval skills=off
+
+# Re-enable dynamic retrieval (default)
+copilot --dynamic-retrieval skills=on
+```
+
+The `dynamicRetrieval` setting is persisted across sessions. Turn it off if you want the agent to always have access to all your skills regardless of relevance scoring — useful when you have a small, tightly focused set of skills.
 
 ## Best Practices
 
