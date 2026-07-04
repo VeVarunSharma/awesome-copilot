@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-07-04
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -368,6 +368,14 @@ A: Agents can discover and invoke multiple skills during a conversation based on
 **Q: Should skills include code examples?**
 
 A: Yes, for clarity. Show examples of desired output format, patterns to follow, or anti-patterns to avoid. For complex schemas or formats, consider bundling them as reference files rather than inline examples.
+
+**Q: How does the agent decide which skills are relevant?**
+
+A: By default, Copilot CLI uses embeddings-based retrieval to find skills whose descriptions are semantically similar to the current task. You can control this with the `--dynamic-retrieval skills=on` or `--dynamic-retrieval skills=off` startup flag. The setting is persisted, so you only need to set it once. Turn it off if you prefer explicit skill invocation only, or if retrieval latency is a concern on very large skill collections.
+
+**Q: How do I review AI-proposed skill changes before committing them?**
+
+A: The `/chronicle skills review` command opens a diff view of any draft skill changes that Copilot has proposed but not yet written to disk. For each proposed change you can **accept**, **reject**, or **defer** — giving you fine-grained control over which skill updates land in your repository.
 
 ## Common Pitfalls to Avoid
 

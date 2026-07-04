@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-07-04
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -109,6 +109,14 @@ You can also install a specific server by name without the picker:
 
 This guided flow is the recommended way to add new MCP servers, especially for servers that require multiple configuration values.
 
+### Enabling and Disabling MCP Servers
+
+You can toggle individual MCP servers on or off without removing them from your configuration. From any active CLI session, run `/mcp` to open the MCP list view, then select a server and use the enable/disable toggle. Disabled servers are excluded from tool discovery and won't be started until re-enabled. This is useful when a server is slow to start or not needed for a particular task but you want to keep its configuration intact.
+
+### Adding Custom HTTP Headers
+
+When editing or adding a remote MCP server in the CLI's MCP config form, you can supply additional HTTP request headers using the familiar `Key: value` format — one header per line. This is useful for passing authentication tokens or custom routing headers that the server requires, without encoding them as environment variables.
+
 ### Configuration Fields
 
 **command**: The executable to run the MCP server (e.g., `npx`, `python`, `docker`).
@@ -179,6 +187,7 @@ These are especially useful for plugins and installer scripts that need to self-
 Some MCP servers require authentication to connect to protected resources. GitHub Copilot CLI supports several authentication approaches:
 
 - **OAuth**: MCP servers can use the OAuth flow to authenticate with external services. The CLI handles the browser redirect and token storage automatically. This also works when running in ACP (Agent Coordination Protocol) mode.
+- **OAuth auto-recovery**: If an OAuth token expires mid-session, the CLI automatically attempts a non-interactive token refresh. If the refresh succeeds, the pending tool call retries transparently. If interactive re-authentication is required, it is deferred to the start of the next turn so the current tool call is not blocked.
 - **Device code flow (RFC 8628)**: When the CLI runs in a **headless or CI environment** where a browser redirect is not possible, it automatically falls back to the device code flow. You'll see a URL and a code to enter on another device to complete authentication.
 - **`/mcp auth`**: If a token expires or you need to switch accounts, run `/mcp auth` inside a session. This opens the re-authentication UI for any OAuth-enabled MCP server and supports account switching. You can re-authenticate without restarting the session.
 - **Microsoft Entra ID (Azure AD)**: MCP servers that authenticate via Microsoft Entra ID are fully supported. Once you complete the initial login, the CLI caches the authentication and **will not show the consent screen on subsequent connections** — you authenticate once per session rather than every time the server reconnects.
@@ -267,6 +276,7 @@ MCP server SDKs are available in [Python](https://github.com/modelcontextprotoco
 - **Document your servers**: Add comments or a README explaining which MCP servers your project uses and why.
 - **Version control carefully**: Commit `.mcp.json` or `.vscode/mcp.json` for shared server configurations, but use `.gitignore` for any files containing credentials.
 - **Test server connectivity**: Verify MCP servers start correctly before relying on them in agent workflows.
+- **Opt in to MCP server instructions**: By default, the CLI only includes instructions from MCP servers that an agent explicitly declares. If you want the agent to benefit from the instructions embedded in every configured MCP server, start the CLI with `--allow-all-mcp-server-instructions`. Use this flag only when you trust all configured servers, as it expands the system prompt with any instructions those servers provide.
 - **Use the MCP allowlist (experimental)**: In high-security environments, the `MCP_ALLOWLIST` feature flag lets you validate MCP servers against a configured registry, blocking unrecognized servers from loading. MCP servers that are blocked by the allowlist policy are **hidden from `/mcp show`** to avoid confusion — only permitted servers appear in that view. This is an experimental feature for enterprise environments requiring strict control over which MCP servers are permitted.
 
 ### Organization Policy for Third-Party MCP Servers
