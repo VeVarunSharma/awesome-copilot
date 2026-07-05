@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-07-05
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -62,8 +62,9 @@ Every agent file has two parts: YAML frontmatter and Markdown instructions.
 ---
 name: 'Security Reviewer'
 description: 'Expert security auditor that reviews code for OWASP vulnerabilities, authentication flaws, and supply chain risks'
-model: Claude Sonnet 4
+model: Claude Sonnet 5
 tools: ['codebase', 'terminal', 'github']
+reasoning: high
 ---
 ```
 
@@ -72,6 +73,8 @@ tools: ['codebase', 'terminal', 'github']
 **description** (required): A clear summary of what the agent does. This is shown in the agent picker and helps users find the right agent.
 
 **model** (recommended): The AI model that powers the agent. Choose based on the complexity of the task—use more capable models for nuanced reasoning.
+
+**reasoning** (optional): Sets the reasoning effort level for the agent. Accepted values are `low`, `medium`, and `high`. Use `high` for tasks requiring deep analysis or complex decision-making (like security review or architecture decisions), and `low` or `medium` for faster, simpler tasks. When set in agent frontmatter, this becomes the default reasoning effort for every turn in that agent's session.
 
 **tools** (recommended): An array of built-in tools and MCP servers the agent can access. Common tools include:
 
@@ -240,7 +243,7 @@ The agent can then query your database, analyze query plans, and suggest optimiz
 
 | Scenario | Recommended Model |
 |----------|-------------------|
-| Complex reasoning, security review | Claude Sonnet 4 or higher |
+| Complex reasoning, security review | Claude Sonnet 5 or Claude Sonnet 4.5 |
 | Code generation, refactoring | GPT-4.1 |
 | Quick analysis, simple tasks | Claude Haiku or GPT-4.1-mini |
 | Large codebase understanding | Models with larger context windows |

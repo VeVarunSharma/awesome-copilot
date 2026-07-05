@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-07-05
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -135,6 +135,24 @@ The `description` field is critical for agent discovery. Write it so that agents
 ❌ **Poor**: `'Commit helper'`
 
 Include trigger keywords and contextual cues that help agents match the skill to user intent.
+
+### Embeddings-Based Skill Discovery
+
+By default, Copilot CLI discovers skills using the description field during each session. You can enable **dynamic retrieval** — an embeddings-based approach that indexes your skills and retrieves the most semantically relevant ones at inference time, improving accuracy for large skill libraries.
+
+Enable it with the `--dynamic-retrieval` flag or persist the setting:
+
+```
+/settings dynamicRetrieval skills=on
+```
+
+Or toggle from the command line:
+
+```bash
+copilot --dynamic-retrieval skills=on
+```
+
+Dynamic retrieval is especially useful when you have many skills with similar descriptions, as it can disambiguate more reliably than exact keyword matching.
 
 ## Real Examples from the Repository
 
@@ -348,6 +366,10 @@ Use [scripts/parse-test-output.sh](scripts/parse-test-output.sh) to extract stru
 **Q: How do I invoke a skill?**
 
 A: Skills can be invoked in two ways. Users can type the skill name as a `/command` in VS Code Chat (e.g., `/generate-tests`). Agents can also discover and invoke skills automatically based on the skill's description and the user's intent.
+
+**Q: How do I review proposed skill changes from the agent?**
+
+A: Use the `/chronicle skills review` command to see any draft skill changes the coding agent has proposed. The command presents each proposed change one at a time, letting you **accept**, **reject**, or **defer** it. This gives you fine-grained control over which agent-suggested skill refinements actually get committed — useful when you're iterating on skill quality with help from the coding agent.
 
 **Q: How are skills different from prompts?**
 
