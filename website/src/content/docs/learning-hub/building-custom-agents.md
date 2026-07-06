@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-07-06
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -240,10 +240,12 @@ The agent can then query your database, analyze query plans, and suggest optimiz
 
 | Scenario | Recommended Model |
 |----------|-------------------|
-| Complex reasoning, security review | Claude Sonnet 4 or higher |
-| Code generation, refactoring | GPT-4.1 |
+| Complex reasoning, security review | Claude Sonnet 5 or higher |
+| Code generation, refactoring | GPT-4.1 or kimi-k2.7-code |
 | Quick analysis, simple tasks | Claude Haiku or GPT-4.1-mini |
 | Large codebase understanding | Models with larger context windows |
+
+> **New models (July 2026)**: Claude Sonnet 5 and kimi-k2.7-code are now supported. Claude Opus 4.8 Fast replaces Claude Opus 4.6 Fast (deprecated). Use the `/settings` or `model` frontmatter to switch.
 
 ### Organizing Agents in Your Repository
 

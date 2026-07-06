@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-07-06
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -342,6 +342,35 @@ Execute the project's test suite:
 
 Use [scripts/parse-test-output.sh](scripts/parse-test-output.sh) to extract structured failure data.
 ```
+
+## Reviewing Draft Skills with /chronicle
+
+The `/chronicle skills review` command gives you an interactive way to evaluate proposed skill changes before they are merged or applied. When Copilot drafts new skills or modifications to existing ones during a session, it can write those as **draft skills**. The review command then presents each draft one by one so you can decide whether to accept, reject, or defer it.
+
+### Running a Skill Review
+
+```bash
+/chronicle skills review
+```
+
+For each draft skill presented, you'll see:
+- The proposed `SKILL.md` content (name, description, instructions)
+- Any bundled asset changes
+- Options to **accept**, **reject**, or **defer** the draft
+
+| Action | Effect |
+|--------|--------|
+| **Accept** | The draft skill is written to the skills directory |
+| **Reject** | The draft is discarded |
+| **Defer** | Skipped for now; shown again in a future review |
+
+### When to Use /chronicle skills review
+
+- After a session where you asked Copilot to **generate or improve skills**
+- Before committing to shared repositories, to validate auto-generated skill content
+- As part of a team workflow where skills are proposed by one member and reviewed by another
+
+> **Tip**: Pair `/chronicle skills review` with `npm run skill:validate` to confirm accepted drafts meet structural requirements before committing them.
 
 ## Common Questions
 

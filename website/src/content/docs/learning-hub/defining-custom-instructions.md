@@ -3,7 +3,7 @@ title: 'Defining Custom Instructions'
 description: 'Learn how to create persistent, context-aware instructions that guide GitHub Copilot automatically across your codebase.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-03-22
+lastUpdated: 2026-07-06
 estimatedReadingTime: '8 minutes'
 tags:
   - instructions
@@ -262,6 +262,46 @@ try {
 }
 ```
 ````
+
+## Composing Instructions with @-style Imports
+
+Instruction files support `@`-style imports to pull in shared content from other files. This lets you define reusable building blocks—security standards, naming conventions, or license headers—once and reference them from many instruction files, keeping each file focused without duplication.
+
+### How @-imports Work
+
+Inside any `.instructions.md` body, use an `@path/to/file` reference to embed another file's contents at that point:
+
+```markdown
+---
+description: 'API development standards'
+applyTo: 'src/api/**/*.ts'
+---
+
+@.github/instructions/shared/security-baseline.md
+
+# API-Specific Rules
+
+- Validate all inputs using the shared schema validators
+- Return consistent error shapes (see shared baseline above)
+```
+
+The same `@`-style import syntax is also supported in `AGENTS.md` and `CLAUDE.md` repository-context files, making it easy to share common guidance across instruction files and agent context files.
+
+### When to Use @-imports
+
+| Scenario | Example |
+|----------|---------|
+| Shared security baseline | One file, referenced from every language-specific instruction |
+| License or copyright header | Common header included in all instruction files |
+| Company naming conventions | A single source of truth for naming rules |
+| Framework-agnostic patterns | Error handling or logging rules shared across stacks |
+
+### Best Practices
+
+- **Keep imported files focused**: Each shared file should cover one concern
+- **Use relative paths**: Prefer paths relative to the repository root (e.g., `.github/instructions/shared/...`)
+- **Avoid circular imports**: A imports B, B imports A will produce unexpected results
+- **Name shared files clearly**: Use a `shared/` subdirectory so it's obvious which files are building blocks
 
 ## Common Questions
 

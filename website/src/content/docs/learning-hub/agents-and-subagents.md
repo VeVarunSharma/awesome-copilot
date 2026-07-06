@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-07-06
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -166,6 +166,29 @@ That means you should think about delegation features in product-specific terms:
 - **GitHub.com coding agent / cloud agent**: supports custom agents, but some VS Code-specific frontmatter is intentionally ignored
 
 If you share agent files across surfaces, document those differences so users know which behaviors are portable and which are editor-specific.
+
+## Tool Filter Inheritance
+
+Custom agents automatically propagate their tool restrictions to any subagents they launch. If a parent agent is configured with a limited set of tools (e.g., only `read` and `search`), subagents spawned by that parent inherit those same restrictions—they cannot use tools the parent couldn't use.
+
+This behaviour means:
+
+- **Security policies are enforced transitively**: Restricting a top-level agent's tools automatically limits what any downstream subagent can do, without needing to configure each subagent separately.
+- **Subagent sessions keep parent tool restrictions**: This applies both to inline subagents and to subagents launched from within Copilot CLI sessions.
+- **Custom agents keep tool filters in nested subagents**: Nesting multiple levels of delegation preserves the original agent's tool constraints throughout the hierarchy.
+
+> **Tip**: If you need a subagent to access a broader tool set than its parent, define it as a separate top-level agent with its own `tools` list and explicitly allowlist it via the `agents` property on the coordinator.
+
+## Configuring Subagent Concurrency and Depth Limits
+
+For usage-based billing users, you can tune how many subagents run in parallel and how deeply they can nest via **`/settings`**. Open `/settings` in Copilot CLI and look for the subagents section to set:
+
+| Setting | What It Controls |
+|---------|-----------------|
+| **Concurrency limit** | Maximum number of subagents running simultaneously |
+| **Depth limit** | Maximum nesting depth for subagent chains |
+
+Lowering these limits conserves credits for long-running orchestrations. Raising them enables more aggressive parallelism when you have budget to spare.
 
 ## Common questions
 
