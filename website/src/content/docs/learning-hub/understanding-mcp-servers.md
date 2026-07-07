@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-07-07
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -108,6 +108,24 @@ You can also install a specific server by name without the picker:
 ```
 
 This guided flow is the recommended way to add new MCP servers, especially for servers that require multiple configuration values.
+
+### Viewing and Managing Active MCP Servers
+
+To see which MCP servers are currently attached and their connection status, run:
+
+```
+/mcp list
+```
+
+This shows each server's name, transport type, and whether it is connected, starting, or has encountered an error.
+
+You can also open the full MCP manager UI at any time — even while the agent is working — to enable or disable individual servers mid-session. Use:
+
+```
+/mcp
+```
+
+> **Note**: While the agent is working, you can toggle servers on and off. Adding, editing, deleting, or re-authenticating servers is queued and takes effect after the current turn finishes.
 
 ### Configuration Fields
 

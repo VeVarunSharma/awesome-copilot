@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-07-07
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -355,6 +355,10 @@ Or open a remote control tab from inside an existing session, and check or toggl
 ```
 
 The **Remote** tab in the CLI shows all active coding agent tasks from the repository. Select a task to connect and begin sending steering messages.
+
+### Browsing and Switching Sessions from the Agents Screen
+
+You can also browse, resume, and switch between sessions directly from the **Agents screen** in the CLI. This gives you a centralized view of all your active and recent agent sessions — including coding agent tasks — without needing to navigate to the Remote tab. Use it to quickly reconnect to a session or start a new one from the same interface.
 
 ### Resuming from the Session Picker
 
