@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-07-08
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -90,6 +90,24 @@ Example `.mcp.json` or `.vscode/mcp.json`:
   }
 }
 ```
+
+### Viewing and Managing MCP Servers at Runtime
+
+You can inspect your active MCP servers from inside a running session without interrupting the agent:
+
+```
+/mcp list
+```
+
+This command lists all currently attached MCP servers and their connection status. You can run `/mcp list` even while the agent is actively working — no need to wait for a turn to finish.
+
+To open the full MCP manager (to enable, disable, add, or edit servers), use:
+
+```
+/mcp
+```
+
+Enabling and disabling servers is available mid-turn, so you can toggle a server on or off while the agent is working. Adding, editing, deleting, or re-authenticating servers waits until the current turn finishes.
 
 ### Installing MCP Servers from the Registry
 
@@ -178,7 +196,7 @@ These are especially useful for plugins and installer scripts that need to self-
 
 Some MCP servers require authentication to connect to protected resources. GitHub Copilot CLI supports several authentication approaches:
 
-- **OAuth**: MCP servers can use the OAuth flow to authenticate with external services. The CLI handles the browser redirect and token storage automatically. This also works when running in ACP (Agent Coordination Protocol) mode.
+- **OAuth**: MCP servers can use the OAuth flow to authenticate with external services. The CLI handles the browser redirect and token storage automatically. This also works when running in ACP (Agent Coordination Protocol) mode. You can also authenticate directly through the **CLI OAuth callback flow** — when a server requires sign-in, the CLI presents a login prompt in the terminal and completes the OAuth handshake without opening a browser, making it suitable for headless environments.
 - **Device code flow (RFC 8628)**: When the CLI runs in a **headless or CI environment** where a browser redirect is not possible, it automatically falls back to the device code flow. You'll see a URL and a code to enter on another device to complete authentication.
 - **`/mcp auth`**: If a token expires or you need to switch accounts, run `/mcp auth` inside a session. This opens the re-authentication UI for any OAuth-enabled MCP server and supports account switching. You can re-authenticate without restarting the session.
 - **Microsoft Entra ID (Azure AD)**: MCP servers that authenticate via Microsoft Entra ID are fully supported. Once you complete the initial login, the CLI caches the authentication and **will not show the consent screen on subsequent connections** — you authenticate once per session rather than every time the server reconnects.

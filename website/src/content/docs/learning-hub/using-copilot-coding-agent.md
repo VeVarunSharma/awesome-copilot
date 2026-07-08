@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-07-08
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -374,6 +374,26 @@ copilot --resume
 | No PR required | You can steer tasks that haven't yet opened a pull request |
 
 > **Note**: Remote control replaces the earlier "steering" feature. If you see references to steering in older documentation, remote control is the updated equivalent.
+
+## Autopilot Mode
+
+When running the coding agent in **autopilot mode**, Copilot works through a task autonomously, making decisions without prompting for each step. Two settings shape autopilot behavior:
+
+### stayInAutopilot
+
+By default, the CLI returns to interactive mode after an autopilot task completes. If you want the agent to remain in autopilot after finishing (for example, so a queued follow-up task starts automatically), enable `stayInAutopilot` in your settings:
+
+```
+/settings stayInAutopilot true
+```
+
+With this enabled, the agent stays in autopilot mode after each task completes rather than pausing for input.
+
+### Auto Allow-All Mode
+
+The CLI supports an **auto allow-all mode** that uses an LLM judge to evaluate tool call requests and auto-approve those it determines are acceptable. This reduces manual approval prompts during autonomous sessions while still applying a safety check.
+
+> **Note**: Auto allow-all mode requires experimental mode to be enabled (`/experimental on` or the `--experimental` flag). It differs from the earlier `AUTO_APPROVAL` environment variable, which has been removed. Review the auto-approval timeline entries — each shows the subject of the approved request (command, file path, URL, or tool name) so you can audit what was allowed.
 
 ## Hooks and the Coding Agent
 

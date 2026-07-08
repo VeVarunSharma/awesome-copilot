@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-07-08
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -175,7 +175,7 @@ No. Most of the time the main agent launches them when it decides the task benef
 
 **Can a subagent use a different model or tool set?**
 
-Yes, when the delegated worker is a custom agent with its own frontmatter.
+Yes, when the delegated worker is a custom agent with its own frontmatter. Custom agents also preserve their `tools` filter in nested subagents — so if an agent is configured to restrict tool access, that restriction carries through to any subagents it launches.
 
 **Are subagents always parallel?**
 

@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-27
+lastUpdated: 2026-07-08
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -198,6 +198,16 @@ copilot plugin marketplace update
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+### The /plugins Dashboard
+
+Inside an interactive Copilot CLI session, you can open a built-in dashboard to browse and manage your installed plugins without leaving the terminal:
+
+```
+/plugins
+```
+
+The dashboard shows all installed plugins, lets you enable or disable individual ones, and gives you quick access to plugin details. Changes take effect in the current session — you can reload a plugin's extensions without restarting Copilot.
 
 ### Loading Plugins from a Local Directory
 

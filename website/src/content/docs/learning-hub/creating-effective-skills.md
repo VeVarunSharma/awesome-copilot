@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-07-08
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -342,6 +342,41 @@ Execute the project's test suite:
 
 Use [scripts/parse-test-output.sh](scripts/parse-test-output.sh) to extract structured failure data.
 ```
+
+## Managing Skills from the CLI
+
+The Copilot CLI includes a `copilot skill` subcommand (and a `/skill` alias inside a session) for listing, adding, and removing skills without manually copying files:
+
+```bash
+# List all loaded skills
+copilot skill list
+
+# Add a skill from a URL, local directory, or file
+copilot skill add https://example.com/my-skill
+copilot skill add ./path/to/skill-folder
+
+# Remove a skill by name
+copilot skill remove generate-tests
+```
+
+Inside a session you can use the `/skill` slash command as an alias:
+
+```
+/skill list
+/skill add ./my-skill
+```
+
+`skill list` surfaces any loading errors or warnings for skills that failed to load, so you can quickly spot misconfigured frontmatter or missing assets.
+
+## Reviewing and Refining Skills with Chronicle
+
+GitHub Copilot CLI's **Chronicle** feature tracks patterns in your interactions and can propose new draft skills based on what it observes. Use `/chronicle skills review` to review these proposals one by one:
+
+```
+/chronicle skills review
+```
+
+For each proposed skill you can **accept** it (saving it to your skills directory), **reject** it (discarding the draft), or **defer** it (skipping it for now to revisit later). This makes it easy to grow your skill library incrementally from real usage patterns rather than writing skills from scratch.
 
 ## Common Questions
 
