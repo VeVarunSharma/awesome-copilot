@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-27
+lastUpdated: 2026-07-10
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -177,6 +177,24 @@ Or from an interactive session:
 
 > **Deprecation notice**: Installing plugins directly from a GitHub repository URL, raw URL, or local file path (e.g., `copilot plugin install github/awesome-copilot`) is deprecated and will be removed in a future release. Use marketplace-based installation instead.
 
+### Pinning to an Exact Commit SHA
+
+For reproducible environments where you need a specific version of a plugin, you can pin a marketplace plugin to an exact commit SHA using the `sha` field in the plugin source configuration. This prevents the plugin from updating automatically and ensures every team member uses the same exact version:
+
+```json
+{
+  "extraKnownMarketplaces": [
+    {
+      "name": "my-org-plugins",
+      "source": "my-org/internal-plugins",
+      "sha": "abc1234def5678..."
+    }
+  ]
+}
+```
+
+> **Tip**: Use SHA pinning in production or regulated environments where unexpected plugin changes could affect compliance or stability.
+
 ### From VS Code
 
 Browse to the plugin via `@agentPlugins` in the Extensions search view or via **Chat: Plugins** in the Command Palette, then click **Install**.
@@ -198,6 +216,16 @@ copilot plugin marketplace update
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+### Plugin Dashboard
+
+Within an interactive session, use the `/plugins` command to open the plugins dashboard — a live view of all installed plugins where you can enable, disable, or uninstall them without leaving the session:
+
+```
+/plugins
+```
+
+> **Tip**: Plugins can now be reloaded without restarting your session. Changes take effect immediately after installation or updates.
 
 ### Loading Plugins from a Local Directory
 
