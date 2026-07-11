@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-27
+lastUpdated: 2026-07-11
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -199,6 +199,16 @@ copilot plugin marketplace update
 copilot plugin uninstall my-plugin
 ```
 
+### The /plugins Dashboard
+
+From inside an interactive Copilot CLI session, the `/plugins` command opens a full-screen dashboard for managing your installed plugins without leaving the session:
+
+```
+/plugins
+```
+
+The dashboard lets you browse installed plugins, see which agents, skills, and hooks each one provides, enable or disable individual plugins, and trigger updates — all without running CLI commands separately. You can also reload plugin extensions without restarting the session, so changes take effect immediately.
+
 ### Loading Plugins from a Local Directory
 
 You can load plugins directly from a local directory without installing them from a marketplace, using the `--plugin-dir` flag when starting Copilot:
@@ -213,6 +223,24 @@ Plugins loaded this way appear in `/plugin list` under a separate **External Plu
 
 - **Marketplace plugins**: `~/.copilot/installed-plugins/MARKETPLACE/PLUGIN-NAME/`
 - **Direct installs**: `~/.copilot/installed-plugins/_direct/PLUGIN-NAME/`
+
+### Pinning a Plugin to an Exact Commit
+
+For reproducible environments — CI pipelines, team dotfiles, or locked project configurations — you can pin a marketplace plugin to a specific commit SHA using the `sha` field in the plugin source configuration:
+
+```json
+{
+  "plugins": [
+    {
+      "name": "context-engineering",
+      "marketplace": "awesome-copilot",
+      "sha": "a1b2c3d4e5f6..."
+    }
+  ]
+}
+```
+
+Pinned plugins will not auto-update and will always use the exact version at that commit, ensuring consistent behavior across machines and over time.
 
 ## How Plugins Work at Runtime
 

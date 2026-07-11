@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-07-11
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -90,6 +90,24 @@ Example `.mcp.json` or `.vscode/mcp.json`:
   }
 }
 ```
+
+### Viewing Attached MCP Servers
+
+Use `/mcp list` inside an interactive session to see all attached MCP servers and their current status:
+
+```
+/mcp list
+```
+
+The output shows the server name, connection state (e.g., `connected`, `disconnected`, `connected (sandboxed)`), and the tools each server exposes. The `(sandboxed)` indicator means the server was spawned locally and is running inside the OS-level sandbox. You can run `/mcp list` even while the agent is actively working.
+
+To open the full MCP manager UI (for adding, editing, or removing servers), use:
+
+```
+/mcp
+```
+
+> **Note**: The full manager UI pauses add/edit/delete/re-auth operations until the current agent turn finishes, but `/mcp list` is always available.
 
 ### Installing MCP Servers from the Registry
 

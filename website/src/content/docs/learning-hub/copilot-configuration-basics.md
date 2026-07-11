@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-07-11
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -392,6 +392,7 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `stayInAutopilot` | Keep the CLI in autopilot mode after an autopilot task completes (default: `false`) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -403,6 +404,20 @@ In addition to the main config file, GitHub Copilot CLI reads two optional per-p
 These files follow the same format as `config.json` and are loaded after the global config, so they can tailor CLI behaviour—including hook definitions—per repository without touching `.github/`.
 
 > **Important (v1.0.36+)**: Custom agents, skills, and commands placed in `~/.claude/` (the Claude Code user directory) are **no longer loaded** by GitHub Copilot CLI. Only `~/.claude/settings.json` is read for configuration. If you previously stored personal agents or skills in `~/.claude/`, move them to the supported locations: `~/.agents/` for user-level agents, `~/.agents/skills/` for personal skills, or `.github/agents/` and `.github/skills/` in your repositories for project-level customizations.
+
+### Pinning Model and Effort at the Repository Level
+
+A trusted repository can lock the AI model, reasoning effort level, and context tier for all users by adding a `.github/copilot/settings.json` file (v1.0.70+):
+
+```json
+{
+  "model": "claude-sonnet-4.6",
+  "effortLevel": "high",
+  "contextTier": "large"
+}
+```
+
+This file can also extend the URL, MCP server, and skill deny lists for the repository, enforcing security policies without requiring each developer to configure them individually. Settings in `.github/copilot/settings.json` apply to all sessions opened in that repository.
 
 ### Model Picker
 
@@ -489,6 +504,14 @@ The `/ask` command lets you ask a quick question without affecting your conversa
 /ask What does the `retry` utility in src/utils do?
 ```
 
+The `/refine` command rewrites a rough, stream-of-consciousness prompt into a clear, well-structured one. Use it when you have a vague idea of what you want but struggle to articulate it precisely:
+
+```
+/refine
+```
+
+After running `/refine`, Copilot rewrites your current prompt to be more specific and actionable. Review the refined version before sending to make sure it captures your intent.
+
 The `/env` command shows all loaded environment details — instructions, MCP servers, skills, agents, and plugins — in a single view. Use it to verify that the right resources are active for the current session:
 
 ```
@@ -543,6 +566,8 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
 
+> **Experimental (v1.0.69+)**: An `auto` mode is available that uses an LLM judge to auto-approve requests it evaluates as acceptable, rather than blindly approving everything. This mode requires experimental features to be enabled first (`/experimental on` or the `--experimental` flag).
+
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
 ```bash
@@ -562,6 +587,15 @@ copilot --plan          # start in plan mode (propose without executing)
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+The `--sandbox` and `--no-sandbox` flags control the OS-level shell sandbox for the current session only, without changing your saved sandbox setting (v1.0.70+):
+
+```bash
+copilot --sandbox      # enable the OS-level sandbox for this session
+copilot --no-sandbox   # disable the OS-level sandbox for this session
+```
+
+These flags are useful with `-p` (non-interactive mode) to temporarily override your global sandbox preference, for example when running in a locked-down CI environment that manages its own isolation. Use `/settings` to change the permanent sandbox setting.
 
 ### Shell Completion
 
