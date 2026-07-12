@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-27
+lastUpdated: 2026-07-12
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -177,6 +177,24 @@ Or from an interactive session:
 
 > **Deprecation notice**: Installing plugins directly from a GitHub repository URL, raw URL, or local file path (e.g., `copilot plugin install github/awesome-copilot`) is deprecated and will be removed in a future release. Use marketplace-based installation instead.
 
+### Pinning a Plugin to an Exact Commit SHA
+
+For reproducible environments, you can pin a marketplace plugin to an exact commit SHA. Add the `sha` field to the plugin source in your `.github/copilot-settings.json`:
+
+```json
+{
+  "plugins": [
+    {
+      "name": "database-data-management",
+      "marketplace": "awesome-copilot",
+      "sha": "abc1234def5678..."
+    }
+  ]
+}
+```
+
+When a `sha` is specified, the CLI verifies that the installed plugin matches the pinned commit and refuses to load it if there is a mismatch. This prevents unexpected behavior from upstream plugin changes in shared or security-sensitive environments.
+
 ### From VS Code
 
 Browse to the plugin via `@agentPlugins` in the Extensions search view or via **Chat: Plugins** in the Command Palette, then click **Install**.
@@ -198,6 +216,26 @@ copilot plugin marketplace update
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+### /plugins Dashboard
+
+Inside an interactive Copilot CLI session you can open a full-screen plugin management dashboard:
+
+```
+/plugins
+```
+
+The `/plugins` dashboard lets you browse installed plugins, enable or disable individual plugins, and reload plugin extensions — all without restarting the session. Changes to enabled/disabled state take effect immediately.
+
+### Reloading Plugins Without a Restart
+
+If you install or update a plugin while a session is running, you no longer need to restart the CLI. Use the `/plugins` dashboard or run:
+
+```
+/plugin reload
+```
+
+to reload installed plugin extensions on the fly.
 
 ### Loading Plugins from a Local Directory
 

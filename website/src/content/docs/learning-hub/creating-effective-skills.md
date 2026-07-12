@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-07-12
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -342,6 +342,42 @@ Execute the project's test suite:
 
 Use [scripts/parse-test-output.sh](scripts/parse-test-output.sh) to extract structured failure data.
 ```
+
+## Auto-Generated Draft Skills
+
+GitHub Copilot CLI can automatically detect repeatable patterns in your workflow and propose a draft skill to capture them. When the CLI observes a clear, repeated workflow pattern during a session, it creates a draft skill in your `.github/skills/` directory (or prompts you to review one).
+
+### Reviewing Draft Skills with `/chronicle skills review`
+
+The `/chronicle` command tracks your session activity over time. When draft skills have been created, you can review and accept or reject them:
+
+```
+/chronicle skills review
+```
+
+This opens an interactive review flow where you can:
+
+- **Accept** a draft to promote it to a permanent skill in your repository
+- **Reject** a draft if the detected pattern isn't one you want to reuse
+- **Defer** a draft to decide later
+
+Draft skills are a great starting point — you can always edit the generated `SKILL.md` to refine the description, add bundled assets, or tighten the instructions before accepting.
+
+### Embeddings-Based Skill Discovery (`dynamicRetrieval`)
+
+By default, Copilot uses the skill's `description` field to match skills to user intent. You can also enable **embeddings-based retrieval**, which uses semantic similarity to find relevant skills even when the exact trigger words aren't present:
+
+```
+/settings dynamicRetrieval skills=on
+```
+
+Or set it permanently via the `--dynamic-retrieval` flag:
+
+```bash
+copilot --dynamic-retrieval skills=on
+```
+
+This is particularly useful in repositories with many skills, where keyword matching alone may miss contextually relevant ones.
 
 ## Common Questions
 

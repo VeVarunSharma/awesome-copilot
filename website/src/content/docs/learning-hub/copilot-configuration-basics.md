@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-07-12
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -165,10 +165,40 @@ A well-organized Copilot configuration directory looks like this:
 │   │   └── SKILL.md
 │   └── refactor-component/
 │       └── SKILL.md
-└── instructions/
-    ├── typescript-conventions.instructions.md
-    └── api-design.instructions.md
+├── instructions/
+│   ├── typescript-conventions.instructions.md
+│   └── api-design.instructions.md
+└── copilot/
+    └── settings.json          # Repository-level model and policy overrides
 ```
+
+### Pinning Model, Effort, and Context Tier per Repository
+
+Trusted repositories can pin the AI model, reasoning effort level, and context tier for all Copilot CLI sessions opened in that repository. They can also extend the URL, MCP server, and skill deny lists. Create `.github/copilot/settings.json`:
+
+```json
+{
+  "model": "claude-sonnet-4.6",
+  "effortLevel": "high",
+  "contextTier": "large",
+  "deny": {
+    "urls": ["http://internal-only.example.com"],
+    "mcpServers": ["untrusted-server"],
+    "skills": ["experimental-skill"]
+  }
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `model` | Pin the model for all sessions in this repository |
+| `effortLevel` | Set reasoning effort (`low`, `medium`, `high`) |
+| `contextTier` | Control how much context is included in prompts |
+| `deny.urls` | Extend the URL deny list with additional blocked domains |
+| `deny.mcpServers` | Block specific MCP server names from loading |
+| `deny.skills` | Prevent specific skill names from being used |
+
+> **Note**: This file is only respected when the repository is trusted by the user. Untrusted repositories cannot influence model selection or security policies.
 
 ### Monorepo Support
 
@@ -392,6 +422,7 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `stayInAutopilot` | When `true`, keeps the CLI in autopilot mode after an autopilot task completes instead of returning to interactive mode (default: `false`) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
