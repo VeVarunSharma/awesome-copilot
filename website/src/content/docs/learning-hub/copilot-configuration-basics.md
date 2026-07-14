@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-07-14
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -403,6 +403,24 @@ In addition to the main config file, GitHub Copilot CLI reads two optional per-p
 These files follow the same format as `config.json` and are loaded after the global config, so they can tailor CLI behaviour—including hook definitions—per repository without touching `.github/`.
 
 > **Important (v1.0.36+)**: Custom agents, skills, and commands placed in `~/.claude/` (the Claude Code user directory) are **no longer loaded** by GitHub Copilot CLI. Only `~/.claude/settings.json` is read for configuration. If you previously stored personal agents or skills in `~/.claude/`, move them to the supported locations: `~/.agents/` for user-level agents, `~/.agents/skills/` for personal skills, or `.github/agents/` and `.github/skills/` in your repositories for project-level customizations.
+
+### Pinning Model, Effort, and Context Tier per Repository (v1.0.70+)
+
+A trusted repository can pin the **model**, **effort level**, and **context tier** for all sessions that start in that directory. This is useful for enforcing consistency — for example, requiring a high-capability model for a security-critical repository, or capping context costs for a large monorepo.
+
+Configure these pins in `.github/copilot/settings.json`:
+
+```json
+{
+  "model": "claude-sonnet-4.6",
+  "effortLevel": "high",
+  "contextTier": "standard"
+}
+```
+
+The same file also accepts `urlDenyList`, `mcpDenyList`, and `skillDenyList` arrays, allowing trusted repository owners to extend the built-in deny lists for additional security controls.
+
+> **Trust requirement**: Repository-level model pinning applies only to sessions where the folder has been explicitly trusted. Untrusted repositories cannot set these values.
 
 ### Model Picker
 

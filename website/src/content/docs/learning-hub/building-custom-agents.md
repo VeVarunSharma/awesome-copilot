@@ -3,10 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
-estimatedReadingTime: '10 minutes'
-tags:
-  - agents
+lastUpdated: 2026-07-14
   - customization
   - fundamentals
 relatedArticles:
@@ -240,10 +237,26 @@ The agent can then query your database, analyze query plans, and suggest optimiz
 
 | Scenario | Recommended Model |
 |----------|-------------------|
-| Complex reasoning, security review | Claude Sonnet 4 or higher |
-| Code generation, refactoring | GPT-4.1 |
+| Complex reasoning, security review | Claude Sonnet 5 or Claude Sonnet 4 |
+| Code generation, refactoring | GPT-5.6 or GPT-4.1 |
 | Quick analysis, simple tasks | Claude Haiku or GPT-4.1-mini |
 | Large codebase understanding | Models with larger context windows |
+
+### Setting Reasoning Effort in Agent Definitions
+
+Custom agents can specify a default **reasoning effort level** directly in their frontmatter using the `reasoning_effort` (or `reasoningEffort`) field. This pins the effort level whenever the agent is active, without requiring users to adjust it manually:
+
+```yaml
+---
+name: 'Security Reviewer'
+description: 'Expert security auditor for OWASP vulnerabilities and supply chain risks'
+model: claude-sonnet-4.6
+tools: ['codebase', 'terminal', 'github']
+reasoning_effort: high
+---
+```
+
+Accepted values are `low`, `medium`, and `high`. Use `high` for agents that handle complex multi-step analysis or security-critical workflows, and `low` for agents that perform quick lookups or formatting tasks.
 
 ### Organizing Agents in Your Repository
 

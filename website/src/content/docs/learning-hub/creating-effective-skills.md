@@ -3,10 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
-estimatedReadingTime: '9 minutes'
-tags:
-  - skills
+lastUpdated: 2026-07-14
   - customization
   - fundamentals
 relatedArticles:
@@ -342,6 +339,23 @@ Execute the project's test suite:
 
 Use [scripts/parse-test-output.sh](scripts/parse-test-output.sh) to extract structured failure data.
 ```
+
+## Skill Discovery with Forge
+
+GitHub Copilot CLI includes **Forge**, a skill discovery engine that watches your sessions for repeated workflow patterns and automatically creates **draft skills** based on what it observes. When Forge detects a clear, repeated pattern — such as a sequence of commands or prompts you run regularly — it proposes a draft skill that captures that workflow.
+
+Draft skills are stored under your skills directory with a `draft` status. You can review, refine, and promote them using the `/chronicle skills review` command:
+
+```
+/chronicle skills review
+```
+
+This opens an interactive review where you can:
+- **Accept** — promote the draft to a full, active skill
+- **Reject** — discard the draft
+- **Defer** — keep the draft for later review
+
+Forge-generated drafts are a fast way to turn your own usage patterns into reusable skills without starting from scratch. Review the generated instructions carefully before accepting, as they may need refinement to generalize beyond the specific context where the pattern was observed.
 
 ## Common Questions
 
