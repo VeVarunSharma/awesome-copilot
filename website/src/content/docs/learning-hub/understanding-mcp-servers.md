@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-07-15
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -118,6 +118,24 @@ This guided flow is the recommended way to add new MCP servers, especially for s
 **env**: Environment variables passed to the server process. Use these for connection strings, API keys, and configuration—never hardcode secrets in the JSON file.
 
 **type** (remote servers): The transport type for remote MCP servers (`http` or `sse`). This field can now be omitted — the CLI defaults to `http` when no type is specified, simplifying remote server configuration.
+
+### Persisting GitHub MCP Toolset Configuration
+
+The built-in `github` MCP server exposes many toolsets and individual tools. You can persist your toolset/tool preferences in `settings.json` so they are restored across sessions without reconfiguring through `/mcp` each time:
+
+```json
+{
+  "githubMcpToolsets": ["repos", "issues", "pull_requests"],
+  "githubMcpTools": {
+    "create_or_update_file": false
+  }
+}
+```
+
+- **`githubMcpToolsets`**: An array of toolset names to enable. Only the listed toolsets will be active; others are disabled.
+- **`githubMcpTools`**: A map of individual tool names to `true`/`false`, for fine-grained control within a toolset.
+
+This is useful when you want a consistent, minimal set of GitHub tools enabled—reducing noise in the tool picker and limiting the agent's surface area for GitHub API calls.
 
 ### Managing Persistent MCP Configuration via Server RPCs
 
