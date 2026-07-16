@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-07-16
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -109,6 +109,8 @@ Then summarize the findings into one recommendation.
 
 By default, subagents do not keep spawning additional subagents. In VS Code, recursive delegation is controlled by the `chat.subagents.allowInvocationsFromSubagents` setting, which is off by default.
 
+In Copilot CLI, nesting depth is controlled by the `subagents.maxDepth` setting. The default maximum nesting depth is **4** levels — meaning the main agent can spawn a subagent, which can spawn another, and so on, up to four levels deep. Usage-based billing users can raise this limit up to 128 via the `subagents.maxDepth` setting in `/settings`. The default was intentionally lowered from 6 to 4 to curb runaway recursive delegation in complex workflows.
+
 ## Launch subagents in Copilot CLI
 
 In GitHub Copilot CLI, the clearest end-user entry point is **`/fleet`**. Fleet acts as an orchestrator that decomposes a larger objective, launches multiple background subagents, respects dependencies, and then synthesizes the final result.
@@ -131,6 +133,10 @@ The important behavior is different from a single chat turn:
 - subagents share the same filesystem, so overlapping writes should be avoided
 
 That makes `/fleet` a practical way to launch subagents even if you are not authoring custom agent files yourself.
+
+### Multi-turn subagents
+
+In Copilot CLI, **multi-turn subagents are always enabled** — you can send follow-up messages to a running subagent without restarting the delegation chain. This means an interactive back-and-forth with a subagent (for clarification, refinement, or additional context) works the same way as it does with the main agent, making subagent workflows more iterative and practical.
 
 ## Orchestration patterns that work well
 
