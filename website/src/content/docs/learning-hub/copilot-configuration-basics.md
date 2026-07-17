@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-07-17
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -270,7 +270,21 @@ When writing TypeScript code:
 
 **When to use**: For project-wide coding standards, architectural patterns, or technology-specific conventions that should influence all suggestions.
 
-## Setting Up Team Configuration
+### Pinning Model Settings per Repository
+
+Repositories can pin a specific model, reasoning effort level, and context tier for all contributors via `.github/copilot/settings.json`. When this file exists and the repository is trusted, Copilot CLI applies these settings automatically for everyone working in the repository — no manual configuration required:
+
+```json
+{
+  "model": "claude-sonnet-4.6",
+  "effortLevel": "high",
+  "contextTier": "full"
+}
+```
+
+You can also use this file to extend the URL, MCP server, and skill deny lists at the repository level, ensuring consistent access controls across your team.
+
+> **Note**: Repository-pinned settings require the repository to be trusted (folder trust confirmed by the user). The `.github/copilot/settings.json` file is version-controlled and shared with all contributors, making it an effective way to standardize model usage for cost-sensitive or compliance-sensitive projects.
 
 Follow these steps to establish effective team-wide Copilot configuration:
 
@@ -392,6 +406,7 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `stayInAutopilot` | When `true`, keeps the CLI in autopilot mode after an autopilot task completes (default: `false`) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -488,6 +503,14 @@ The `/ask` command lets you ask a quick question without affecting your conversa
 ```
 /ask What does the `retry` utility in src/utils do?
 ```
+
+The `/refine` command rewrites a rough, stream-of-consciousness prompt into a clear, well-structured one before sending it. Use it when you have a complex request that you want to articulate more precisely:
+
+```
+/refine
+```
+
+Type your rough draft, then `/refine` will produce a polished version you can review and submit. This is especially useful when working on ambiguous tasks where prompt clarity significantly affects the quality of the output.
 
 The `/env` command shows all loaded environment details — instructions, MCP servers, skills, agents, and plugins — in a single view. Use it to verify that the right resources are active for the current session:
 

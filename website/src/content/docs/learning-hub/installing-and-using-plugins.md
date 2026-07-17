@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-27
+lastUpdated: 2026-07-17
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -142,6 +142,14 @@ Or from a local path:
 copilot plugin marketplace add /path/to/local-marketplace
 ```
 
+### Removing Marketplaces
+
+Remove a registered marketplace when you no longer need it:
+
+```bash
+copilot plugin marketplace remove anthropics/claude-code
+```
+
 ### Sharing Marketplace Registrations Across a Team
 
 To automatically register an additional marketplace for everyone working in a repository, add an `extraKnownMarketplaces` entry to your `.github/copilot-settings.json` (or `config.json`):
@@ -198,6 +206,34 @@ copilot plugin marketplace update
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+### In-Session Plugin Management
+
+Use the `/plugins` dashboard inside an interactive Copilot session to manage installed plugins without leaving your session:
+
+```
+/plugins
+```
+
+This opens a panel where you can view, enable, disable, and configure plugins while the session is live. Changes take effect immediately without restarting.
+
+### Pinning a Plugin to a Specific Commit
+
+To ensure your team uses a reproducible, immutable version of a plugin (useful for security-sensitive or production environments), you can pin a plugin to an exact commit SHA in its source configuration:
+
+```json
+{
+  "extraKnownMarketplaces": [
+    {
+      "name": "my-org-plugins",
+      "source": "my-org/internal-plugins",
+      "sha": "abc123def456..."
+    }
+  ]
+}
+```
+
+With the `sha` field set, the CLI uses that exact commit regardless of any subsequent changes to the repository. Remove the `sha` field or run `copilot plugin update` to move to a newer version.
 
 ### Loading Plugins from a Local Directory
 
