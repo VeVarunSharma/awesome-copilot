@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-07-18
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -108,6 +108,8 @@ Then summarize the findings into one recommendation.
 ### 4. Know the nesting rule
 
 By default, subagents do not keep spawning additional subagents. In VS Code, recursive delegation is controlled by the `chat.subagents.allowInvocationsFromSubagents` setting, which is off by default.
+
+In GitHub Copilot CLI, the default maximum sub-agent nesting depth is **4** (reduced from 6 in v1.0.71). This cap prevents runaway recursive delegation while still allowing meaningful orchestration patterns. If you're on usage-based billing, you can raise the limit by setting `subagents.maxDepth` (up to 128) in your CLI settings.
 
 ## Launch subagents in Copilot CLI
 

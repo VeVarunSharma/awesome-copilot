@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-07-18
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -269,6 +269,36 @@ When writing TypeScript code:
 ```
 
 **When to use**: For project-wide coding standards, architectural patterns, or technology-specific conventions that should influence all suggestions.
+
+### Repository-Pinned Copilot Settings
+
+Beyond agents, skills, and instructions, a trusted repository can also **pin the AI model, effort level, and context tier** for all sessions in that repository, and extend the deny lists for URLs, MCP servers, and skills. Place these overrides in `.github/copilot/settings.json`:
+
+```json
+{
+  "model": "claude-sonnet-4.5",
+  "effortLevel": "high",
+  "contextTier": "large",
+  "deniedUrls": ["internal.corp.example.com"],
+  "deniedMcpServers": ["untrusted-server"],
+  "deniedSkills": ["experimental-skill"]
+}
+```
+
+**Supported fields**:
+
+| Field | Description |
+|-------|-------------|
+| `model` | Pin the AI model (e.g., `"claude-sonnet-4.5"`, `"gpt-5.4"`) |
+| `effortLevel` | Set reasoning effort: `"low"`, `"medium"`, or `"high"` |
+| `contextTier` | Control context window size: `"small"`, `"medium"`, or `"large"` |
+| `deniedUrls` | Extend the URL block list for web fetch operations |
+| `deniedMcpServers` | Prevent specific MCP servers from loading in sessions |
+| `deniedSkills` | Prevent specific skills from being loaded |
+
+> **When to use**: Pin the model and effort level when your team has standardized on a particular AI configuration for consistency (for example, ensuring all CI automation uses the same model), or when security policy requires restricting web access to specific domains.
+
+> **Note (v1.0.70+)**: Repository-pinned settings via `.github/copilot/settings.json` require Copilot CLI v1.0.70 or later. The repository must be marked as trusted in your Copilot settings for these overrides to take effect.
 
 ## Setting Up Team Configuration
 
@@ -562,6 +592,8 @@ copilot --plan          # start in plan mode (propose without executing)
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+> **Plan mode safety (v1.0.71+)**: Plan mode hard-blocks any built-in tool calls that would modify the workspace — the agent cannot edit files or run mutating shell commands while planning. MCP and external tools are still permitted. This ensures plan mode truly acts as a read-only preview of what the agent *would* do.
 
 ### Shell Completion
 

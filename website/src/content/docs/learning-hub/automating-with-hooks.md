@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-07-18
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -360,7 +360,7 @@ Block dangerous commands before they execute. Use the `matcher` field to target 
 }
 ```
 
-The `preToolUse` hook receives JSON input with details about the tool being called. Your script can inspect this input and exit with a non-zero code to **deny** the tool execution, or exit with zero to **approve** it.
+The `preToolUse` hook receives JSON input with details about the tool being called. Your script can inspect this input and exit with **code 2** to **explicitly deny** the tool execution, or exit with zero to **approve** it. Exiting with code 2 is the recommended way to signal a deliberate policy rejection — it is distinguished from other non-zero exit codes (such as 1), which indicate a general hook failure rather than an intentional denial.
 
 ### Modifying Tool Arguments with preToolUse
 
@@ -565,7 +565,7 @@ echo "Pre-commit checks passed ✅"
 ## Best Practices
 
 - **Keep hooks fast**: Hooks run synchronously, so slow hooks delay the agent. Set tight timeouts and optimize scripts.
-- **Use non-zero exit codes to block**: If a hook exits with a non-zero code, the triggering action is blocked. Use this for must-pass checks.
+- **Use exit code 2 to explicitly deny in `preToolUse`**: Exit with code 2 to signal a deliberate policy rejection in `preToolUse` hooks. Other non-zero exit codes indicate a hook failure. For other event types, any non-zero exit code blocks the triggering action.
 - **Bundle scripts in the hook folder**: Keep related scripts alongside the hooks.json for portability.
 - **Document setup requirements**: If hooks depend on tools being installed (Prettier, ESLint), document this in the README.
 - **Test locally first**: Run hook scripts manually before relying on them in agent sessions.
