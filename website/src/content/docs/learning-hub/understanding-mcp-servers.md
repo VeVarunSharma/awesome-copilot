@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-07-19
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -133,6 +133,24 @@ The available RPCs are:
 | `mcp.config.remove` | Remove a server from the persistent configuration |
 
 These are especially useful for plugins and installer scripts that need to self-register or de-register their MCP server as part of install/uninstall flows, without requiring the user to manually edit config files.
+
+### Persisting GitHub MCP Toolset Configuration
+
+Copilot CLI includes a built-in GitHub MCP server that exposes GitHub API capabilities. You can control exactly which GitHub MCP toolsets and tools are enabled by adding settings to your `settings.json` (opened with `/settings`):
+
+```json
+{
+  "githubMcpToolsets": ["repos", "issues", "pull_requests"],
+  "githubMcpTools": ["list_issues", "create_pull_request"]
+}
+```
+
+| Setting | Description |
+|---------|-------------|
+| `githubMcpToolsets` | Enable specific toolset groups (e.g., `repos`, `issues`, `pull_requests`, `actions`) |
+| `githubMcpTools` | Enable individual tools by name, or use `"*"` to enable all GitHub MCP tools |
+
+These settings are persisted across sessions. You can also use the `--add-github-mcp-tool` flag when starting Copilot to enable specific tools for a session without editing settings. Using `"*"` for `githubMcpTools` enables all available GitHub MCP tools.
 
 ### Common MCP Server Configurations
 

@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-07-19
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -364,6 +364,10 @@ A: Store skill folders in your repository's `.github/skills/` directory. They're
 **Q: Can agents chain multiple skills?**
 
 A: Agents can discover and invoke multiple skills during a conversation based on user intent. Each skill invocation is independent, but agents maintain conversation context across invocations.
+
+**Q: How do I see which skills are active or disabled?**
+
+A: Run `copilot skill list` (or use `copilot skill list --json` for machine-readable output) to see all skills and their status. Disabled skills are clearly marked in both the table and JSON output, so you can quickly identify which skills are available for agents to discover and invoke.
 
 **Q: Should skills include code examples?**
 

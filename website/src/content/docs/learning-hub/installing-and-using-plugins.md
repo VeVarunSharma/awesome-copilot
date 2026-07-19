@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-27
+lastUpdated: 2026-07-19
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -142,6 +142,12 @@ Or from a local path:
 copilot plugin marketplace add /path/to/local-marketplace
 ```
 
+To remove a registered marketplace you no longer need:
+
+```bash
+copilot plugin marketplace remove anthropics/claude-code
+```
+
 ### Sharing Marketplace Registrations Across a Team
 
 To automatically register an additional marketplace for everyone working in a repository, add an `extraKnownMarketplaces` entry to your `.github/copilot-settings.json` (or `config.json`):
@@ -197,6 +203,22 @@ copilot plugin marketplace update
 
 # Remove a plugin
 copilot plugin uninstall my-plugin
+
+# Remove only a specific skill from a plugin (keeping the rest)
+copilot plugins remove --skill my-plugin:skill-name
+```
+
+You can also scope install and remove operations to specific plugin components using flags:
+
+```bash
+# Install or update only the MCP servers from a plugin
+copilot plugin install my-plugin --mcp
+
+# Install or update only the skills from a plugin
+copilot plugin install my-plugin --skill
+
+# Install or update only the agents from a plugin
+copilot plugin install my-plugin --plugin
 ```
 
 ### Loading Plugins from a Local Directory
@@ -224,6 +246,8 @@ When you install a plugin, its components become available to Copilot CLI automa
 - **MCP servers** extend the tools available to agents
 
 You don't need to do any additional configuration after installing — the plugin's components integrate seamlessly into your workflow. Plugins take effect immediately after installation without requiring a Copilot CLI restart.
+
+> **Tip**: Plugins enabled at the repository level (via `.github/copilot-settings.json`) are automatically shown in `/plugin list` and the skill pickers, so team members can see which plugins are active in their current workspace.
 
 ## Plugins from This Repository
 
