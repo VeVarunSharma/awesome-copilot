@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-27
+lastUpdated: 2026-07-20
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -197,6 +197,45 @@ copilot plugin marketplace update
 
 # Remove a plugin
 copilot plugin uninstall my-plugin
+```
+
+You can also target individual components within a plugin using `--plugin`, `--mcp`, or `--skill` flags (v1.0.72+):
+
+```bash
+# Enable or disable a specific MCP server from a plugin
+copilot plugins enable --mcp my-mcp-server
+copilot plugins disable --plugin my-plugin
+
+# Remove a specific skill from an installed plugin
+copilot plugins remove --skill my-skill
+
+# Install a skill from a local file, URL, or directory
+copilot plugins install --skill ./my-skill/
+copilot plugins install --skill https://example.com/my-skill.zip
+
+# Install a skill scoped to the current repository (stores in .github/skills/)
+copilot plugins install --skill ./my-skill/ --scope project
+```
+
+Within an interactive session, use `/plugins help` to see all available subcommands, or `/plugins` followed by the action you need (`install`, `update`, `uninstall`, `enable`, `disable`, `remove`).
+
+### Managing Marketplaces
+
+```bash
+# List registered marketplaces
+copilot plugin marketplace list
+
+# Add a new marketplace from a GitHub repository
+copilot plugin marketplace add my-org/internal-plugins
+
+# Browse available plugins in a marketplace
+copilot plugin marketplace browse awesome-copilot
+
+# Fetch the latest plugin catalog from all registered marketplaces
+copilot plugin marketplace update
+
+# Remove a marketplace registration (v1.0.71+)
+copilot plugin marketplace remove my-org/internal-plugins
 ```
 
 ### Loading Plugins from a Local Directory
