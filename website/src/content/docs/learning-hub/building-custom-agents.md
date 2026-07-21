@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-07-21
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -88,6 +88,8 @@ For MCP server tools, reference them by server name (e.g., `postgres`, `docker`)
 ### Agent Instructions
 
 After the frontmatter, write Markdown instructions that define the agent's behavior. Structure these clearly:
+
+> **Tip (v1.0.73+)**: Relative links in agent instruction files are resolved from the agent file's own location. This means you can reference supplementary documents, examples, or templates with relative paths (e.g., `[style guide](./guides/style-guide.md)`) and they will resolve correctly regardless of where the user launches Copilot.
 
 ````markdown
 ---
