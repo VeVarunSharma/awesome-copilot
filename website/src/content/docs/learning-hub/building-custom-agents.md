@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-07-22
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -244,6 +244,30 @@ The agent can then query your database, analyze query plans, and suggest optimiz
 | Code generation, refactoring | GPT-4.1 |
 | Quick analysis, simple tasks | Claude Haiku or GPT-4.1-mini |
 | Large codebase understanding | Models with larger context windows |
+
+### Runtime Model Selection (Copilot CLI)
+
+In addition to setting a model in agent frontmatter, Copilot CLI provides commands for changing the model at runtime without modifying your agent files:
+
+**Change model for the current session only** (v1.0.72+):
+
+```bash
+/model --session claude-sonnet-4
+# or short form:
+/model -s claude-sonnet-4
+```
+
+This overrides the model, reasoning effort, or context window tier for just the current session, leaving your global and agent defaults untouched. The change reverts when you start a new session.
+
+**Select a model specifically for plan mode** (v1.0.74+):
+
+```bash
+/model plan                   # open the model picker for plan mode
+/model --plan claude-haiku    # set a specific plan-mode model
+/model --plan off             # clear the plan-mode model (revert to session model)
+```
+
+When you use `/model plan`, that model is used only while you are in plan mode. The session model resumes as soon as you leave plan mode. This lets you use a lighter, faster model for planning steps while reserving a more capable model for implementation.
 
 ### Organizing Agents in Your Repository
 
