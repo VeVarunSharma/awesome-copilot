@@ -3,7 +3,7 @@ title: 'Agents and Subagents'
 description: 'Learn how delegated subagents differ from primary agents, when to use them, and how to launch them in VS Code and Copilot CLI.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-02
+lastUpdated: 2026-07-23
 estimatedReadingTime: '9 minutes'
 tags:
   - agents
@@ -108,6 +108,10 @@ Then summarize the findings into one recommendation.
 ### 4. Know the nesting rule
 
 By default, subagents do not keep spawning additional subagents. In VS Code, recursive delegation is controlled by the `chat.subagents.allowInvocationsFromSubagents` setting, which is off by default.
+
+### 5. Send follow-up messages to running subagents
+
+In GitHub Copilot CLI, **multi-turn subagents are always enabled**. This means you can send follow-up messages to a subagent while it is still running — the message is queued and delivered as a steering input without stopping the current turn. This is particularly useful when you want to refine the subagent's direction mid-task or provide additional context it didn't have at launch.
 
 ## Launch subagents in Copilot CLI
 
