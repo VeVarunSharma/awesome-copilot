@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-07-24
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -407,6 +407,29 @@ These files follow the same format as `config.json` and are loaded after the glo
 ### Model Picker
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
+
+#### Changing the Model for Just One Session
+
+Use `/model --session` (shorthand `-s`) to change the model, reasoning effort, or context window for the current session only, leaving your global settings unchanged:
+
+```
+/model --session claude-opus-4.6
+/model -s gpt-5.4 --effort high
+```
+
+When you end the session, these overrides are discarded and your global model preference is restored.
+
+#### Dedicated Model for Plan Mode
+
+You can pick a model that is used specifically while in plan mode, independently of your regular session model:
+
+```
+/model plan                  # open the model picker for plan mode
+/model --plan claude-opus-4.6  # set a specific model for plan mode
+/model --plan off              # clear the plan-mode override
+```
+
+When plan mode is active the CLI uses the plan-mode model; when you leave plan mode it reverts to the session model. This lets you use a high-reasoning model for the planning step and a faster model for execution.
 
 ### CLI Session Commands
 
