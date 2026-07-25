@@ -3,7 +3,7 @@ title: 'Creating Effective Skills'
 description: 'Master the art of writing reusable, shareable skill folders that deliver consistent results across your team.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-07-25
 estimatedReadingTime: '9 minutes'
 tags:
   - skills
@@ -360,6 +360,23 @@ A: Yes! Skills are folders, not single files. You can bundle reference documents
 **Q: How do I share skills with my team?**
 
 A: Store skill folders in your repository's `.github/skills/` directory. They're automatically available to all team members with Copilot access when working in that repository.
+
+**Q: Can I install a skill directly from the CLI?**
+
+A: Yes (v1.0.72+). You can install skills from a local path, URL, or directory using:
+
+```bash
+# Install from a local directory (user-scope)
+copilot plugins install --skill ./my-skill/
+
+# Install into the current repository (project-scope)
+copilot plugins install --skill ./my-skill/ --scope project
+
+# Install from a URL
+copilot plugins install --skill https://example.com/my-skill.zip
+```
+
+Installed skills appear in `copilot skill list` and are available immediately without restarting Copilot. You can remove them with `copilot plugins remove --skill <skill-name>`.
 
 **Q: Can agents chain multiple skills?**
 
