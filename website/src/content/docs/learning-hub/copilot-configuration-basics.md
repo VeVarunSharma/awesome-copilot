@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-07-26
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -407,6 +407,32 @@ These files follow the same format as `config.json` and are loaded after the glo
 ### Model Picker
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
+
+Recently added models include **Claude Opus 5** and **Gemini 3.6 Flash**, available in the model picker alongside the existing Claude Sonnet, Haiku, and GPT-4.1 options.
+
+#### Per-session model override
+
+Use `/model --session` (shorthand: `-s`) to change the model, reasoning effort, or context window for **only the current session**, leaving your global settings unchanged:
+
+```
+/model --session claude-opus-4.6
+/model -s gemini-3.6-flash
+/model -s off          # revert to global model for this session
+```
+
+This is useful when a particular task benefits from a more capable (or faster) model without permanently changing your default.
+
+#### Model selection in Plan mode
+
+When using plan mode, you can pick a **separate model** just for the planning phase:
+
+```
+/model plan            # open the model picker for plan mode
+/model --plan claude-opus-4.6   # set a specific model for planning
+/model --plan off      # clear the plan-mode model (revert to session model)
+```
+
+The plan-mode model reverts to your session model automatically when you leave plan mode.
 
 ### CLI Session Commands
 
