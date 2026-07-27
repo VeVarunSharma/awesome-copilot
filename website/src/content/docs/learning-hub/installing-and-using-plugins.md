@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-27
+lastUpdated: 2026-07-27
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -72,6 +72,8 @@ The `plugin.json` manifest declares what the plugin contains:
   ]
 }
 ```
+
+> **Open Plugin Spec v1 (v1.0.74+)**: Copilot CLI now supports **Open Plugin Spec v1** plugin manifests in addition to its own `plugin.json` format. If you have an `mcp.json` at the project root (the Open Plugin Spec standard location), Copilot CLI will read MCP server configurations from it automatically — no renaming to `.mcp.json` required. This makes it easier to share plugin configurations across tools that follow the Open Plugin Spec.
 
 ## Why Use Plugins?
 
@@ -197,7 +199,34 @@ copilot plugin marketplace update
 
 # Remove a plugin
 copilot plugin uninstall my-plugin
+
+# Enable or disable a plugin without uninstalling it
+copilot plugin enable my-plugin
+copilot plugin disable my-plugin
 ```
+
+### Installing Individual Skills from the CLI
+
+As of v1.0.72, you can install a single skill directly without wrapping it in a full plugin. Point to a local directory, a file path, or a URL:
+
+```bash
+# Install a skill from a local directory
+copilot plugins install --skill ./my-skill/
+
+# Install a skill from a URL
+copilot plugins install --skill https://example.com/skills/my-skill.zip
+
+# Install into the current repository (project-scoped)
+copilot plugins install --skill ./my-skill/ --scope project
+```
+
+You can also remove individually installed skills:
+
+```bash
+copilot plugins remove --skill my-skill-name
+```
+
+This is especially handy when you want to share a single skill with a team without publishing a full plugin.
 
 ### Loading Plugins from a Local Directory
 
