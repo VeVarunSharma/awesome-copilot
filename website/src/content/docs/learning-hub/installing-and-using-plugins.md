@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-27
+lastUpdated: 2026-07-28
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -72,6 +72,12 @@ The `plugin.json` manifest declares what the plugin contains:
   ]
 }
 ```
+
+### Open Plugin Spec v1 Support
+
+GitHub Copilot CLI also supports **Open Plugin Spec v1** plugin manifests — a community standard for describing AI tool plugins across different platforms. If a plugin was built to this standard, Copilot CLI can install and use it directly without requiring a Copilot-specific `plugin.json`. This improves interoperability with plugin ecosystems outside of GitHub.
+
+In addition, `mcp.json` files (the standard MCP server configuration format) are recognized directly as plugin sources, so tool collections distributed as `mcp.json` bundles can be consumed as plugins without additional wrapping.
 
 ## Why Use Plugins?
 
@@ -172,10 +178,26 @@ copilot plugin install database-data-management@awesome-copilot
 Or from an interactive session:
 
 ```
-/plugin install database-data-management@awesome-copilot
+/plugins install database-data-management@awesome-copilot
 ```
 
 > **Deprecation notice**: Installing plugins directly from a GitHub repository URL, raw URL, or local file path (e.g., `copilot plugin install github/awesome-copilot`) is deprecated and will be removed in a future release. Use marketplace-based installation instead.
+
+### Installing Skills
+
+You can install individual skills (without a full plugin) directly from the CLI or an interactive session:
+
+```bash
+# Install a skill from a local directory or URL
+copilot plugins install --skill ./my-skill/
+copilot plugins install --skill ./my-skill/ --scope project  # install into the current repository
+```
+
+Or from within an interactive session:
+
+```
+/plugins install --skill ./my-skill/
+```
 
 ### From VS Code
 
@@ -197,6 +219,25 @@ copilot plugin marketplace update
 
 # Remove a plugin
 copilot plugin uninstall my-plugin
+
+# Remove a specific skill installed outside a plugin
+copilot plugins remove --skill my-skill
+```
+
+The same operations are also available from within an interactive session using `/plugins`:
+
+```
+/plugins list
+/plugins update my-plugin
+/plugins help               # show available /plugins subcommands
+```
+
+You can also target individual MCP servers and skills using `--mcp` and `--skill` flags:
+
+```
+/plugins enable --skill my-skill
+/plugins disable --mcp my-server
+/plugins remove --skill my-skill
 ```
 
 ### Loading Plugins from a Local Directory
