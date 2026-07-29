@@ -3,7 +3,7 @@ title: 'Building Custom Agents'
 description: 'Learn how to create specialized GitHub Copilot agents with custom personas, tool integrations, and domain expertise.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-02-26
+lastUpdated: 2026-07-29
 estimatedReadingTime: '10 minutes'
 tags:
   - agents
@@ -240,10 +240,13 @@ The agent can then query your database, analyze query plans, and suggest optimiz
 
 | Scenario | Recommended Model |
 |----------|-------------------|
+| Most demanding reasoning, deepest analysis | Claude Opus 5 |
 | Complex reasoning, security review | Claude Sonnet 4 or higher |
 | Code generation, refactoring | GPT-4.1 |
-| Quick analysis, simple tasks | Claude Haiku or GPT-4.1-mini |
+| Quick analysis, simple tasks | Claude Haiku, GPT-4.1-mini, or gemini-3.6-flash |
 | Large codebase understanding | Models with larger context windows |
+
+> **New models (July 2026)**: Claude Opus 5 and gemini-3.6-flash are now available in GitHub Copilot CLI. Claude Opus 5 is Anthropic's most capable model, suited for the most demanding reasoning tasks. gemini-3.6-flash is a fast, efficient option for quick tasks and high-volume workflows.
 
 ### Organizing Agents in Your Repository
 

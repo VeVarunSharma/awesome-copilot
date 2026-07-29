@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-07-29
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -562,6 +562,21 @@ copilot --plan          # start in plan mode (propose without executing)
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+#### Choosing a Model for Plan Mode
+
+Plan mode can use a different model than your main session — useful when you want a more capable model for planning while a faster model handles execution, or vice versa. Use `/model plan` (or `/model --plan`) inside an interactive session:
+
+```
+/model plan claude-opus-5           # use Claude Opus 5 while planning
+/model plan gemini-3.6-flash        # use a fast model for lightweight plans
+/model plan off                     # clear the plan-mode model override
+/model plan                         # open the model picker for plan mode
+```
+
+When you leave plan mode, the session automatically reverts to your normal session model. This keeps plan-mode model selection scoped and temporary without changing your global model preference.
+
+> **Note**: Plan mode blocks tool calls that would modify the workspace (file edits, mutating shell commands). Session-folder planning artifacts — such as a `plan.md` written to your session scratch space — are allowed so the agent can record its plan without touching your working tree.
 
 ### Shell Completion
 
