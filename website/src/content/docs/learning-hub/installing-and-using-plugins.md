@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-27
+lastUpdated: 2026-07-30
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -72,6 +72,8 @@ The `plugin.json` manifest declares what the plugin contains:
   ]
 }
 ```
+
+> **Cross-tool compatibility**: GitHub Copilot CLI supports **Open Plugin Spec v1** plugin manifests and `mcp.json` configuration. This means plugins authored for Claude Code or other compatible tools can often be installed and used directly in Copilot CLI without modification, and vice versa.
 
 ## Why Use Plugins?
 
@@ -198,6 +200,44 @@ copilot plugin marketplace update
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+### Enabling and Disabling Plugin Components
+
+You can selectively enable or disable individual components from an installed plugin — without fully uninstalling it. This works for plugins, instructions, agents, LSP servers, and hooks:
+
+```bash
+# Enable or disable an entire plugin
+copilot plugins enable my-plugin
+copilot plugins disable my-plugin
+
+# Enable or disable a specific agent from a plugin
+copilot plugins enable --plugin my-plugin --agent api-architect
+
+# Enable or disable a specific MCP server from a plugin
+copilot plugins disable --plugin my-plugin --mcp postgres
+
+# Enable or disable a specific skill from a plugin
+copilot plugins disable --plugin my-plugin --skill database-migrations
+```
+
+Within an interactive session, you can manage components using the `/plugins` command, which shows enable/disable toggles for all installed plugins and their components.
+
+### Installing Skills from the CLI
+
+You can install individual skills directly from a file, URL, or directory — without packaging them into a plugin:
+
+```bash
+# Install a skill from a local directory
+copilot plugins install --skill ./my-skill/
+
+# Install a skill from a URL
+copilot plugins install --skill https://example.com/skills/my-skill.zip
+
+# Install a skill scoped to the current repository (stored in .github/skills/)
+copilot plugins install --skill ./my-skill/ --scope project
+```
+
+This is useful when you want to add a single skill to a project without creating a full plugin package. Project-scoped skills are committed with the repository and available to the coding agent automatically.
 
 ### Loading Plugins from a Local Directory
 

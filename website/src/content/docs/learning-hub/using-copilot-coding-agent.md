@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-07-30
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -324,6 +324,15 @@ This repository provides a curated collection of agents, skills, and hooks desig
 1. Browse the [Skills Directory](../../skills/) for specialized skills
 2. Copy the entire skill folder into your repository's `.github/skills/` directory
 3. The coding agent will automatically use the skill when it's relevant to a task
+
+You can also install skills directly from the Copilot CLI without copying files manually:
+
+```bash
+# Install a skill from a local directory into the current repository
+copilot plugins install --skill ./path/to/skill/ --scope project
+```
+
+This copies the skill into your repository's `.github/skills/` directory and makes it immediately available to the coding agent.
 
 ### Adding Hooks from This Repo
 
