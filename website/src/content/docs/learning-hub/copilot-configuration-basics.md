@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-07-31
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -392,6 +392,7 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `allowDevToolCaches` | Grant sandboxed builds access to toolchain caches and registries (on by default); set `false` to opt out |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -407,6 +408,14 @@ These files follow the same format as `config.json` and are loaded after the glo
 ### Model Picker
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
+
+Shell completion for `--model` (v1.0.78+) now suggests `auto` and all supported model names when you press Tab, so you can select a model without memorizing the exact identifier:
+
+```bash
+copilot --model <Tab>   # lists auto, claude-sonnet-4.6, grok-4.5, ...
+```
+
+Recently added models include **grok-4.5** (v1.0.76+). Use `/model` or `--model grok-4.5` to select it.
 
 ### CLI Session Commands
 
@@ -543,6 +552,17 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
 
+The `/permissions` command (v1.0.78+) is a new unified way to switch between approval modes — interactive, autopilot, and plan — without leaving the session:
+
+```
+/permissions              # show current approval mode and available options
+/permissions interactive  # require confirmation for each tool use
+/permissions autopilot    # allow all tools without confirmation (same as /allow-all on)
+/permissions plan         # propose changes without executing them
+```
+
+Use `/permissions` when you want a clear overview of the current mode or need to switch between modes mid-session. It complements `/allow-all` (which remains available) but surfaces the full set of approval modes in one place.
+
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
 ```bash
@@ -562,6 +582,40 @@ copilot --plan          # start in plan mode (propose without executing)
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+> **Note**: When resuming a session with `--resume`, the restored session's previous mode (interactive, autopilot, or plan) is automatically restored so your session continues in the same mode you left.
+
+### Sessions Sidebar (Experimental)
+
+The Sessions sidebar lets you manage multiple concurrent sessions side-by-side in the terminal — switch between them, spawn new ones, and see their status at a glance. Enable it with:
+
+```
+/experimental on
+```
+
+Once enabled, the sidebar appears at the side of the terminal and shows a card for each session. Hover over a card to preview the session; click or navigate to it to switch. You can configure hover-to-focus and visual accents via `sidebar.hoverFocus` and `sidebar.accentActiveSession` in your config.
+
+### Credit Limits
+
+The `/limits predict` command (v1.0.76+) estimates how many AI credits your current session is likely to consume, based on similar past sessions:
+
+```
+/limits predict
+```
+
+Use this before starting a long autonomous task to gauge whether you have sufficient quota, or to adjust your approach if the estimate is higher than expected.
+
+### Authentication
+
+The `copilot login` command (v1.0.77+) now defaults to a **browser-based OAuth flow** on local interactive terminals. A browser window opens automatically and you approve access with a single click — no device code to copy and paste:
+
+```bash
+copilot login           # opens browser OAuth flow (local interactive terminals)
+copilot login --web-flow    # force browser OAuth
+copilot login --device-code # force device-code flow (for headless/remote terminals)
+```
+
+The device-code flow remains the default on remote or headless terminals where a browser cannot be opened. You can also choose between flows interactively via the `/login` slash command.
 
 ### Shell Completion
 

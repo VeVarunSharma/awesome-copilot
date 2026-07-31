@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-27
+lastUpdated: 2026-07-31
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -224,6 +224,22 @@ When you install a plugin, its components become available to Copilot CLI automa
 - **MCP servers** extend the tools available to agents
 
 You don't need to do any additional configuration after installing — the plugin's components integrate seamlessly into your workflow. Plugins take effect immediately after installation without requiring a Copilot CLI restart.
+
+### Enabling and Disabling Plugin Components (v1.0.76+)
+
+The `/plugins` command now includes enable/disable toggles for all plugin components — plugins, instructions, agents, LSP servers, and hooks — without uninstalling them:
+
+```
+/plugins        # open the plugin management UI
+```
+
+From the `/plugins` panel you can toggle individual items on or off. Disabled items are preserved on disk but excluded from the current session and all future sessions until re-enabled. This is useful for:
+
+- **Temporarily disabling a hook** that's causing issues without uninstalling it
+- **Silencing an instruction file** for a session where its rules don't apply
+- **Pausing an MCP server** that you don't need for the current task
+
+These toggles persist across sessions (they're stored in your local config), so you can safely disable a component and know it won't come back unexpectedly.
 
 ## Plugins from This Repository
 
