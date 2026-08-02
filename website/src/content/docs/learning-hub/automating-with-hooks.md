@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-08-02
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -101,6 +101,8 @@ Hooks can trigger on several lifecycle events:
 | `errorOccurred` | An error occurs during agent execution | Log errors for debugging, send notifications, track error patterns |
 
 > **Key insight**: The `preToolUse` hook is the most powerful — it can **approve or deny** individual tool executions. This enables fine-grained security policies like blocking specific shell commands or requiring approval for sensitive file operations.
+
+> **`sessionEnd` and piped runs (v1.0.78+)**: When a run's prompt is piped over stdin (using `-p`), the `sessionEnd` hook fires **once per completed agent turn** with `reason: complete` (or `reason: error` if the turn failed). A piped run that exits before completing a turn fires no `sessionEnd` hook at all. This is consistent with how `-p` (non-piped prompt flag) works — use the `reason` field to distinguish a successful turn completion from an error exit.
 
 ### sessionStart additionalContext
 

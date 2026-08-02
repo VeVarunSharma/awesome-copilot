@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-08-02
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -381,6 +381,25 @@ Configuration file: `~/.copilot-cli/config.json`
 }
 ```
 
+### CLI Authentication
+
+Log in to GitHub Copilot CLI with:
+
+```bash
+copilot login
+```
+
+By default, `copilot login` uses a **browser-based (web) OAuth flow** on local interactive terminals — your browser opens automatically for a seamless sign-in. On remote or headless terminals (for example, SSH sessions or CI), the device code flow is used instead. You can force a specific flow with flags:
+
+```bash
+copilot login --web-flow     # force browser-based OAuth (local)
+copilot login --device-code  # force device code flow (headless-friendly)
+```
+
+You can also choose your login method interactively from inside a Copilot session with the `/login` command.
+
+### CLI Settings
+
 CLI settings use **camelCase** naming. Key settings added in recent releases:
 
 | Setting | Description |
@@ -392,6 +411,8 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `allowDevToolCaches` | Grant sandboxed builds access to toolchain caches and registries (default: `true`). Set to `false` to opt out and enforce a fully isolated sandbox |
+| `stayInAutopilot` | Keep autopilot mode selected after `task_complete` instead of returning to interactive mode (default: `true`) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -447,6 +468,19 @@ You can also press **x** on a highlighted session in the session picker (`--resu
 
 In the session picker, press **`s`** to cycle the sort order: relevance, last used, created, or name. The picker also shows the branch name and idle/in-use status for each session.
 
+**Sessions sidebar (experimental)**: Enable a split-view sidebar for managing multiple concurrent sessions. Switch between them, spawn new ones, and see their status at a glance — all without leaving your current session. To enable it, turn on experimental mode:
+
+```
+/experimental on
+```
+
+With experimental mode on, the sidebar can be toggled open or closed. Two settings let you tune the sidebar to your preference:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `sidebar.hoverFocus` | `false` | When `true`, hovering the mouse over a session card focuses it |
+| `sidebar.accentActiveSession` | `true` | Visually accent the currently active session card |
+
 The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history, reverting both the conversation and any file changes made after that point. You can also trigger it by pressing **double-Esc**:
 
 ```
@@ -481,6 +515,8 @@ The exported file contains everything needed to view the session without a netwo
 
 **Keyboard shortcuts for queuing messages**: Use **Ctrl+Q** or **Ctrl+Enter** to queue a message (send it while the agent is still working). **Ctrl+D** no longer queues messages — it now has its default terminal behavior. If you have muscle memory for Ctrl+D queuing, switch to Ctrl+Q.
 
+**Managing the message queue**: Once you have messages queued, use the **queue manager** (accessible via the directable staff panel) to reorder, edit, remove, repeat, or immediately send any queued message. This is useful when you queue several follow-up prompts and then decide to reprioritize or discard some of them before they run.
+
 **Background running tasks**: Press **Ctrl+X → B** to move the current running task or shell command to the background. The task continues executing while you can type a new message or review earlier output. This is useful for long-running commands where you want to interact with the agent while waiting for the result.
 
 The `/ask` command lets you ask a quick question without affecting your conversation history. The current session context is preserved, so you can use it for one-off lookups without derailing an ongoing task. Responses are rendered as full markdown, including tables and formatted links:
@@ -488,6 +524,14 @@ The `/ask` command lets you ask a quick question without affecting your conversa
 ```
 /ask What does the `retry` utility in src/utils do?
 ```
+
+The `/limits predict` command (v1.0.76+) suggests an appropriate AI-credit session limit based on sessions you have run previously for similar tasks:
+
+```
+/limits predict
+```
+
+Use this before starting a long autonomous task to set a budget that prevents runaway credit usage.
 
 The `/env` command shows all loaded environment details — instructions, MCP servers, skills, agents, and plugins — in a single view. Use it to verify that the right resources are active for the current session:
 
@@ -542,6 +586,16 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 > **Note**: `/allow-all on` permissions persist after `/clear` starts a new session, so you don't need to re-enable it each time.
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
+
+The `/permissions` command (v1.0.78+) lets you switch between approval modes mid-session without leaving the interactive UI:
+
+```
+/permissions          # show current approval mode
+/permissions auto     # switch to auto-approve (equivalent to /allow-all on)
+/permissions manual   # return to manual approval for each tool use
+```
+
+This is a faster alternative to `/allow-all on|off` when you want to temporarily open up permissions for a burst of autonomous work and then return to interactive review.
 
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
