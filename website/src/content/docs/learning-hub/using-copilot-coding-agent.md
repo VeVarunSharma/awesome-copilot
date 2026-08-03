@@ -3,7 +3,7 @@ title: 'Using the Copilot Coding Agent'
 description: 'Learn how to use GitHub Copilot coding agent to autonomously work on issues, generate pull requests, and automate development tasks.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-08-03
 estimatedReadingTime: '12 minutes'
 tags:
   - coding-agent
@@ -108,6 +108,22 @@ steps:
   - name: Run all tests
     run: npm test && pytest
 ```
+
+### Sandbox and Toolchain Caches
+
+The coding agent runs in a sandboxed environment. By default, the sandbox grants access to **toolchain caches, registries, and installs** — so dependency installs (npm, pip, bundler, etc.) work without extra setup and benefit from cached packages. This is controlled by the `allowDevToolCaches` setting.
+
+If you need a fully isolated build — for example, to verify your dependency lockfiles are complete — you can disable this in your `settings.json`:
+
+```json
+{
+  "sandbox": {
+    "allowDevToolCaches": false
+  }
+}
+```
+
+In most projects you can leave this at the default (`true`) and enjoy faster, more reliable builds.
 
 ## Assigning Work to the Coding Agent
 
@@ -374,6 +390,25 @@ copilot --resume
 | No PR required | You can steer tasks that haven't yet opened a pull request |
 
 > **Note**: Remote control replaces the earlier "steering" feature. If you see references to steering in older documentation, remote control is the updated equivalent.
+
+## Parallel Work with Worktrees
+
+> **Experimental**: The `/new-worktree` command is currently experimental. Behavior may change in future releases.
+
+When you want to work on two separate tasks at the same time without mixing their contexts, you can use the `/new-worktree` command to spin up a new git worktree with a fresh conversation:
+
+```
+/new-worktree
+```
+
+This creates a new worktree in your repository and opens a new, isolated conversation in it. Each worktree gets its own branch and context window — so you can tackle a bug fix in one session while exploring a new feature in another, without one conversation's history bleeding into the other.
+
+**When to use `/new-worktree`**:
+- Working on two independent tasks that shouldn't share context
+- Experimenting with an alternative approach while keeping your main session clean
+- Reviewing or running code in an isolated environment alongside your primary session
+
+Each worktree session is independent: tools, hooks, and MCP servers all operate against that worktree's directory, and the worktrees are managed with standard `git worktree` mechanics under the hood.
 
 ## Hooks and the Coding Agent
 

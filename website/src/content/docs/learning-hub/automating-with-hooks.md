@@ -3,7 +3,7 @@ title: 'Automating with Hooks'
 description: 'Learn how to use hooks to automate lifecycle events like formatting, linting, and governance checks during Copilot agent sessions.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-28
+lastUpdated: 2026-08-03
 estimatedReadingTime: '8 minutes'
 tags:
   - hooks
@@ -272,6 +272,18 @@ exit 1     # deny (let the user decide interactively)
 ```
 
 > **Security note**: Use `PermissionRequest` hooks carefully. Blanket auto-approval in non-CI environments removes an important safety check. Scope the auto-approval logic precisely (e.g., only in CI, only for specific tools).
+
+### Switching Approval Modes with /permissions
+
+For interactive sessions, you can change the approval mode at any time without restarting the CLI using the `/permissions` slash command:
+
+```
+/permissions
+```
+
+Running `/permissions` opens an interactive picker where you can switch between approval modes (e.g., from prompt-per-action to auto-approve or vice versa) for the current session. This is useful when you start a session cautiously but want to speed up once you trust the context, or when you need to tighten permissions mid-session for a sensitive operation.
+
+`PermissionRequest` hooks and the `/permissions` command work together: hooks automate permission decisions programmatically, while `/permissions` lets you override the mode interactively in the moment.
 
 ### Handling Tool Failures with postToolUseFailure
 
