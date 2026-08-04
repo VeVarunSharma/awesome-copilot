@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-08-04
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -392,6 +392,7 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `showToolDurations` | Show elapsed time for each tool call in the timeline header (on by default; disable with `/settings showToolDurations`) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -447,11 +448,13 @@ You can also press **x** on a highlighted session in the session picker (`--resu
 
 In the session picker, press **`s`** to cycle the sort order: relevance, last used, created, or name. The picker also shows the branch name and idle/in-use status for each session.
 
-The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history, reverting both the conversation and any file changes made after that point. You can also trigger it by pressing **double-Esc**:
+The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history. You can also trigger it by pressing **double-Esc**:
 
 ```
 /rewind
 ```
+
+When you select a point to rewind to, `/rewind` gives you the choice to restore the conversation only, or the conversation **and** the files that Copilot changed. It restores only the files Copilot actually modified since that point — files whose contents have since been changed by other means are skipped. `/rewind` does not require a git repository.
 
 Use `/rewind` when you want to branch off from a different point in the conversation, rather than just undoing the most recent turn.
 
@@ -470,6 +473,16 @@ The `/cd` command changes the working directory for the current session. Each se
 ```
 
 This is useful when you have multiple backgrounded sessions each focused on a different project directory.
+
+The `/new-worktree` command (experimental) creates a new git worktree from the current repository and opens a fresh Copilot conversation scoped to that worktree:
+
+```
+/new-worktree
+```
+
+This is useful when you want to work on a separate branch in parallel without affecting your current session's working tree. Each worktree gets its own conversation context, so tasks stay isolated.
+
+> **Note**: `/new-worktree` is experimental. Enable experimental features in your settings to use it.
 
 The `/share html` command exports the current session — including conversation history and any research reports — as a **self-contained interactive HTML file**:
 
@@ -542,6 +555,14 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 > **Note**: `/allow-all on` permissions persist after `/clear` starts a new session, so you don't need to re-enable it each time.
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
+
+The `/permissions` command provides a menu-driven way to switch between approval modes without needing to remember the `/allow-all` subcommands:
+
+```
+/permissions
+```
+
+This opens an interactive picker where you can choose between your current approval mode settings. Use it as a quick alternative to `/allow-all on`/`/allow-all off` when you want a guided overview of available modes.
 
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
