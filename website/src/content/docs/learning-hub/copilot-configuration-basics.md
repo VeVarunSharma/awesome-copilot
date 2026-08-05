@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-08-05
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -392,6 +392,9 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `allowDevToolAccess` | Grant sandboxed builds access to toolchain caches, registries, and dev-tool installs (on by default). **Note**: renamed from `allowDevToolCaches` in v1.0.79 — update any existing configuration that sets this to `false`. |
+| `stayInAutopilot` | Stay in autopilot mode after `task_complete` (default: `true`). Set to `false` to return to interactive mode after each completed task. |
+| `showToolDurations` | Show how long each tool call took in the timeline header (on by default). Disable with `/settings showToolDurations`. |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -452,6 +455,8 @@ The `/rewind` command opens a timeline picker that lets you roll back the conver
 ```
 /rewind
 ```
+
+`/rewind` does not require git — it tracks its own change history and restores only the files Copilot changed, skipping any file whose contents no longer match what Copilot last wrote. A two-option prompt lets you choose between reverting the conversation only, or reverting both the conversation and files.
 
 Use `/rewind` when you want to branch off from a different point in the conversation, rather than just undoing the most recent turn.
 
@@ -542,6 +547,22 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 > **Note**: `/allow-all on` permissions persist after `/clear` starts a new session, so you don't need to re-enable it each time.
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
+
+The `/permissions` command opens an approval-mode picker that lets you switch between tool-permission levels mid-session:
+
+```
+/permissions          # open the approval mode picker
+```
+
+Use `/permissions` when you want to tighten or loosen tool approval for the current session without fully enabling `/allow-all`. It provides a more granular alternative to toggling all-auto mode on and off.
+
+The `/worktree new` command creates a new git worktree and opens a fresh conversation in it, without disturbing your current session:
+
+```
+/worktree new         # create a new worktree and start a new conversation in it
+```
+
+Worktrees let you work on multiple branches simultaneously. Start an agent session in the new worktree for an independent task — the session's working directory switches to the new worktree automatically, and you can use `copilot --resume` to switch between sessions in different worktrees.
 
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
