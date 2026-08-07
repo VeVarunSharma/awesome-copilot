@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-27
+lastUpdated: 2026-08-07
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -33,6 +33,7 @@ A plugin bundles one or more of the following components:
 | **Hooks** | Event handlers that intercept agent behavior | `hooks.json` or `hooks/` |
 | **MCP Servers** | Model Context Protocol integrations for external tools | `.mcp.json` or `.github/mcp.json` |
 | **LSP Servers** | Language Server Protocol integrations | `lsp.json` or `.github/lsp.json` |
+| **Extensions** | Plugin-level extensions shipped under `com.github.copilot/extensions/` | `com.github.copilot/extensions/` |
 
 A plugin might include all of these or just one — for example, a plugin could provide a single specialized agent, or an entire development toolkit with multiple agents, skills, hooks, and MCP server configurations working together.
 
@@ -198,6 +199,20 @@ copilot plugin marketplace update
 # Remove a plugin
 copilot plugin uninstall my-plugin
 ```
+
+### Enabling and Disabling Plugin Components
+
+The `/plugins` command lets you enable or disable individual plugin components without uninstalling the plugin:
+
+```
+/plugins
+```
+
+This opens an interactive menu where you can toggle individual **plugins**, **instructions**, **agents**, **LSP servers**, and **hooks** on or off. Disabling a component keeps it installed but excludes it from the current session. This is useful for troubleshooting or temporarily switching to a different set of tools.
+
+### Automatic Updates for First-Party Plugins
+
+First-party plugins (published by GitHub) **automatically update to the latest version** at the start of each session. You'll always have the most recent agents, skills, and hooks without needing to run `copilot plugin update` manually.
 
 ### Loading Plugins from a Local Directory
 

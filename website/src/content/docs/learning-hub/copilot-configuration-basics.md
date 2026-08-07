@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-08-07
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -447,13 +447,17 @@ You can also press **x** on a highlighted session in the session picker (`--resu
 
 In the session picker, press **`s`** to cycle the sort order: relevance, last used, created, or name. The picker also shows the branch name and idle/in-use status for each session.
 
-The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history, reverting both the conversation and any file changes made after that point. You can also trigger it by pressing **double-Esc**:
+The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history. You can also trigger it by pressing **double-Esc**:
 
 ```
 /rewind
 ```
 
-Use `/rewind` when you want to branch off from a different point in the conversation, rather than just undoing the most recent turn.
+When rewinding, you'll be prompted to choose between:
+- **Conversation only** — rewinds the chat history without touching files
+- **Conversation + files** — rewinds the chat and restores only the files Copilot itself changed, skipping any file whose contents have since been modified by another means
+
+`/rewind` no longer requires git — it uses Copilot's own change tracking to restore files. Use it when you want to branch off from a different point in the conversation, rather than just undoing the most recent turn.
 
 The `/undo` command reverts the last turn—including any file changes the agent made—letting you course-correct without manually undoing edits:
 
@@ -470,6 +474,25 @@ The `/cd` command changes the working directory for the current session. Each se
 ```
 
 This is useful when you have multiple backgrounded sessions each focused on a different project directory.
+
+The `/worktree new` command creates a new git worktree and starts a new Copilot CLI session inside it. This is useful for working on multiple independent branches simultaneously — each worktree has its own session context, so parallel tasks don't interfere with each other:
+
+```
+/worktree new
+```
+
+### Sessions Tab and Sidebar
+
+The **Sessions tab** (accessible from the sidebar) lets you manage multiple concurrent sessions without leaving the CLI. From the Sessions view you can:
+
+- **Switch** between active sessions with a single keypress
+- **Spawn** new sessions alongside your current one
+- **Monitor** the status of each session (idle, running, completed)
+- **Close** sessions you no longer need
+
+The sidebar also provides a compact **session overview** — a split-view panel that shows your sessions at a glance, with accent highlighting on the active session. Toggle the sidebar with the sidebar keyboard shortcut, or turn on hover-to-focus via `sidebar.hoverFocus` in settings.
+
+This makes it practical to run several parallel Copilot tasks — for example, one session implementing a feature while another runs tests — and quickly navigate between them.
 
 The `/share html` command exports the current session — including conversation history and any research reports — as a **self-contained interactive HTML file**:
 
@@ -543,6 +566,14 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
 
+The `/permissions` command provides a quick way to switch between approval modes interactively:
+
+```
+/permissions
+```
+
+This opens a menu where you can select from available approval modes (interactive, agent, autopilot) without needing to restart the session. Use it when you want to temporarily raise or lower the approval level for the current task — for example, switching to autopilot for a long-running refactor, then back to interactive for sensitive changes.
+
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
 ```bash
@@ -561,7 +592,13 @@ copilot --autopilot     # alias for --mode autopilot (allow-all)
 copilot --plan          # start in plan mode (propose without executing)
 ```
 
-This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+You can also combine `--plan` with `--mode autopilot` to have the CLI first generate a plan and then automatically implement it without waiting for approval:
+
+```bash
+copilot --plan --mode autopilot -p "Refactor the authentication module"
+```
+
+This is especially useful in CI pipelines or automated scripts where you want a plan-then-execute workflow without any interactive prompts.
 
 ### Shell Completion
 
