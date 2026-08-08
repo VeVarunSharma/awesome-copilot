@@ -77,6 +77,7 @@ export default defineConfig({
             "learning-hub/agentic-workflows",
             "learning-hub/using-copilot-coding-agent",
             "learning-hub/installing-and-using-plugins",
+            "learning-hub/managing-copilot-cli-sessions",
             "learning-hub/before-after-customization-examples",
           ],
         },
