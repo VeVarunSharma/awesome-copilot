@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-08-09
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -392,6 +392,9 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `allowDevToolAccess` | Grant sandboxed builds access to toolchain caches, registries, and installs (on by default). Set to `false` to opt out of sandbox dev-tool access. |
+| `pinnedPrompts` | Show the current prompt pinned above the timeline. Off by default on terminals under 30 rows. |
+| `worktreeBaseRef` | Controls whether `/worktree`, `/worktree new`, and `--worktree` start from `HEAD` or the remote default branch. All three default to `HEAD`. |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -408,6 +411,8 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
+Models are organized into sections — **Recent**, **Recommended**, **New**, and others — so you can quickly find recently used models or discover newly added ones. Use **Shift+Tab** to switch between grouping views.
+
 ### CLI Session Commands
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
@@ -418,6 +423,8 @@ GitHub Copilot CLI has two commands for managing session state, with distinct be
 | `/clear [prompt]` | Abandons the current session entirely and starts a new one. Backgrounded sessions are not affected. MCP servers configured in your project are preserved in the new session. |
 
 Both commands accept an optional prompt argument to seed the new session with an opening message, for example `/new Add error handling to the login flow`.
+
+You can manage multiple concurrent sessions from the **Sessions tab** in the sidebar. Each session has its own conversation context, working directory, and MCP server connections — switching between sessions does not restart MCP servers or rebuild hook state, so background sessions continue running uninterrupted.
 
 The `/session rename` command renames the current session. When called **without a name argument**, it automatically generates a session name based on the conversation history:
 
@@ -447,13 +454,15 @@ You can also press **x** on a highlighted session in the session picker (`--resu
 
 In the session picker, press **`s`** to cycle the sort order: relevance, last used, created, or name. The picker also shows the branch name and idle/in-use status for each session.
 
-The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history, reverting both the conversation and any file changes made after that point. You can also trigger it by pressing **double-Esc**:
+The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history. You can also trigger it by pressing **double-Esc**:
 
 ```
 /rewind
 ```
 
-Use `/rewind` when you want to branch off from a different point in the conversation, rather than just undoing the most recent turn.
+When you select a point to rewind to, Copilot offers two choices: **conversation only** (roll back the conversation history without touching files) or **conversation + files** (roll back the conversation and revert files that Copilot changed after that point). Only files whose contents still match what Copilot last wrote are reverted — files you modified manually are left intact.
+
+> **Note (v1.0.78+)**: `/rewind` no longer requires git. It works in any directory, not just git repositories.
 
 The `/undo` command reverts the last turn—including any file changes the agent made—letting you course-correct without manually undoing edits:
 
@@ -543,6 +552,14 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
 
+The `/permissions` command lets you switch between approval modes without needing the full `/allow-all` syntax:
+
+```
+/permissions
+```
+
+This opens an interactive picker where you can select your preferred mode (e.g., requiring approval for all actions, or auto-approving specific categories). It is equivalent to `/allow-all` but provides a guided UI for choosing the right level for your session.
+
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
 ```bash
@@ -559,6 +576,12 @@ The `--mode` flag (along with its aliases `--autopilot` and `--plan`) lets you l
 copilot --mode agent    # start in agent mode (autonomous tool use)
 copilot --autopilot     # alias for --mode autopilot (allow-all)
 copilot --plan          # start in plan mode (propose without executing)
+```
+
+You can combine `--plan` with `--mode autopilot` to have the agent plan first, then automatically implement the plan without waiting for your approval:
+
+```bash
+copilot --plan --mode autopilot "Add input validation to the registration form"
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
