@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-08-10
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -408,6 +408,17 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
+Models in the picker are grouped into **Recent**, **Recommended**, **New**, and other sections to help you find the right model quickly. Use **Shift+Tab** to switch between grouping views.
+
+**Session-scoped model selection**: The `/model` command is session-scoped by default — it changes the model for the current session only. To set a persistent default model that applies to all future sessions, use `/config model` instead:
+
+```
+/model                 # change model for this session only
+/config model          # set default model for all future sessions
+```
+
+You can also pick a dedicated model for plan mode with `/model plan` (or `/model --plan`), which reverts to the session model when you leave plan mode.
+
 ### CLI Session Commands
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
@@ -560,6 +571,14 @@ copilot --mode agent    # start in agent mode (autonomous tool use)
 copilot --autopilot     # alias for --mode autopilot (allow-all)
 copilot --plan          # start in plan mode (propose without executing)
 ```
+
+You can also **combine `--plan` with `--mode autopilot`** to have Copilot plan the work first and then implement it automatically without pausing for approval at each step:
+
+```bash
+copilot --plan --mode autopilot "Add rate limiting to the /api/login endpoint"
+```
+
+This is useful for well-defined tasks where you trust the plan and want fully autonomous execution after the planning phase.
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
 
