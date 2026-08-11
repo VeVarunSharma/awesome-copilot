@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-08-11
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -408,6 +408,15 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
+Models are organized into grouped sections — **Recent**, **Recommended**, **New**, and others — to help you quickly find the right model. Press **Shift+Tab** to switch between grouping views.
+
+The `/model` command is **session-scoped by default**: it changes the model for the current session only. To set a permanent default model for future sessions, use `/config model`:
+
+```
+/model claude-sonnet-4.6   # change model for this session only
+/config model              # open the model picker to set your default
+```
+
 ### CLI Session Commands
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
@@ -418,6 +427,8 @@ GitHub Copilot CLI has two commands for managing session state, with distinct be
 | `/clear [prompt]` | Abandons the current session entirely and starts a new one. Backgrounded sessions are not affected. MCP servers configured in your project are preserved in the new session. |
 
 Both commands accept an optional prompt argument to seed the new session with an opening message, for example `/new Add error handling to the login flow`.
+
+You can manage multiple concurrent sessions from the **Sessions tab** in the sidebar. The Sessions tab shows all active and backgrounded sessions, lets you switch between them, and displays their status at a glance — making it easy to juggle parallel workstreams without losing context.
 
 The `/session rename` command renames the current session. When called **without a name argument**, it automatically generates a session name based on the conversation history:
 
@@ -478,6 +489,14 @@ The `/share html` command exports the current session — including conversation
 ```
 
 The exported file contains everything needed to view the session without a network connection and can be shared with teammates or stored for later reference. This complements `/share` (which shares via URL) for cases where an offline or attached format is preferred.
+
+The `/app` command opens the current CLI session in the **GitHub Copilot desktop app**, switching you from the terminal to the app's interface without losing context:
+
+```
+/app
+```
+
+This requires GitHub Copilot app 1.1.3 or later.
 
 **Keyboard shortcuts for queuing messages**: Use **Ctrl+Q** or **Ctrl+Enter** to queue a message (send it while the agent is still working). **Ctrl+D** no longer queues messages — it now has its default terminal behavior. If you have muscle memory for Ctrl+D queuing, switch to Ctrl+Q.
 
@@ -561,6 +580,12 @@ copilot --autopilot     # alias for --mode autopilot (allow-all)
 copilot --plan          # start in plan mode (propose without executing)
 ```
 
+You can also **combine `--plan` with `--mode autopilot`** to have Copilot generate a plan first and then immediately begin implementing it — without waiting for your approval between the planning and execution phases:
+
+```bash
+copilot --plan --mode autopilot "Refactor the payment module"
+```
+
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
 
 ### Shell Completion
@@ -586,6 +611,63 @@ echo 'source ~/.copilot-completion.bash' >> ~/.bashrc
 ```
 
 > **Tip**: Reload your shell (`source ~/.bashrc` or open a new terminal) after adding the completion script for changes to take effect.
+
+### Worktrees
+
+The `/worktree` command starts a new Copilot CLI session in a separate [git worktree](https://git-scm.com/docs/git-worktree), letting you work on a different branch in parallel without affecting your main working directory:
+
+```
+/worktree             # create a new worktree from the current HEAD
+/worktree new         # start a new session in a new worktree
+```
+
+Use `/worktree new` to spin up a fresh session in an isolated worktree — ideal for trying out a change, running experiments, or working on multiple branches simultaneously without stashing or switching.
+
+The **`worktreeBaseRef` setting** controls which commit new worktrees branch from:
+
+| Value | Behaviour |
+|-------|-----------|
+| `HEAD` (default) | New worktrees branch from your current commit |
+| Remote default branch | New worktrees branch from the remote default branch (e.g., `main`) |
+
+Set `worktreeBaseRef` in your config if you want `/worktree` and `--worktree` to consistently start from the shared baseline rather than your local HEAD.
+
+### Sandbox Configuration
+
+The sandbox restricts what commands the agent can run and which filesystem paths it can access, providing security boundaries during autonomous sessions.
+
+**Viewing the current sandbox policy**
+
+Run `/sandbox policy` to see the effective sandbox configuration — which paths are readable or writable, which network rules apply, and which settings are locked by enterprise policy:
+
+```
+/sandbox policy
+```
+
+Settings flagged as `(disabled)` are locked — either by enterprise policy or because a conflicting rule takes precedence.
+
+**Breaking change — `allowDevToolAccess` (v1.0.79)**
+
+The sandbox setting `allowDevToolCaches` has been **renamed to `allowDevToolAccess`**. The old key is silently ignored, so an existing `false` opt-out reverts to the default (`on`). If you have this setting in `settings.json` or an MDM policy, rename it:
+
+```json
+// Before (no longer read):
+{ "sandbox": { "allowDevToolCaches": false } }
+
+// After:
+{ "sandbox": { "allowDevToolAccess": false } }
+```
+
+**Breaking change — Auth settings keys (v1.0.79)**
+
+The sandbox auth settings keys have moved:
+
+| Old key | New key |
+|---------|---------|
+| `sandbox.gitAuth` | `sandbox.auth.git` |
+| `sandbox.ghAuth` | `sandbox.auth.gh` |
+
+The old keys are silently ignored. Update your `settings.json` if you previously configured sandbox auth. The `/sandbox` configuration dialog now groups these under a dedicated **Auth** tab for clarity.
 
 ## Common Questions
 
