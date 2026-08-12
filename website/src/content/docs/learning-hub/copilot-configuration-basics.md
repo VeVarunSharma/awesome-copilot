@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-08-12
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -392,6 +392,8 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `worktreeBaseRef` | Controls whether `/worktree`, `/worktree new`, and `--worktree` start from `HEAD` or the remote default branch (default: `HEAD`) |
+| `pinnedPrompts` | Pin the current prompt to the top of the timeline (off by default; set to `true` to enable) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -407,6 +409,19 @@ These files follow the same format as `config.json` and are loaded after the glo
 ### Model Picker
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
+
+Models in the picker are grouped into **Recent**, **Recommended**, **New**, and other sections. Use **Shift+Tab** to switch between grouping views.
+
+### Model Selection: Session vs. Default
+
+The `/model` command is **session-scoped by default** — it changes the model for the current session only and reverts when you start a new session. To set a persistent default model for all future sessions, use `/config model` instead:
+
+```
+/model gpt-4.1           # change model for this session only
+/config model gpt-4.1    # set as the default for all future sessions
+```
+
+This separation lets you experiment with different models in a session without permanently changing your default.
 
 ### CLI Session Commands
 
@@ -446,6 +461,25 @@ The `/session delete` command removes sessions you no longer need:
 You can also press **x** on a highlighted session in the session picker (`--resume`) to delete it directly from the list.
 
 In the session picker, press **`s`** to cycle the sort order: relevance, last used, created, or name. The picker also shows the branch name and idle/in-use status for each session.
+
+The **Sessions tab** in the sidebar lets you manage multiple concurrent sessions at a glance—switch between active sessions, see their status, and navigate back to any backgrounded session without leaving the terminal UI.
+
+### Working with Worktrees
+
+The `/worktree` commands let you work in Git worktrees — isolated working trees of the same repository where you can run parallel branches side by side:
+
+```
+/worktree          # open a picker of existing worktrees and switch to one
+/worktree new      # start a new session in a new worktree (branches off from HEAD)
+```
+
+You can also start a session directly in a worktree from the command line:
+
+```bash
+copilot --worktree
+```
+
+The `worktreeBaseRef` setting controls whether `/worktree new` and `--worktree` create the new branch starting from `HEAD` (the default) or from the remote default branch.
 
 The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history, reverting both the conversation and any file changes made after that point. You can also trigger it by pressing **double-Esc**:
 
@@ -561,7 +595,13 @@ copilot --autopilot     # alias for --mode autopilot (allow-all)
 copilot --plan          # start in plan mode (propose without executing)
 ```
 
-This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+You can also **combine `--plan` with `--mode autopilot`** to let Copilot produce a plan first and then immediately implement it without pausing for approval:
+
+```bash
+copilot --plan --mode autopilot "Refactor the auth module to use JWT"
+```
+
+This is useful in scripts or CI pipelines where you want the CLI to plan and then execute autonomously in one step.
 
 ### Shell Completion
 
