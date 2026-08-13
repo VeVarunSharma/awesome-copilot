@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-08-13
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -173,6 +173,8 @@ A well-organized Copilot configuration directory looks like this:
 ### Monorepo Support
 
 In monorepos with multiple packages or services, GitHub Copilot CLI discovers customizations at **every directory level** from your working directory up to the git repository root. This means each package or service can have its own `.github/` folder with specialized agents, instructions, skills, and MCP servers, while still inheriting configuration from parent directories.
+
+> **Performance tip (v1.0.79+)**: Large monorepos now use **tgrep** ([trigram-indexed grep](https://github.com/microsoft/tgrep)) instead of ripgrep for file searches. Trigram indexing dramatically speeds up regex searches across large codebases by building an index of all 3-character substrings, which means searches that previously took seconds complete nearly instantly.
 
 ```
 my-monorepo/
@@ -408,6 +410,8 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
+> **v1.0.79+**: The model picker now groups models into **Recent**, **Recommended**, **New**, and other sections, making it easier to find familiar or newly added models. Press **Shift+Tab** to cycle between grouping views.
+
 ### CLI Session Commands
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
@@ -534,14 +538,70 @@ The `/keep-alive` command prevents the system from sleeping while Copilot CLI is
 The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, where the agent runs all tools without asking for confirmation. It now supports `on`, `off`, and `show` subcommands:
 
 ```
-/allow-all on     # enable allow-all mode
-/allow-all off    # disable allow-all mode
-/allow-all show   # check current allow-all status
+/allow-all on      # enable allow-all mode
+/allow-all auto    # enable autopilot only for auto-approved tools (enterprise policy)
+/allow-all off     # disable allow-all mode
+/allow-all show    # check current allow-all status
 ```
 
 > **Note**: `/allow-all on` permissions persist after `/clear` starts a new session, so you don't need to re-enable it each time.
 
+> **Enterprise policy (v1.0.79+)**: If your organization enforces an "allow-auto-only" policy, `/allow-all auto` will work while full `/allow-all on` remains blocked. This lets enterprises grant safe autopilot access for pre-approved tools without opening unrestricted tool execution.
+
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
+
+The `/model` command is now **session-scoped by default** — it changes the model only for the current session and resets when you start a new one. To set the default model for all future sessions, use `/config model`:
+
+```
+/model                    # pick a model for this session only
+/config model             # set the default model for all future sessions
+```
+
+> **v1.0.79+**: This split between session-scoped `/model` and persistent `/config model` replaces the previous behavior where `/model` always changed the persistent default. If you want a model choice to stick across sessions, use `/config model`.
+
+The `/model` command is also now **`pinnedPrompts`**-aware: prompt pinning is **off by default**. To show the current prompt pinned at the top of the timeline, set `pinnedPrompts` to `true` in your settings:
+
+```json
+{
+  "pinnedPrompts": true
+}
+```
+
+The `/worktree` command creates a new git worktree and opens Copilot in it, letting you work on a branch in parallel without disturbing your current session. In v1.0.79+, you can also create a brand-new worktree from scratch:
+
+```
+/worktree              # create a worktree from the current branch
+/worktree new          # create a new worktree and start a fresh session in it
+```
+
+The `worktreeBaseRef` setting controls whether `/worktree`, `/worktree new`, and `--worktree` branch from `HEAD` (the default) or from the remote's default branch:
+
+```json
+{
+  "worktreeBaseRef": "HEAD"          // default — branch from current HEAD
+}
+```
+
+The `/sandbox` command manages the sandbox that Copilot CLI uses to isolate shell commands. Use `/sandbox policy` to inspect the effective sandbox configuration:
+
+```
+/sandbox               # open the sandbox configuration dialog
+/sandbox policy        # show effective sandbox paths, denials, and network rules
+```
+
+> **v1.0.79+**: The `/sandbox` configuration dialog now shows where sandbox settings are stored in `settings.json`, and groups the git, `gh`, and (on macOS) keychain settings under a new **Auth** tab. The auth settings keys moved from `sandbox.gitAuth`/`sandbox.ghAuth` to `sandbox.auth.git`/`sandbox.auth.gh`. **Update your settings files if you use these keys** — the old keys are ignored.
+
+> **Breaking change (v1.0.79+)**: The `allowDevToolCaches` sandbox setting has been renamed to `allowDevToolAccess`. The old key is silently ignored, so an existing `false` opt-out will revert to the default (enabled). Rename it in your `settings.json` and any MDM/managed-policy configuration.
+
+The `/app` command opens the current CLI session in the **GitHub Copilot desktop app** for a richer visual interface, without losing your session state:
+
+```
+/app
+```
+
+> **Requires**: GitHub Copilot app 1.1.3 or later.
+
+The **Sessions tab and sidebar** (v1.0.79+) let you manage multiple concurrent sessions from a single CLI window. You can switch between active sessions, monitor their status, and start new ones without opening additional terminal windows.
 
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
@@ -562,6 +622,11 @@ copilot --plan          # start in plan mode (propose without executing)
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+> **v1.0.79+**: You can now **combine `--plan` with `--mode autopilot`** to have Copilot first produce a plan and then immediately implement it without waiting for your approval. This is ideal for fully automated pipelines:
+> ```bash
+> copilot --plan --mode autopilot "Refactor the database layer to use connection pooling"
+> ```
 
 ### Shell Completion
 
