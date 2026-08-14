@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-27
+lastUpdated: 2026-08-14
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -33,8 +33,11 @@ A plugin bundles one or more of the following components:
 | **Hooks** | Event handlers that intercept agent behavior | `hooks.json` or `hooks/` |
 | **MCP Servers** | Model Context Protocol integrations for external tools | `.mcp.json` or `.github/mcp.json` |
 | **LSP Servers** | Language Server Protocol integrations | `lsp.json` or `.github/lsp.json` |
+| **Extensions** | Host-specific UI or behavior extensions | `com.github.copilot/extensions/` |
 
 A plugin might include all of these or just one — for example, a plugin could provide a single specialized agent, or an entire development toolkit with multiple agents, skills, hooks, and MCP server configurations working together.
+
+> **Note (v1.0.79+)**: Agent plugins following the Agent Plugin Spec can ship host-specific extensions by placing them in a `com.github.copilot/extensions/` directory inside the plugin. This allows plugins to provide Copilot-specific UI integrations or behavior overrides alongside their agents and skills.
 
 ### Example: What a Plugin Looks Like
 
@@ -151,13 +154,14 @@ To automatically register an additional marketplace for everyone working in a re
   "extraKnownMarketplaces": [
     {
       "name": "my-org-plugins",
-      "source": "my-org/internal-plugins"
+      "source": "my-org/internal-plugins",
+      "autoUpdate": true
     }
   ]
 }
 ```
 
-With this in place, team members automatically get the `my-org-plugins` marketplace available without running a separate `marketplace add` command. This replaces the older `marketplaces` setting, which was removed in v1.0.16.
+With this in place, team members automatically get the `my-org-plugins` marketplace available without running a separate `marketplace add` command. Setting `"autoUpdate": true` on a marketplace entry keeps its plugins automatically updated to the latest version at session start. This replaces the older `marketplaces` setting, which was removed in v1.0.16.
 
 ## Installing Plugins
 

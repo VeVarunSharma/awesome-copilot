@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-08-14
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -392,6 +392,8 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `worktreeBaseRef` | Controls whether `/worktree` starts from `HEAD` or the remote default branch |
+| `pinnedPrompts` | Show the pinned prompt row in the UI (`true`/`false`; off by default) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -407,6 +409,17 @@ These files follow the same format as `config.json` and are loaded after the glo
 ### Model Picker
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
+
+Models are now grouped into **Recent**, **Recommended**, **New**, and other sections so you can quickly find the most relevant options. Press **Shift+Tab** to switch between grouping views.
+
+> **Important (v1.0.79+)**: `/model` is now **session-scoped by default**. Changing the model with `/model` applies only to the current session and does not persist to future sessions. To set a persistent default model for all future sessions, use `/config model` instead:
+>
+> ```
+> /model gpt-4.1          # changes model for this session only
+> /config model gpt-4.1   # sets the default for all future sessions
+> ```
+>
+> Use `/model plan` (or `/model --plan`) to set a separate model used while in plan mode.
 
 ### CLI Session Commands
 
@@ -462,6 +475,33 @@ The `/undo` command reverts the last turn—including any file changes the agent
 ```
 
 Use `/undo` when the agent's last response went in an unwanted direction and you want to try a different approach from that point.
+
+The `/worktree` command starts a new parallel coding session in a Git worktree, letting you work on multiple branches simultaneously without context-switching:
+
+```
+/worktree <task>         # start a new session in a new worktree for a task
+/worktree new            # open a new worktree without a kickoff task
+```
+
+The `worktreeBaseRef` setting controls whether `/worktree`, `/worktree new`, and `--worktree` start from `HEAD` or the remote default branch. All three default to `HEAD`:
+
+```json
+{
+  "worktreeBaseRef": "origin/main"
+}
+```
+
+This is useful when you want parallel feature branches to always start from the latest main branch rather than whatever HEAD is in your working session.
+
+The `/app` command opens the current session in the **GitHub Copilot desktop app** without losing your terminal context:
+
+```
+/app
+```
+
+This is useful when you want to continue an active terminal session in the desktop app's richer UI (requires GitHub Copilot app 1.1.3 or later).
+
+**Sessions sidebar**: The **Sessions tab** in the terminal UI lets you manage multiple concurrent sessions without leaving Copilot — switch between them, spawn new ones, and see their live status at a glance. Enable it with experimental mode (`/experimental on`).
 
 The `/cd` command changes the working directory for the current session. Each session maintains its own working directory that persists when you switch between sessions:
 
