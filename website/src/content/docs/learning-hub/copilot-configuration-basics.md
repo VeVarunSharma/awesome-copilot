@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-08-15
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -173,6 +173,8 @@ A well-organized Copilot configuration directory looks like this:
 ### Monorepo Support
 
 In monorepos with multiple packages or services, GitHub Copilot CLI discovers customizations at **every directory level** from your working directory up to the git repository root. This means each package or service can have its own `.github/` folder with specialized agents, instructions, skills, and MCP servers, while still inheriting configuration from parent directories.
+
+> **Large monorepo performance (v1.0.79+)**: In large monorepos, Copilot CLI now uses [tgrep](https://github.com/microsoft/tgrep) (trigram-indexed grep) for code search instead of ripgrep. tgrep builds an index that makes regex searches significantly faster across large codebases with thousands of files.
 
 ```
 my-monorepo/
@@ -408,6 +410,15 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
+**Model grouping (v1.0.79+)**: The model picker now organizes models into sections — **Recent**, **Recommended**, **New**, and others — making it easier to find the right model. Press **Shift+Tab** to switch between different grouping views (e.g., by recency, by capability).
+
+**Session-scoped model selection (v1.0.79+)**: `/model` changes the model for the **current session only**. To set a default model for all future sessions, use `/config model` instead:
+
+```
+/model claude-sonnet-4.6       # change model for this session only
+/config model claude-sonnet-4.6  # set as the default for all future sessions
+```
+
 ### CLI Session Commands
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
@@ -470,6 +481,31 @@ The `/cd` command changes the working directory for the current session. Each se
 ```
 
 This is useful when you have multiple backgrounded sessions each focused on a different project directory.
+
+### Sessions Tab (v1.0.79+)
+
+The **Sessions tab** provides a central view for managing multiple concurrent Copilot sessions from a single terminal. Open it with **Ctrl+X → S** (or however your setup binds it). The tab shows all running, waiting, and idle sessions, with busy sessions sorted to the top. Press **Enter** on a session to switch to it, **N** to create a new one, or **X** to close it.
+
+You can also manage sessions from the **sidebar**, which stays visible as you work and shows session status at a glance — whether each session is running, waiting on input, or idle.
+
+### Working Trees
+
+The `/worktree` command lets you start a new Copilot session in a Git worktree, so you can work on multiple branches in parallel without stashing or switching:
+
+```
+/worktree              # list existing worktrees and switch to one
+/worktree new          # create a new worktree and start a session in it
+```
+
+**`worktreeBaseRef` setting (v1.0.79+)**: Controls whether `/worktree`, `/worktree new`, and `--worktree` create worktrees starting from `HEAD` (the default) or the remote default branch:
+
+```json
+{
+  "worktreeBaseRef": "HEAD"         // default — start from current HEAD
+}
+```
+
+Set to `"origin/main"` (or your remote default branch) to always base new worktrees on the latest upstream state.
 
 The `/share html` command exports the current session — including conversation history and any research reports — as a **self-contained interactive HTML file**:
 
@@ -543,6 +579,22 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
 
+The `/autopilot` command lets you set a specific objective for the agent to work toward autonomously. This is available without needing to enable experimental mode:
+
+```
+/autopilot implement the login rate-limiter described in issue #42
+```
+
+The agent will pursue the objective, using tools as needed, until the goal is met or it needs clarification.
+
+The `/app` command opens the current session in the **GitHub Copilot desktop app** (requires app version 1.1.3 or later):
+
+```
+/app
+```
+
+This is useful when you want to continue a CLI session with the richer UI of the desktop app, or share a session URL from there.
+
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
 ```bash
@@ -562,6 +614,14 @@ copilot --plan          # start in plan mode (propose without executing)
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+**Combining `--plan` with `--mode autopilot` (v1.0.79+)**: Use both flags together to have the agent first produce a plan, then automatically implement it without waiting for your approval:
+
+```bash
+copilot --plan --mode autopilot "Refactor the payment module"
+```
+
+This is useful for well-defined tasks where you trust the agent to proceed after producing a plan — it plans first, then implements in one uninterrupted flow.
 
 ### Shell Completion
 
