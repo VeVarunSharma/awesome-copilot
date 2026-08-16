@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-08-16
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -408,6 +408,26 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
+Models are grouped into **Recent**, **Recommended**, **New**, and other sections. Press **Shift+Tab** to switch between grouping views.
+
+**Session-scoped model selection (v1.0.79+)**: `/model` now sets the model for the current session only. To set a persistent default that applies to all future sessions, use `/config model`:
+
+```
+/model                  # open picker — changes this session only
+/config model           # open picker — changes the default for future sessions
+/config model off       # clear the default (revert to auto)
+```
+
+You can also set a **plan-mode model** separately from the session model:
+
+```
+/model plan             # pick a model to use while in plan mode
+/model --plan gpt-5.4   # set the plan model directly
+/model plan off         # clear the plan model override
+```
+
+The plan model reverts to the session model when you leave plan mode.
+
 ### CLI Session Commands
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
@@ -446,6 +466,8 @@ The `/session delete` command removes sessions you no longer need:
 You can also press **x** on a highlighted session in the session picker (`--resume`) to delete it directly from the list.
 
 In the session picker, press **`s`** to cycle the sort order: relevance, last used, created, or name. The picker also shows the branch name and idle/in-use status for each session.
+
+**Sessions tab and sidebar (v1.0.79+)**: The Sessions sidebar lets you manage multiple concurrent sessions — switch between them, spawn new ones, and see their status at a glance — without leaving the current session. Open it from the **Sessions** tab in the CLI interface. You can also queue prompts, shell commands, and supported slash commands so they run in order once the current task finishes (use **Ctrl+Q** or **Ctrl+Enter**).
 
 The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history, reverting both the conversation and any file changes made after that point. You can also trigger it by pressing **double-Esc**:
 
@@ -561,7 +583,62 @@ copilot --autopilot     # alias for --mode autopilot (allow-all)
 copilot --plan          # start in plan mode (propose without executing)
 ```
 
+**Combining `--plan` with `--mode autopilot` (v1.0.79+)**: You can now combine both flags to first produce a plan and then automatically execute it without pausing for approval:
+
+```bash
+copilot --plan --mode autopilot "Refactor the authentication module"
+```
+
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+### Worktrees
+
+The `/worktree` command lets you start a Copilot session inside a Git worktree — an isolated working copy of your repository where the agent can make changes without touching your main checkout.
+
+```
+/worktree <task>        # create a new worktree and start working on a task
+/worktree new           # create a new worktree and start a fresh session in it (v1.0.79+)
+/move                   # move the current session into a new worktree
+```
+
+The `worktreeBaseRef` setting (v1.0.79+) controls the starting point for new worktrees. All three commands (`/worktree`, `/worktree new`, and `--worktree`) now default to **HEAD**:
+
+```json
+{
+  "worktreeBaseRef": "HEAD"            // default — branch off the current commit
+  // "worktreeBaseRef": "origin/main"  // alternative — branch off the remote default
+}
+```
+
+This is useful when you want the agent to work on a parallel track without branching from an outdated remote state.
+
+### Sandbox
+
+The OS sandbox restricts which files and network resources Copilot can access, providing an extra layer of safety when running agent sessions. Configure sandbox behaviour in your settings:
+
+```json
+{
+  "sandbox": {
+    "enabled": true,
+    "auth": {
+      "git": true,    // allow git credential access inside the sandbox
+      "gh": true      // allow gh CLI credential access inside the sandbox
+    },
+    "allowDevToolAccess": true   // grant build caches, registries, and tool installs
+  }
+}
+```
+
+> **Breaking change (v1.0.79)**: The `allowDevToolCaches` setting has been renamed to `allowDevToolAccess`. The old key is silently ignored — if you previously set `"allowDevToolCaches": false` to opt out, rename it to `"allowDevToolAccess": false` in your `settings.json` and any managed/MDM policy files.
+
+The `/sandbox` command lets you inspect and toggle sandbox settings interactively:
+
+```
+/sandbox              # open the sandbox configuration dialog
+/sandbox policy       # show effective sandbox paths, denials, and network access (v1.0.79+)
+```
+
+The policy view is useful for verifying what the sandbox actually allows in your current environment, including any restrictions applied by enterprise MDM settings.
 
 ### Shell Completion
 
