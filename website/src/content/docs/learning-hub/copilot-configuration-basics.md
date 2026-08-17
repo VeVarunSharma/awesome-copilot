@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-08-17
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -392,6 +392,9 @@ CLI settings use **camelCase** naming. Key settings added in recent releases:
 | `include_gitignored` | Include gitignored files in `@` file search |
 | `extension_mode` | Control extensibility (agent tools and plugins) |
 | `continueOnAutoMode` | Automatically switch to the auto model on rate limit instead of pausing |
+| `worktreeBaseRef` | Controls whether `/worktree`, `/worktree new`, and `--worktree` start from `HEAD` or the remote default branch (defaults to `HEAD`) |
+| `pinnedPrompts` | Pin the current prompt in the terminal UI (off by default) |
+| `stayInAutopilot` | Keep autopilot mode selected after `task_complete` (defaults to `true`) |
 
 > **Note**: Older snake_case names (e.g., `include_gitignored`, `auto_updates_channel`) are still accepted for backward compatibility, but camelCase is now the preferred format.
 
@@ -408,6 +411,19 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
+The model picker groups models into **Recent**, **Recommended**, **New**, and other sections. Press **Shift+Tab** to cycle between grouping views, making it easy to find newly-added models or return to one you used recently.
+
+**Session-scoped vs. default model**: `/model` changes the model for the **current session only**. To set a default model for all future sessions, use `/config model` instead:
+
+```
+/model                    # pick a model for this session only
+/config model             # pick a default model for all future sessions
+/model plan               # pick a model used while in plan mode
+/model off                # clear the session-scoped model override
+```
+
+This separation makes it easy to experiment with a different model in one session without accidentally changing your preferred default.
+
 ### CLI Session Commands
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
@@ -418,6 +434,12 @@ GitHub Copilot CLI has two commands for managing session state, with distinct be
 | `/clear [prompt]` | Abandons the current session entirely and starts a new one. Backgrounded sessions are not affected. MCP servers configured in your project are preserved in the new session. |
 
 Both commands accept an optional prompt argument to seed the new session with an opening message, for example `/new Add error handling to the login flow`.
+
+### Managing Multiple Sessions
+
+GitHub Copilot CLI supports running and switching between **multiple concurrent sessions** from a Sessions tab and sidebar. You can spawn new sessions, switch between them, and see each session's status at a glance — without losing context in any of them.
+
+To open the Sessions sidebar, run `/experimental on` if you haven't already, then look for the Sessions tab in the split-view sidebar. Switching sessions no longer restarts MCP servers or rebuilds hook state, so a turn running in another session is never interrupted when you switch away.
 
 The `/session rename` command renames the current session. When called **without a name argument**, it automatically generates a session name based on the conversation history:
 
@@ -560,6 +582,14 @@ copilot --mode agent    # start in agent mode (autonomous tool use)
 copilot --autopilot     # alias for --mode autopilot (allow-all)
 copilot --plan          # start in plan mode (propose without executing)
 ```
+
+You can combine `--plan` with `--mode autopilot` to have the agent plan first and then implement without waiting for approval:
+
+```bash
+copilot --plan --mode autopilot "Refactor the payment service"
+```
+
+In this combination, the agent first produces a plan, then automatically proceeds to implement it — useful in scripts and CI pipelines where you want a fully automated plan-then-implement flow.
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
 

@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-27
+lastUpdated: 2026-08-17
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -72,6 +72,10 @@ The `plugin.json` manifest declares what the plugin contains:
   ]
 }
 ```
+
+### Plugin Extensions
+
+Plugins can also ship **Copilot extensions** by placing them under a `com.github.copilot/extensions/` directory inside the plugin. Extensions shipped this way are registered and activated when the plugin is installed, giving plugin authors a way to bundle both agent customizations and extension capabilities in a single installable package.
 
 ## Why Use Plugins?
 
@@ -158,6 +162,24 @@ To automatically register an additional marketplace for everyone working in a re
 ```
 
 With this in place, team members automatically get the `my-org-plugins` marketplace available without running a separate `marketplace add` command. This replaces the older `marketplaces` setting, which was removed in v1.0.16.
+
+#### Auto-updating Marketplace Plugins
+
+Add `"autoUpdate": true` to an `extraKnownMarketplaces` entry to automatically update that marketplace's plugins at session start:
+
+```json
+{
+  "extraKnownMarketplaces": [
+    {
+      "name": "my-org-plugins",
+      "source": "my-org/internal-plugins",
+      "autoUpdate": true
+    }
+  ]
+}
+```
+
+With `autoUpdate` enabled, every time a new Copilot CLI session starts, installed plugins from that marketplace are refreshed to their latest version automatically — no manual `copilot plugin update` required. This is especially useful for internal or rapidly-evolving plugin collections where you always want the latest version.
 
 ## Installing Plugins
 
