@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-08-18
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -408,6 +408,19 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
+Models are organized into **Recent**, **Recommended**, **New**, and other sections. Press **Shift+Tab** to switch between grouping views.
+
+The `/model` command is now **session-scoped by default** — it changes the model for the current session only. To set a default model for all future sessions, use `/config model` instead:
+
+```
+/model                  # open the model picker (session-scoped)
+/config model           # set a persistent default model for future sessions
+/model plan             # pick a model to use specifically during plan mode
+/model plan off         # clear the plan-mode model (reverts to session model)
+```
+
+> **Note (v1.0.79+)**: If you previously relied on `/model` persisting across sessions, switch to `/config model` to set your global default.
+
 ### CLI Session Commands
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
@@ -447,7 +460,7 @@ You can also press **x** on a highlighted session in the session picker (`--resu
 
 In the session picker, press **`s`** to cycle the sort order: relevance, last used, created, or name. The picker also shows the branch name and idle/in-use status for each session.
 
-The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history, reverting both the conversation and any file changes made after that point. You can also trigger it by pressing **double-Esc**:
+The `/rewind` command opens a timeline picker that lets you roll back the conversation to any earlier point in history. When rewinding, you can choose to restore **only the conversation** (leaving files unchanged) or restore **both the conversation and files** that Copilot changed after that point. Rewind no longer requires a git repository — it works based on Copilot's own record of file changes, skipping any file whose contents no longer match what Copilot last wrote. You can also trigger it by pressing **double-Esc**:
 
 ```
 /rewind
@@ -531,6 +544,14 @@ The `/keep-alive` command prevents the system from sleeping while Copilot CLI is
 
 > **Note**: `/keep-alive` was previously an experimental feature. As of v1.0.36, it is available without enabling experimental mode.
 
+The `/permissions` command lets you switch between approval modes interactively, without the all-or-nothing behavior of `/allow-all`. Use it to fine-tune which tool categories require confirmation:
+
+```
+/permissions
+```
+
+This is useful when you want more control than autopilot (`/allow-all`) but less friction than approving every individual tool call.
+
 The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, where the agent runs all tools without asking for confirmation. It now supports `on`, `off`, and `show` subcommands:
 
 ```
@@ -559,9 +580,10 @@ The `--mode` flag (along with its aliases `--autopilot` and `--plan`) lets you l
 copilot --mode agent    # start in agent mode (autonomous tool use)
 copilot --autopilot     # alias for --mode autopilot (allow-all)
 copilot --plan          # start in plan mode (propose without executing)
+copilot --plan --mode autopilot  # plan first, then implement without waiting for approval
 ```
 
-This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+Combining `--plan` with `--mode autopilot` lets Copilot draft a plan first, then execute it automatically once the plan phase completes — useful in scripted workflows where you want structured planning before autonomous implementation.
 
 ### Shell Completion
 

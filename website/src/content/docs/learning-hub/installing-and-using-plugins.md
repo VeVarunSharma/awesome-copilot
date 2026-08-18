@@ -3,7 +3,7 @@ title: 'Installing and Using Plugins'
 description: 'Learn how to find, install, and manage plugins that extend GitHub Copilot CLI with reusable agents, skills, hooks, and integrations.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-27
+lastUpdated: 2026-08-18
 estimatedReadingTime: '8 minutes'
 tags:
   - plugins
@@ -72,6 +72,8 @@ The `plugin.json` manifest declares what the plugin contains:
   ]
 }
 ```
+
+> **Open Plugin Spec v1**: Plugins can also use the [Open Plugin Spec v1](https://agentskills.io/specification) manifest format, which is supported alongside the standard `plugin.json` format. Open Plugin Spec plugins can additionally include an `mcp.json` configuration file for bundling MCP server definitions.
 
 ## Why Use Plugins?
 
@@ -151,13 +153,14 @@ To automatically register an additional marketplace for everyone working in a re
   "extraKnownMarketplaces": [
     {
       "name": "my-org-plugins",
-      "source": "my-org/internal-plugins"
+      "source": "my-org/internal-plugins",
+      "autoUpdate": true
     }
   ]
 }
 ```
 
-With this in place, team members automatically get the `my-org-plugins` marketplace available without running a separate `marketplace add` command. This replaces the older `marketplaces` setting, which was removed in v1.0.16.
+With this in place, team members automatically get the `my-org-plugins` marketplace available without running a separate `marketplace add` command. Setting `autoUpdate: true` keeps plugins from this marketplace updated to the latest version at session start. This replaces the older `marketplaces` setting, which was removed in v1.0.16.
 
 ## Installing Plugins
 
@@ -181,7 +184,41 @@ Or from an interactive session:
 
 Browse to the plugin via `@agentPlugins` in the Extensions search view or via **Chat: Plugins** in the Command Palette, then click **Install**.
 
-## Managing Plugins
+### Auto-updating Plugins
+
+**First-party plugins** (from official GitHub Copilot marketplaces) automatically update to the latest version at session start — no manual `copilot plugin update` required.
+
+For custom marketplaces registered via `extraKnownMarketplaces`, you can opt into the same behavior by setting `autoUpdate: true`:
+
+```json
+{
+  "extraKnownMarketplaces": [
+    {
+      "name": "my-org-plugins",
+      "source": "my-org/internal-plugins",
+      "autoUpdate": true
+    }
+  ]
+}
+```
+
+With `autoUpdate: true`, any plugins installed from that marketplace are refreshed to their latest version whenever a new session starts.
+
+### Enabling and Disabling Plugins
+
+The `/plugins` command lets you enable or disable individual plugins, agents, skills, instructions, hooks, and LSP servers without uninstalling them:
+
+```
+/plugins                          # open the plugin manager UI
+/plugins enable my-plugin         # re-enable a disabled plugin
+/plugins disable my-plugin        # disable a plugin without removing it
+/plugins update my-plugin         # update to latest version
+/plugins uninstall my-plugin      # remove the plugin entirely
+```
+
+Disabling a plugin deactivates its agents, skills, and hooks for the current session without deleting any files. This is useful when you want to temporarily suppress a plugin's behavior without losing your configuration.
+
+### Managing Plugins
 
 Once installed, plugins are managed with a few simple commands:
 
@@ -255,10 +292,12 @@ See [Using the Copilot Coding Agent](../using-copilot-coding-agent/) for details
 
 - **Start with a marketplace plugin** before building your own — there may already be one that fits your needs
 - **Keep plugins focused** — a plugin for "Rails development" is better than a plugin for "everything"
-- **Check for updates regularly** — run `copilot plugin update` to get the latest improvements
+- **Let first-party plugins auto-update** — official GitHub Copilot plugins update automatically at session start, so you always get the latest improvements without manual intervention
+- **Enable `autoUpdate` for team marketplaces** — set `autoUpdate: true` in `extraKnownMarketplaces` for internal plugin sources to keep the team on the latest versions
 - **Review what you install** — plugins run code on your machine, so inspect unfamiliar plugins before installing
 - **Use plugins for team standards** — publish an internal plugin to ensure every team member has the same agents, skills, and hooks
 - **Remove unused plugins** — declutter with `copilot plugin uninstall` to keep your environment clean
+- **Use `/plugins` to temporarily disable** — instead of uninstalling, use `/plugins disable` to deactivate a plugin without losing its configuration
 
 ## Common Questions
 
