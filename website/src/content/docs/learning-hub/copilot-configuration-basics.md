@@ -3,7 +3,7 @@ title: 'Copilot Configuration Basics'
 description: 'Learn how to configure GitHub Copilot at user, workspace, and repository levels to optimize your AI-assisted development experience.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-30
+lastUpdated: 2026-08-19
 estimatedReadingTime: '10 minutes'
 tags:
   - configuration
@@ -408,6 +408,8 @@ These files follow the same format as `config.json` and are loaded after the glo
 
 The model picker opens in a **full-screen view** with inline reasoning effort adjustment. Use the **← / →** arrow keys to change the reasoning effort level (`low`, `medium`, `high`) directly from the picker without leaving the session. The current reasoning effort level is also displayed in the model header (e.g., `claude-sonnet-4.6 (high)`) so you always know which level is active.
 
+> **New models (v1.0.81)**: **Gemini 3.7 Flash** is now available in the model picker alongside existing Claude and GPT options. Open the picker with `/model` and scroll to find it.
+
 ### CLI Session Commands
 
 GitHub Copilot CLI has two commands for managing session state, with distinct behaviours:
@@ -543,6 +545,25 @@ The `/allow-all` command (also accessible as `/yolo`) enables autopilot mode, wh
 
 > **ACP clients (v1.0.39+)**: ACP clients can also toggle allow-all mode programmatically via session configuration, without issuing a slash command. This is useful for automated pipelines that drive Copilot CLI through the ACP protocol.
 
+> **Enterprise allow-auto-only policy (v1.0.79+)**: Organizations can enforce an `allow-auto-only` policy that permits `/allow-all auto` (tool-level auto-approve) while keeping full `/allow-all on` blocked. If you find that `/allow-all on` is unavailable in your organization, this policy is likely active — contact your admin to confirm which level of automation is permitted.
+
+The `/sandbox` command opens a full-screen configuration dialog for managing tool-level permissions (the sandbox). It shows which tools are currently allowed or blocked and lets you adjust them interactively:
+
+```
+/sandbox
+```
+
+As of v1.0.79, the sandbox dialog also shows the exact path to the `settings.json` file where your sandbox settings are persisted, so you know exactly which file to edit if you prefer direct configuration. Press **Ctrl+E** inside the dialog to open that `settings.json` directly in your default editor.
+
+The `/schedule` command and **Schedule Manager** let you queue prompts to run at a specific time or on a recurring interval using the `/after` and `/every` commands:
+
+```
+/after 30m "Run the full test suite and summarize results"
+/every 1h "Check for new issues and triage them"
+```
+
+The Schedule Manager (opened via `/schedule`) shows all queued and recurring prompts. Press **x** on any row to remove a scheduled or recurring prompt without cancelling the whole session.
+
 The `--effort` flag (shorthand for `--reasoning-effort`) controls how much computational reasoning the model applies to a request:
 
 ```bash
@@ -562,6 +583,14 @@ copilot --plan          # start in plan mode (propose without executing)
 ```
 
 This is useful in scripts or CI pipelines where you want the CLI to immediately begin working in a specific mode without an interactive prompt.
+
+The `--usage-output-file` flag writes a structured JSON file with per-agent token usage and API call metrics for the session:
+
+```bash
+copilot --usage-output-file ./usage.json "Refactor the auth module"
+```
+
+The JSON output breaks down usage by agent (e.g., the main assistant, subagents spawned during the session), making it useful for cost tracking, capacity planning, or auditing automated pipelines.
 
 ### Shell Completion
 

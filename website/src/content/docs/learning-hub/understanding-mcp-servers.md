@@ -3,7 +3,7 @@ title: 'Understanding MCP Servers'
 description: 'Learn how Model Context Protocol servers extend GitHub Copilot with access to external tools, databases, and APIs.'
 authors:
   - GitHub Copilot Learning Hub Team
-lastUpdated: 2026-04-16
+lastUpdated: 2026-08-19
 estimatedReadingTime: '8 minutes'
 tags:
   - mcp
@@ -277,6 +277,12 @@ GitHub organizations can enforce a policy that restricts which third-party MCP s
 - A **warning is shown** if a configured MCP server is blocked by the policy, so you know which servers are restricted before expecting them to work.
 
 If you see a warning that an MCP server is blocked, contact your organization administrator to find out which servers are on the allowlist, or switch to an approved alternative.
+
+### Enterprise-Managed MCP Servers
+
+Organizations can also **provide** MCP servers to members rather than just restricting them. Enterprise-managed MCP servers are centrally configured by administrators and automatically appear in the MCP manager UI (`/mcp show`) for all users in the organization — no manual configuration required.
+
+This means your team can use standardized servers (for internal databases, ticketing systems, or proprietary APIs) without each developer having to add them manually. If you see MCP servers in `/mcp show` that you did not add yourself, they are likely enterprise-managed.
 
 ## Common Questions
 
